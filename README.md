@@ -1,0 +1,2 @@
+# MealWhiz
+Project for school
