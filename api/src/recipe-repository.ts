@@ -60,3 +60,6 @@ const exampleRecipes: Recipe[] = [
     return exampleRecipes;
   }
   
+  export function getRecipeById(id: number): Recipe | undefined {
+    return exampleRecipes.find(e => e.id === id)
+  }
