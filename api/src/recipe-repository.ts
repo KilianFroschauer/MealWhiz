@@ -12,6 +12,13 @@ export interface Recipe {
   tags: string[];
 }
 
+export interface SimpleRecipe {
+  id: number;
+  name: string;
+  time: number;
+  difficulty: "easy" | "medium" | "hard";
+}
+
 const exampleRecipes: Recipe[] = [
   {
     id: 1,
@@ -80,6 +87,20 @@ const exampleRecipes: Recipe[] = [
   },
 ];
 
+export function convertToSimpleRecipe(recipes: Recipe[]): SimpleRecipe[] {
+  const array: SimpleRecipe[] = [];
+
+  recipes.forEach((r) =>
+    array.push({
+      id: r.id,
+      difficulty: r.difficulty,
+      name: r.name,
+      time: r.time
+    })
+  );
+
+  return array;
+}
 
   export function getAllRecipes(): Recipe[] {
     return exampleRecipes;

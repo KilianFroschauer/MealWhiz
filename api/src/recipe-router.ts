@@ -1,6 +1,7 @@
 import express from "express";
 import { StatusCodes } from "http-status-codes";
-import { getAllRecipes, getRecipeById, Recipe } from "./recipe-repository";
+import { convertToSimpleRecipe, getAllRecipes, getRecipeById, Recipe } from "./recipe-repository";
+import { error } from "console";
 
 export const recipeRouter = express.Router();
 
@@ -36,14 +37,13 @@ const parseArrayParam = (param: string | string[] | undefined) =>
  *                     description: The unique identifier for the recipe.
  *                   name:
  *                     type: string
- *                   ingredients:
- *                     type: array
- *                     items:
- *                       type: string
- *                   tags:
- *                     type: array
- *                     items:
- *                       type: string
+ *                   time:
+ *                     type: integer
+ *                     description: Preparation time in minutes.
+ *                   difficulty:
+ *                     type: string
+ *                     enum: [easy, medium, hard]
+ *                     description: Difficulty level of the recipe.
  *       400:
  *         description: Query parameter is missing or invalid.
  *         content:
@@ -59,7 +59,7 @@ recipeRouter.get("/search", (request, response) => {
     const query = request.query.query as string | undefined;
 
     if (!query || typeof query !== "string") {
-        response.status(404).json({ error: "Query parameter is required" });
+        response.status(400).json({ error: "Query parameter is required" });
     }
     else {
         const lowerQuery = query.toLowerCase();
@@ -70,7 +70,7 @@ recipeRouter.get("/search", (request, response) => {
             recipe.tags.some(tag => tag.toLowerCase().includes(lowerQuery)) // Match in tags
         );
 
-        response.status(200).json(searchResults);
+        response.status(200).json(convertToSimpleRecipe(searchResults));
     }
 })
 
@@ -161,32 +161,22 @@ recipeRouter.get("/search", (request, response) => {
  *                 properties:
  *                   id:
  *                     type: integer
+ *                     description: The unique identifier for the recipe.
  *                   name:
  *                     type: string
- *                   ingredients:
- *                     type: array
- *                     items:
- *                       type: string
- *                   tags:
- *                     type: array
- *                     items:
- *                       type: string
- *       400:
- *         description: Invalid request
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "Invalid request"
+ *                   time:
+ *                     type: integer
+ *                     description: Preparation time in minutes.
+ *                   difficulty:
+ *                     type: string
+ *                     enum: [easy, medium, hard]
+ *                     description: Difficulty level of the recipe.
  */
 recipeRouter.get("/", (req, res) => {
     let filteredRecipes = getAllRecipes();
 
     // Get parameter
-    const { name, minRating, maxCal, minCal, diff, maxTime } = req.query;
+    const { minRating, maxCal, minCal, diff, maxTime } = req.query;
     const dietaryPreferences = parseArrayParam(req.query.dp as string | string[] | undefined);
     const allergens = parseArrayParam(req.query.a as string | string[] | undefined);
     const mealTimes = parseArrayParam(req.query.mt as string | string[] | undefined);
@@ -261,7 +251,7 @@ recipeRouter.get("/", (req, res) => {
         );
     }
 
-    res.status(StatusCodes.OK).send(filteredRecipes);
+    res.status(StatusCodes.OK).send(convertToSimpleRecipe(filteredRecipes));
 });
 
 /**
@@ -294,6 +284,31 @@ recipeRouter.get("/", (req, res) => {
  *                   type: array
  *                   items:
  *                     type: string
+ *                 ratings:
+ *                   type: number
+ *                   description: Rating of the recipe.
+ *                 dietaryPreferences:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                 allergens:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                 calories:
+ *                   type: integer
+ *                   description: Calories in the recipe.
+ *                 time:
+ *                   type: integer
+ *                   description: Preparation time in minutes.
+ *                 difficulty:
+ *                   type: string
+ *                   enum: [easy, medium, hard]
+ *                   description: Difficulty level of the recipe.
+ *                 mealTimes:
+ *                   type: array
+ *                   items:
+ *                     type: string
  *                 tags:
  *                   type: array
  *                   items:
@@ -309,7 +324,6 @@ recipeRouter.get("/", (req, res) => {
  *                   type: string
  *                   example: "Recipe not found"
  */
-
 recipeRouter.get("/:id", (request, response) => {
     const bookId: number = parseInt(request.params.id);
     const recipe: Recipe | undefined = getRecipeById(bookId);
@@ -318,5 +332,5 @@ recipeRouter.get("/:id", (request, response) => {
         response.status(StatusCodes.OK).send(recipe);
     }
 
-    response.status(StatusCodes.BAD_REQUEST).send();
+    response.status(StatusCodes.BAD_REQUEST).send({error: "Recipe not found"});
 });
