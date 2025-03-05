@@ -8,6 +8,180 @@ export const recipeRouter = express.Router();
 const parseArrayParam = (param: string | string[] | undefined) =>
     param ? (Array.isArray(param) ? param : param.split(",")) : [];
 
+/**
+ * @swagger
+ * /recipes/search:
+ *   get:
+ *     summary: Search for recipes based on query
+ *     description: This endpoint allows searching for recipes by name, ingredients, or tags using a query string.
+ *     parameters:
+ *       - in: query
+ *         name: query
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The search query string to filter recipes by name, ingredients, or tags.
+ *     responses:
+ *       200:
+ *         description: A list of recipes that match the query.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     description: The unique identifier for the recipe.
+ *                   name:
+ *                     type: string
+ *                   ingredients:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *                   tags:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *       400:
+ *         description: Query parameter is missing or invalid.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Query parameter is required"
+ */
+recipeRouter.get("/search", (request, response) => {
+    const query = request.query.query as string | undefined;
+
+    if (!query || typeof query !== "string") {
+        response.status(404).json({ error: "Query parameter is required" });
+    }
+    else {
+        const lowerQuery = query.toLowerCase();
+
+        const searchResults = getAllRecipes().filter(recipe =>
+            recipe.name.toLowerCase().includes(lowerQuery) ||  // Match in name
+            recipe.ingredients.some(ing => ing.toLowerCase().includes(lowerQuery)) ||  // Match in ingredients
+            recipe.tags.some(tag => tag.toLowerCase().includes(lowerQuery)) // Match in tags
+        );
+
+        response.status(200).json(searchResults);
+    }
+})
+
+/**
+ * @swagger
+ * /recipes:
+ *   get:
+ *     summary: Get filtered recipes
+ *     description: Retrieve a list of recipes based on various filters.
+ *     parameters:
+ *       - in: query
+ *         name: name
+ *         schema:
+ *           type: string
+ *         description: Filter recipes by name (partial match)
+ *       - in: query
+ *         name: minRating
+ *         schema:
+ *           type: number
+ *           minimum: 0
+ *           maximum: 5
+ *         description: Minimum recipe rating (0-5)
+ *       - in: query
+ *         name: maxCal
+ *         schema:
+ *           type: integer
+ *         description: Maximum calories
+ *       - in: query
+ *         name: minCal
+ *         schema:
+ *           type: integer
+ *         description: Minimum calories
+ *       - in: query
+ *         name: diff
+ *         schema:
+ *           type: string
+ *           enum: [easy, medium, hard]
+ *         description: Filter by difficulty level
+ *       - in: query
+ *         name: maxTime
+ *         schema:
+ *           type: number
+ *         description: Maximum preparation time in minutes
+ *       - in: query
+ *         name: dp
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *         description: Filter by dietary preferences (comma-separated)
+ *       - in: query
+ *         name: a
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *         description: Exclude recipes with these allergens (comma-separated)
+ *       - in: query
+ *         name: mt
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *         description: Filter by meal times (e.g., breakfast, dinner)
+ *       - in: query
+ *         name: tags
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *         description: Filter by recipe tags (comma-separated)
+ *       - in: query
+ *         name: ing
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *         description: Filter recipes that must contain all specified ingredients
+ *     responses:
+ *       200:
+ *         description: A list of filtered recipes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   name:
+ *                     type: string
+ *                   ingredients:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *                   tags:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *       400:
+ *         description: Invalid request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid request"
+ */
 recipeRouter.get("/", (req, res) => {
     let filteredRecipes = getAllRecipes();
 
@@ -67,7 +241,7 @@ recipeRouter.get("/", (req, res) => {
             recipe.time <= parseFloat(maxTime as string)
         );
     }
-    
+
     // Filter by difficulty
     if (diff) {
         filteredRecipes = filteredRecipes.filter(recipe => recipe.difficulty === diff);
@@ -87,15 +261,54 @@ recipeRouter.get("/", (req, res) => {
         );
     }
 
-    // Filter by name
-    //if (name) {
-    //  filteredRecipes = filteredRecipes.filter(recipe =>
-    //    recipe.name.toLowerCase().includes(name.toString().toLowerCase())
-    //  );
-    //}
-
     res.status(StatusCodes.OK).send(filteredRecipes);
 });
+
+/**
+ * @swagger
+ * /recipes/{id}:
+ *   get:
+ *     summary: Get a specific recipe
+ *     description: Retrieve a single recipe by its ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the recipe
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the recipe
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   description: The unique identifier for the recipe.
+ *                 name:
+ *                   type: string
+ *                 ingredients:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                 tags:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *       400:
+ *         description: Recipe not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Recipe not found"
+ */
 
 recipeRouter.get("/:id", (request, response) => {
     const bookId: number = parseInt(request.params.id);

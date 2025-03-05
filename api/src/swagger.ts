@@ -16,7 +16,7 @@ const swaggerOptions = {
       },
     ],
   },
-  apis: ["./src/index.ts"], // Adjust the path based on your file structure
+  apis: ["./src/index.ts", "./src/recipe-router.ts"],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
