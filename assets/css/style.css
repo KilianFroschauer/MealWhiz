@@ -1,4 +1,3 @@
-
 /*** Spinner Start ***/
 #spinner {
     opacity: 0;
@@ -294,46 +293,50 @@
 
 
 /*** Fruits Start ***/
-.fruite .tab-class .nav-item a.active {
+.food .tab-class .nav-item a.active {
     background: var(--bs-secondary) !important;
 }
 
-.fruite .tab-class .nav-item a.active span {
+.food .tab-class .nav-item a.active span {
     color: var(--bs-white) !important; 
 }
 
-.fruite .fruite-categorie .fruite-name {
+.food .fruite-categorie .fruite-name {
     line-height: 40px;
 }
 
-.fruite .fruite-categorie .fruite-name a {
+.food .fruite-categorie .fruite-name a {
     transition: 0.5s;
 }
 
-.fruite .fruite-categorie .fruite-name a:hover {
+.food .fruite-categorie .fruite-name a:hover {
     color: var(--bs-secondary);
 }
 
-.fruite .fruite-item {
+.food .food-item {
     height: 100%;
     transition: 0.5s;
 }
-.fruite .fruite-item:hover {
+.food .food-item:hover {
     box-shadow: 0 0 55px rgba(0, 0, 0, 0.4);
 }
 
-.fruite .fruite-item .fruite-img {
+.food .food-item .food-img {
     overflow: hidden;
     transition: 0.5s;
     border-radius: 10px 10px 0 0;
+    height: 250px; /* Set fixed height for all image containers */
 }
 
-.fruite .fruite-item .fruite-img img {
+.food .food-item .food-img img {
     transition: 0.5s;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Make image cover the container */
 }
 
-.fruite .fruite-item .fruite-img img:hover {
-    transform: scale(1.3);
+.food .food-item .food-img img:hover {
+    transform: scale(1.15);
 }
 /*** Fruits End ***/
 
@@ -511,4 +514,20 @@
     line-height: 35px;
 }
 /*** Footer End ***/
+
+/* Recipe Difficulty Badges */
+.badge-difficulty-easy {
+    background-color: #28a745; /* Custom green color */
+    color: white;
+  }
+  
+  .badge-difficulty-medium {
+    background-color: #ffc107; /* Custom yellow/orange color */
+    color: #212529; /* Dark text for better contrast on yellow */
+  }
+  
+  .badge-difficulty-hard {
+    background-color: #dc3545; /* Custom red color */
+    color: white;
+  }
 
