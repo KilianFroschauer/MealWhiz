@@ -1,0 +1,39 @@
+### Suche nach Rezepten mit dem Suchbegriff "Käse"
+GET http://localhost:3000/recipes/search?query=Käse
+Accept: application/json
+
+### Alle Rezepte ohne Filter abrufen
+GET http://localhost:3000/recipes
+Accept: application/json
+
+### Rezepte nach Zutat "Butter" und "Zwiebeln" filtern
+GET http://localhost:3000/recipes?ing=Butter,Zwiebeln
+Accept: application/json
+
+### Rezepte nach Tags "Austrian" und "Pastry" filtern
+GET http://localhost:3000/recipes?tags=Austrian,Pastry
+Accept: application/json
+
+### Rezepte mit maximal 500 Kalorien und Schwierigkeit "easy"
+GET http://localhost:3000/recipes?maxCal=500&diff=easy
+Accept: application/json
+
+### Rezepte mit mindestens 4.5 Bewertung, ohne Allergene "Gluten"
+GET http://localhost:3000/recipes?minRating=4.5&a=Gluten
+Accept: application/json
+
+### Rezepte mit Diätpräferenz "vegetarian" und maximal 30 Minuten
+GET http://localhost:3000/recipes?dp=vegetarian&maxTime=30
+Accept: application/json
+
+### Rezepte für "Dinner"
+GET http://localhost:3000/recipes?mt=Dinner
+Accept: application/json
+
+### Einzelnes Rezept mit ID 1 abrufen
+GET http://localhost:3000/recipes/1
+Accept: application/json
+
+### Nicht vorhandenes Rezept (z. B. ID 999)
+GET http://localhost:3000/recipes/999
+Accept: application/json

@@ -1,7 +1,6 @@
 import express from "express";
 import { StatusCodes } from "http-status-codes";
-import { convertToSimpleRecipe, getAllRecipes, getRecipeById, Recipe } from "./recipe-repository";
-import { error } from "console";
+import { convertToSimpleRecipe, getAllRecipes, getFilteredRecipes, getRecipeById, Recipe } from "./recipe-repository";
 
 export const recipeRouter = express.Router();
 
@@ -55,24 +54,23 @@ const parseArrayParam = (param: string | string[] | undefined) =>
  *                   type: string
  *                   example: "Query parameter is required"
  */
-recipeRouter.get("/search", (request, response) => {
-    const query = request.query.query as string | undefined;
+recipeRouter.get("/search", async (request, response) => {
+    try {
+        const query = request.query.query as string | undefined;
 
-    if (!query || typeof query !== "string") {
-        response.status(400).json({ error: "Query parameter is required" });
+        if (!query || typeof query !== "string") {
+            response.status(400).json({ error: "Query parameter is required" });
+        }
+        else {
+            const searchResults = await getFilteredRecipes({ query });
+            response.status(200).json(convertToSimpleRecipe(searchResults));
+        }
+
+    } catch (error) {
+        console.error('Error in search endpoint:', error);
+        response.status(500).json({ error: "Internal server error" });
     }
-    else {
-        const lowerQuery = query.toLowerCase();
-
-        const searchResults = getAllRecipes().filter(recipe =>
-            recipe.name.toLowerCase().includes(lowerQuery) ||  // Match in name
-            recipe.ingredients.some(ing => ing.toLowerCase().includes(lowerQuery)) ||  // Match in ingredients
-            recipe.tags.some(tag => tag.toLowerCase().includes(lowerQuery)) // Match in tags
-        );
-
-        response.status(200).json(convertToSimpleRecipe(searchResults));
-    }
-})
+});
 
 /**
  * @swagger
@@ -172,86 +170,34 @@ recipeRouter.get("/search", (request, response) => {
  *                     enum: [easy, medium, hard]
  *                     description: Difficulty level of the recipe.
  */
-recipeRouter.get("/", (req, res) => {
-    let filteredRecipes = getAllRecipes();
+recipeRouter.get("/", async (req, res) => {
+    try {
+        // Get parameter
+        const { name, minRating, maxCal, minCal, diff, maxTime } = req.query;
+        const dietaryPreferences = parseArrayParam(req.query.dp as string | string[] | undefined);
+        const allergens = parseArrayParam(req.query.a as string | string[] | undefined);
+        const mealTimes = parseArrayParam(req.query.mt as string | string[] | undefined);
+        const tags = parseArrayParam(req.query.tags as string | string[] | undefined);
+        const ingredients = parseArrayParam(req.query.ing as string | string[] | undefined);
 
-    // Get parameter
-    const { minRating, maxCal, minCal, diff, maxTime } = req.query;
-    const dietaryPreferences = parseArrayParam(req.query.dp as string | string[] | undefined);
-    const allergens = parseArrayParam(req.query.a as string | string[] | undefined);
-    const mealTimes = parseArrayParam(req.query.mt as string | string[] | undefined);
-    const tags = parseArrayParam(req.query.tags as string | string[] | undefined);
-    const ingredients = parseArrayParam(req.query.ing as string | string[] | undefined);
-
-    // Filter by ingredients
-    if (ingredients.length) {
-        filteredRecipes = filteredRecipes.filter(recipe =>
-            ingredients.every(ing => recipe.ingredients.includes(ing))
-        );
+        const filteredRecipes = await getFilteredRecipes({
+            name: name ? (name as string) : undefined,
+            minRating: minRating ? parseFloat(minRating as string) : undefined,
+            maxCal: maxCal ? parseInt(maxCal as string) : undefined,
+            minCal: minCal ? parseInt(minCal as string) : undefined,
+            diff: diff as string,
+            maxTime: maxTime ? parseInt(maxTime as string) : undefined,
+            dietaryPreferences: dietaryPreferences as string[],
+            allergens: allergens as string[],
+            mealTimes: mealTimes as string[],
+            tags: tags as string[],
+            ingredients: ingredients.join(",")
+        });
+        res.status(200).json(convertToSimpleRecipe(filteredRecipes));
+    } catch (error) {
+        console.error('Error in filter endpoint:', error);
+        res.status(500).json({ error: "Internal server error" });
     }
-
-    // Filter by dietary preferneces
-    if (dietaryPreferences.length) {
-        filteredRecipes = filteredRecipes.filter(recipe =>
-            dietaryPreferences.every(diet => recipe.dietaryPreferences.includes(diet))
-        );
-    }
-
-    // Filter by allergens
-    if (allergens.length) {
-        filteredRecipes = filteredRecipes.filter(recipe =>
-            !allergens.some(allergen => recipe.allergens.includes(allergen))
-        );
-    }
-
-    // Filter by maximum calories
-    if (maxCal) {
-        filteredRecipes = filteredRecipes.filter(recipe =>
-            recipe.calories <= parseInt(maxCal as string)
-        );
-    }
-
-    // Filter by minimum calories
-    if (minCal) {
-        filteredRecipes = filteredRecipes.filter(recipe =>
-            recipe.calories >= parseInt(minCal as string)
-        );
-    }
-
-    // Filter by minimum rating
-    if (minRating) {
-        filteredRecipes = filteredRecipes.filter(recipe =>
-            recipe.ratings >= parseFloat(minRating as string)
-        );
-    }
-
-    // Filter by maximum time
-    if (maxTime) {
-        filteredRecipes = filteredRecipes.filter(recipe =>
-            recipe.time <= parseFloat(maxTime as string)
-        );
-    }
-
-    // Filter by difficulty
-    if (diff) {
-        filteredRecipes = filteredRecipes.filter(recipe => recipe.difficulty === diff);
-    }
-
-    // Filter by meal times
-    if (mealTimes.length) {
-        filteredRecipes = filteredRecipes.filter(recipe =>
-            mealTimes.some(meal => recipe.mealTimes.includes(meal))
-        );
-    }
-
-    // Filter by tags
-    if (tags.length) {
-        filteredRecipes = filteredRecipes.filter(recipe =>
-            tags.some(tag => recipe.tags.includes(tag))
-        );
-    }
-
-    res.status(StatusCodes.OK).send(convertToSimpleRecipe(filteredRecipes));
 });
 
 /**
@@ -324,13 +270,25 @@ recipeRouter.get("/", (req, res) => {
  *                   type: string
  *                   example: "Recipe not found"
  */
-recipeRouter.get("/:id", (request, response) => {
-    const bookId: number = parseInt(request.params.id);
-    const recipe: Recipe | undefined = getRecipeById(bookId);
+recipeRouter.get("/:id", async (request, response) => {
+    try {
+        const recipeId = parseInt(request.params.id);
 
-    if (recipe !== undefined) {
-        response.status(StatusCodes.OK).send(recipe);
+        if (isNaN(recipeId)) {
+            response.status(400).json({ error: "Invalid recipe ID" });
+        }
+        else {
+
+            const recipe = await getRecipeById(recipeId);
+
+            if (recipe) {
+                response.status(200).send(recipe);
+            } else {
+                response.status(404).send({ error: "Recipe not found" });
+            }
+        }
+    } catch (error) {
+        console.error(`Error fetching recipe ${request.params.id}:`, error);
+        response.status(500).json({ error: "Internal server error" });
     }
-
-    response.status(StatusCodes.BAD_REQUEST).send({error: "Recipe not found"});
 });
