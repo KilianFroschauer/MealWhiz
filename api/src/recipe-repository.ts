@@ -21,74 +21,6 @@ export interface SimpleRecipe {
   difficulty: "easy" | "medium" | "hard";
 }
 
-const exampleRecipes: Recipe[] = [
-  {
-    id: 1,
-    name: "Spaghetti Carbonara",
-    ingredients: ["Spaghetti", "Eier", "Parmesan", "Speck", "Pfeffer", "Salz"],
-    ratings: 4.5,
-    dietaryPreferences: ["non-vegetarian"],
-    allergens: ["Eggs", "Dairy", "Gluten"],
-    calories: 600,
-    time: 20,
-    difficulty: "medium",
-    mealTimes: ["Lunch", "Dinner"],
-    tags: ["Italian", "Pasta", "Classic"],
-  },
-  {
-    id: 2,
-    name: "Käsespätzle",
-    ingredients: ["Spätzle", "Käse", "Zwiebeln", "Butter", "Salz", "Pfeffer"],
-    ratings: 4.7,
-    dietaryPreferences: ["vegetarian"],
-    allergens: ["Dairy", "Gluten"],
-    calories: 750,
-    time: 30,
-    difficulty: "medium",
-    mealTimes: ["Lunch", "Dinner"],
-    tags: ["German", "Comfort Food", "Cheese"],
-  },
-  {
-    id: 3,
-    name: "Apfelstrudel",
-    ingredients: ["Äpfel", "Blätterteig", "Zucker", "Zimt", "Rosinen", "Butter"],
-    ratings: 4.6,
-    dietaryPreferences: ["vegetarian"],
-    allergens: ["Dairy", "Gluten"],
-    calories: 500,
-    time: 45,
-    difficulty: "hard",
-    mealTimes: ["Dessert"],
-    tags: ["Austrian", "Pastry", "Sweet"],
-  },
-  {
-    id: 4,
-    name: "Tomatensuppe",
-    ingredients: ["Tomaten", "Zwiebeln", "Knoblauch", "Brühe", "Olivenöl", "Salz", "Pfeffer"],
-    ratings: 4.3,
-    dietaryPreferences: ["vegetarian", "vegan", "gluten-free"],
-    allergens: [],
-    calories: 150,
-    time: 25,
-    difficulty: "easy",
-    mealTimes: ["Lunch", "Dinner"],
-    tags: ["Soup", "Healthy", "Quick"],
-  },
-  {
-    id: 5,
-    name: "Wiener Schnitzel",
-    ingredients: ["Kalbfleisch", "Mehl", "Eier", "Paniermehl", "Butter", "Salz", "Pfeffer", "Zitrone"],
-    ratings: 4.8,
-    dietaryPreferences: ["non-vegetarian"],
-    allergens: ["Eggs", "Gluten"],
-    calories: 800,
-    time: 35,
-    difficulty: "hard",
-    mealTimes: ["Lunch", "Dinner"],
-    tags: ["Austrian", "Traditional", "Meat"],
-  },
-];
-
 export async function getAllRecipes(): Promise<Recipe[]> {
   try {
     const query = `
@@ -152,7 +84,9 @@ export async function getRecipeById(id: number): Promise<Recipe | undefined> {
     if (result.rows.length === 0) {
       return undefined;
     }
-    return mapDbRowsToRecipes(result.rows)[0];
+
+    const recipes = await mapDbRowsToRecipes(result.rows);
+    return recipes[0];
   } catch (error) {
     console.error(`Error fetching recipe with id ${id}:`, error);
     throw error;
@@ -287,17 +221,17 @@ export function convertToSimpleRecipe(recipes: Recipe[]): SimpleRecipe[] {
 }
 
 // Helper function to map database rows to Recipe objects
-function mapDbRowsToRecipes(rows: any[]): Recipe[] {
-  return rows.map(row => {
+async function mapDbRowsToRecipes(rows: any[]): Promise<Recipe[]> {
+  const recipePromises = rows.map(async row => {
     // Parse ingredients from text to array
     const ingredients = parseIngredients(row.ingredients);
     
     // Map difficulty from database to enum value
     const difficulty = mapDifficultyToEnum(row.difficulty);
     
-    // Extract calories from description if possible (not ideal but workable)
-    const calories = extractCaloriesFromDescription(row.description);
-    
+    // Calculate calories from recipe_ingredient junction table
+    const calories = await calculateRecipeCalories(row.recipe_id);
+
     return {
       id: row.recipe_id,
       name: row.title,
@@ -308,10 +242,12 @@ function mapDbRowsToRecipes(rows: any[]): Recipe[] {
       calories: calories,
       time: row.total_time,
       difficulty: difficulty,
-      mealTimes: determineMealTimes(row),  // Need to infer this
-      tags: row.cuisine ? [row.cuisine] : [], // Using cuisine as tag
+      mealTimes: determineMealTimes(row),
+      tags: row.cuisine ? [row.cuisine] : [],
     };
   });
+  
+  return Promise.all(recipePromises);
 }
 
 function parseIngredients(ingredientsText: string): string[] {
@@ -339,19 +275,6 @@ function mapDifficultyToEnum(difficultyText: string): "easy" | "medium" | "hard"
   if (lowercaseDiff.includes('easy')) return "easy";
   if (lowercaseDiff.includes('hard')) return "hard";
   return "medium";
-}
-
-function extractCaloriesFromDescription(description: string): number {
-  if (!description) return 0;
-  
-  // Try to find a pattern like "XXX calories" or "XXX kcal"
-  const calorieMatch = description.match(/(\d+)\s*(?:calories|kcal)/i);
-  if (calorieMatch) {
-    return parseInt(calorieMatch[1], 10);
-  }
-  
-  // Default value if not found
-  return 0;
 }
 
 function determineMealTimes(row: any): string[] {
@@ -384,4 +307,43 @@ function determineMealTimes(row: any): string[] {
   }
   
   return mealTimes;
+}
+
+/**
+ * Calculate calories for a recipe using the recipe_ingredient junction table
+ * and food_products nutritional information
+ */
+async function calculateRecipeCalories(recipeId: number): Promise<number> {
+  try {
+    const query = `
+      SELECT SUM(fp.energy_kcal_100g * ri.quantity / 100) as total_calories
+      FROM recipe_ingredient ri
+      JOIN food_products fp ON ri.ingredient_code = fp.code
+      WHERE ri.recipe_id = $1
+      AND ri.unit IN ('g', 'ml', 'gram')
+    `;
+    
+    const queryPcs = `
+      SELECT SUM(fp.energy_kcal_100g * 0.5) as pcs_calories
+      FROM recipe_ingredient ri 
+      JOIN food_products fp ON ri.ingredient_code = fp.code
+      WHERE ri.recipe_id = $1
+      AND ri.unit IN ('pc', 'pcs', 'piece', 'pieces')
+    `;
+    
+    // Get calories from weighted ingredients
+    const weightResult = await pool.query(query, [recipeId]);
+    let totalCalories = parseFloat(weightResult.rows[0]?.total_calories || '0');
+    
+    // Add calories from piece-based ingredients (est. 50g per piece)
+    const pcsResult = await pool.query(queryPcs, [recipeId]);
+    totalCalories += parseFloat(pcsResult.rows[0]?.pcs_calories || '0');
+    
+    return Math.round(totalCalories);
+  } catch (error) {
+    console.error(`Error calculating calories for recipe ${recipeId}:`, error);
+    
+    // Fallback to old method if there's an error
+    return 0;
+  }
 }
