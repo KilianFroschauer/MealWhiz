@@ -39,6 +39,10 @@ const parseArrayParam = (param: string | string[] | undefined) =>
  *                   time:
  *                     type: integer
  *                     description: Preparation time in minutes.
+ *                  ratings:
+ *                     type: number
+ *                     format: float
+ *                     description: Average user rating (0-5)
  *                   difficulty:
  *                     type: string
  *                     enum: [easy, medium, hard]
@@ -53,6 +57,16 @@ const parseArrayParam = (param: string | string[] | undefined) =>
  *                 error:
  *                   type: string
  *                   example: "Query parameter is required"
+ *      500:
+ *        description: Internal server error
+ * *        content:
+ *          application/json:
+ *           schema:
+ *             type: object
+ *            properties:
+ *              error:
+ *               type: string
+ *              example: "Internal server error"
  */
 recipeRouter.get("/search", async (request, response) => {
     try {
@@ -165,10 +179,24 @@ recipeRouter.get("/search", async (request, response) => {
  *                   time:
  *                     type: integer
  *                     description: Preparation time in minutes.
+ *                  ratings:
+ *                     type: number
+ *                     format: float
+ *                     description: Average user rating (0-5)
  *                   difficulty:
  *                     type: string
  *                     enum: [easy, medium, hard]
  *                     description: Difficulty level of the recipe.
+ *          500:
+ *              description: Internal server error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              error:
+ *                                  type: string
+ *                                  example: "Internal server error"
  */
 recipeRouter.get("/", async (req, res) => {
     try {
@@ -230,6 +258,9 @@ recipeRouter.get("/", async (req, res) => {
  *                   type: array
  *                   items:
  *                     type: string
+ *                 desciption:
+ *                   type: string
+ *                   description: Information about the recipe
  *                 ratings:
  *                   type: number
  *                   description: Rating of the recipe.
@@ -260,6 +291,16 @@ recipeRouter.get("/", async (req, res) => {
  *                   items:
  *                     type: string
  *       400:
+ *         description: Invalid recipe ID format
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid recipe ID"
+ *       404:
  *         description: Recipe not found
  *         content:
  *           application/json:
@@ -269,6 +310,16 @@ recipeRouter.get("/", async (req, res) => {
  *                 error:
  *                   type: string
  *                   example: "Recipe not found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error"
  */
 recipeRouter.get("/:id", async (request, response) => {
     try {
