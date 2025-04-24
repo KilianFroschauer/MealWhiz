@@ -19,6 +19,7 @@ export interface SimpleRecipe {
   id: number;
   name: string;
   time: number;
+  ratings: number;
   difficulty: "easy" | "medium" | "hard";
 }
 
@@ -217,6 +218,7 @@ export function convertToSimpleRecipe(recipes: Recipe[]): SimpleRecipe[] {
     id: recipe.id,
     name: recipe.name,
     time: recipe.time,
+    ratings: recipe.ratings,
     difficulty: recipe.difficulty
   }));
 }
