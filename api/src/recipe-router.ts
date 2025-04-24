@@ -172,28 +172,48 @@ recipeRouter.get("/search", async (request, response) => {
  */
 recipeRouter.get("/", async (req, res) => {
     try {
-        // Get parameter
-        const { name, minRating, maxCal, minCal, diff, maxTime } = req.query;
-        const dietaryPreferences = parseArrayParam(req.query.dp as string | string[] | undefined);
-        const allergens = parseArrayParam(req.query.a as string | string[] | undefined);
-        const mealTimes = parseArrayParam(req.query.mt as string | string[] | undefined);
-        const tags = parseArrayParam(req.query.tags as string | string[] | undefined);
-        const ingredients = parseArrayParam(req.query.ing as string | string[] | undefined);
 
-        const filteredRecipes = await getFilteredRecipes({
-            name: name ? (name as string) : undefined,
-            minRating: minRating ? parseFloat(minRating as string) : undefined,
-            maxCal: maxCal ? parseInt(maxCal as string) : undefined,
-            minCal: minCal ? parseInt(minCal as string) : undefined,
-            diff: diff as string,
-            maxTime: maxTime ? parseInt(maxTime as string) : undefined,
-            dietaryPreferences: dietaryPreferences as string[],
-            allergens: allergens as string[],
-            mealTimes: mealTimes as string[],
-            tags: tags as string[],
-            ingredients: ingredients.join(",")
-        });
-        res.status(200).json(convertToSimpleRecipe(filteredRecipes));
+        // Define all valid query parameters
+        const validParams = [
+            'name', 'minRating', 'maxCal', 'minCal', 'diff', 'maxTime',
+            'dp', 'a', 'mt', 'tags', 'ing'
+        ];
+
+        // Check for invalid parameters
+        const invalidParams = Object.keys(req.query).filter(param => !validParams.includes(param));
+
+        // If invalid parameters were found, return a 400 error
+        if (invalidParams.length > 0) {
+            res.status(400).json({
+                error: `Invalid query parameter(s): ${invalidParams.join(', ')}`,
+                validParameters: validParams
+            });
+        }
+        else {
+
+            // Get parameter
+            const { name, minRating, maxCal, minCal, diff, maxTime } = req.query;
+            const dietaryPreferences = parseArrayParam(req.query.dp as string | string[] | undefined);
+            const allergens = parseArrayParam(req.query.a as string | string[] | undefined);
+            const mealTimes = parseArrayParam(req.query.mt as string | string[] | undefined);
+            const tags = parseArrayParam(req.query.tags as string | string[] | undefined);
+            const ingredients = parseArrayParam(req.query.ing as string | string[] | undefined);
+
+            const filteredRecipes = await getFilteredRecipes({
+                name: name ? (name as string) : undefined,
+                minRating: minRating ? parseFloat(minRating as string) : undefined,
+                maxCal: maxCal ? parseInt(maxCal as string) : undefined,
+                minCal: minCal ? parseInt(minCal as string) : undefined,
+                diff: diff as string,
+                maxTime: maxTime ? parseInt(maxTime as string) : undefined,
+                dietaryPreferences: dietaryPreferences as string[],
+                allergens: allergens as string[],
+                mealTimes: mealTimes as string[],
+                tags: tags as string[],
+                ingredients: ingredients.join(",")
+            });
+            res.status(200).json(convertToSimpleRecipe(filteredRecipes));
+        }
     } catch (error) {
         console.error('Error in filter endpoint:', error);
         res.status(500).json({ error: "Internal server error" });

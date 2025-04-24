@@ -37,3 +37,17 @@ Accept: application/json
 ### Nicht vorhandenes Rezept (z. B. ID 999)
 GET http://localhost:3000/recipes/999
 Accept: application/json
+
+
+### Testcase: TC-011-01
+GET http://localhost:3000/recipes?ing=mehl
+Accept: application/json
+
+
+### Testcase: TC-011-02
+GET http://localhost:3000/recipes?dp=vegetarian
+Accept: application/json
+
+### Testcase: TC-011-04
+GET http://localhost:3000/recipes?dabk=def
+Accept: application/json
