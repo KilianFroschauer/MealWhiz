@@ -6,6 +6,7 @@ export interface Recipe {
   ingredients: string[];
   ratings: number;
   dietaryPreferences: string[];
+  desciption: string;
   allergens: string[];
   calories: number;
   time: number;
@@ -238,6 +239,7 @@ async function mapDbRowsToRecipes(rows: any[]): Promise<Recipe[]> {
       ingredients: ingredients,
       ratings: row.rating || 0,
       dietaryPreferences: row.diary_pref ? [row.diary_pref] : [],
+      desciption: row.description || '',
       allergens: row.allergen_list || [],
       calories: calories,
       time: row.total_time,
