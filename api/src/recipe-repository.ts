@@ -198,6 +198,12 @@ export async function getFilteredRecipes(filters: {
       params.push(`%${filters.ingredients}%`);
       paramIndex++;
     }
+
+    if (filters.mealTimes?.length) {
+      conditions.push(`r.meal_times && $${paramIndex}::meal_time[]`);
+      params.push(filters.mealTimes);
+      paramIndex++;
+    }
     
     // Add WHERE clause if we have conditions
     if (conditions.length > 0) {
@@ -282,10 +288,13 @@ function mapDifficultyToEnum(difficultyText: string): "easy" | "medium" | "hard"
 }
 
 function determineMealTimes(row: any): string[] {
-  // This is a bit of a guess - we don't have this data in the schema
-  // Could check the recipe title or description for keywords
-  const mealTimes: string[] = [];
+  // Use the meal_times array from the database if available
+  if (row.meal_times && Array.isArray(row.meal_times)) {
+    return row.meal_times;
+  }
   
+  // Fallback to the old method if database value is not available
+  const mealTimes: string[] = [];
   const titleLower = row.title?.toLowerCase() || '';
   const descLower = row.description?.toLowerCase() || '';
   
