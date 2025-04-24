@@ -52,6 +52,22 @@ document.addEventListener('DOMContentLoaded', () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     });
+    // Universal search bar redirect logic for all pages
+    document.querySelectorAll('input[type="search"]').forEach(input => {
+        input.addEventListener('keydown', (e) => {
+            const event = e;
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const query = event.target.value.trim();
+                if (query.length > 0) {
+                    // Always use absolute path for redirect
+                    if (!window.location.pathname.endsWith('/recipes.html')) {
+                        window.location.href = location.origin + "/pages/recipes.html?query=" + encodeURIComponent(query);
+                    }
+                }
+            }
+        });
+    });
     // Testimonial carousel
     initCarousels();
     // Product Quantity
@@ -88,3 +104,5 @@ function initCarousels() {
     // When implementing a carousel in vanilla JS, you'll need to handle all the
     // functionality that owl.carousel.js provided, or use a different library
 }
+// --- REMOVE RECIPE CARD LOGIC FROM THIS FILE TO AVOID DUPLICATES ---
+// (getRecipeImage, createRecipeCard, capitalize, renderRecipes, fetchAndRenderRecipes)
