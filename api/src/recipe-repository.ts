@@ -9,10 +9,14 @@ export interface Recipe {
   desciption: string;
   allergens: string[];
   calories: number;
+  proteins: number; // Added field
+  carbs: number;    // Added field
+  fat: number;      // Added field
   time: number;
   difficulty: "easy" | "medium" | "hard";
   mealTimes: string[];
   tags: string[];
+  servings: number; // Added field
 }
 
 export interface SimpleRecipe {
@@ -47,7 +51,7 @@ export async function getAllRecipes(): Promise<Recipe[]> {
       LEFT JOIN diary_pref dp ON r.diary_pref_id = dp.diary_pref_id
       LEFT JOIN cuisine c ON r.cuisine_id = c.cuisine_id
     `;
-    
+
     const result = await pool.query(query);
     return mapDbRowsToRecipes(result.rows);
   } catch (error) {
@@ -81,7 +85,7 @@ export async function getRecipeById(id: number): Promise<Recipe | undefined> {
       LEFT JOIN cuisine c ON r.cuisine_id = c.cuisine_id
       WHERE r.recipe_id = $1
     `;
-    
+
     const result = await pool.query(query, [id]);
     if (result.rows.length === 0) {
       return undefined;
@@ -133,12 +137,12 @@ export async function getFilteredRecipes(filters: {
       LEFT JOIN diary_pref dp ON r.diary_pref_id = dp.diary_pref_id
       LEFT JOIN cuisine c ON r.cuisine_id = c.cuisine_id
     `;
-    
+
     // Where clause conditions and parameters
     const conditions: string[] = [];
     const params: any[] = [];
     let paramIndex = 1;
-    
+
     // Add all the filter conditions
     if (filters.query) {
       conditions.push(`
@@ -149,37 +153,37 @@ export async function getFilteredRecipes(filters: {
       params.push(`%${filters.query}%`);
       paramIndex++;
     }
-    
+
     if (filters.name) {
       conditions.push(`r.title ILIKE $${paramIndex}`);
       params.push(`%${filters.name}%`);
       paramIndex++;
     }
-    
+
     if (filters.minRating !== undefined) {
       conditions.push(`r.rating >= $${paramIndex}`);
       params.push(filters.minRating);
       paramIndex++;
     }
-    
+
     if (filters.maxTime !== undefined) {
       conditions.push(`r.total_time <= $${paramIndex}`);
       params.push(filters.maxTime);
       paramIndex++;
     }
-    
+
     if (filters.diff) {
       conditions.push(`d.difficulty = $${paramIndex}`);
       params.push(filters.diff);
       paramIndex++;
     }
-    
+
     if (filters.dietaryPreferences?.length) {
       conditions.push(`dp.diary_pref = ANY($${paramIndex})`);
       params.push(filters.dietaryPreferences);
       paramIndex++;
     }
-    
+
     if (filters.allergens?.length) {
       // Exclude recipes with specified allergens
       conditions.push(`
@@ -192,7 +196,7 @@ export async function getFilteredRecipes(filters: {
       params.push(filters.allergens);
       paramIndex++;
     }
-    
+
     if (filters.ingredients) {
       conditions.push(`r.ingredients ILIKE $${paramIndex}`);
       params.push(`%${filters.ingredients}%`);
@@ -204,12 +208,12 @@ export async function getFilteredRecipes(filters: {
       params.push(filters.mealTimes);
       paramIndex++;
     }
-    
+
     // Add WHERE clause if we have conditions
     if (conditions.length > 0) {
       queryText += ` WHERE ${conditions.join(' AND ')}`;
     }
-    
+
     // Execute the query
     const result = await pool.query(queryText, params);
     return mapDbRowsToRecipes(result.rows);
@@ -229,7 +233,6 @@ export function convertToSimpleRecipe(recipes: Recipe[]): SimpleRecipe[] {
   }));
 }
 
-// Helper function to map database rows to Recipe objects
 async function mapDbRowsToRecipes(rows: any[]): Promise<Recipe[]> {
   const recipePromises = rows.map(async row => {
     // Parse ingredients from text to array
@@ -238,8 +241,8 @@ async function mapDbRowsToRecipes(rows: any[]): Promise<Recipe[]> {
     // Map difficulty from database to enum value
     const difficulty = mapDifficultyToEnum(row.difficulty);
     
-    // Calculate calories from recipe_ingredient junction table
-    const calories = await calculateRecipeCalories(row.recipe_id);
+    // Calculate nutrition info
+    const nutrition = await calculateRecipeNutrition(row.recipe_id);
 
     return {
       id: row.recipe_id,
@@ -249,11 +252,15 @@ async function mapDbRowsToRecipes(rows: any[]): Promise<Recipe[]> {
       dietaryPreferences: row.diary_pref ? [row.diary_pref] : [],
       desciption: row.description || '',
       allergens: row.allergen_list || [],
-      calories: calories,
+      calories: nutrition.calories,
+      proteins: nutrition.proteins,
+      carbs: nutrition.carbs,
+      fat: nutrition.fat,
       time: row.total_time,
       difficulty: difficulty,
       mealTimes: determineMealTimes(row),
       tags: row.cuisine ? [row.cuisine] : [],
+      servings: row.servings || 4, // Include the new servings field
     };
   });
   
@@ -262,7 +269,7 @@ async function mapDbRowsToRecipes(rows: any[]): Promise<Recipe[]> {
 
 function parseIngredients(ingredientsText: string): string[] {
   if (!ingredientsText) return [];
-  
+
   // Try to handle different formats
   // Could be JSON, comma-separated, or line-separated
   try {
@@ -292,12 +299,12 @@ function determineMealTimes(row: any): string[] {
   if (row.meal_times && Array.isArray(row.meal_times)) {
     return row.meal_times;
   }
-  
+
   // Fallback to the old method if database value is not available
   const mealTimes: string[] = [];
   const titleLower = row.title?.toLowerCase() || '';
   const descLower = row.description?.toLowerCase() || '';
-  
+
   if (titleLower.includes('breakfast') || descLower.includes('breakfast')) {
     mealTimes.push('Breakfast');
   }
@@ -313,50 +320,60 @@ function determineMealTimes(row: any): string[] {
   if (titleLower.includes('snack') || descLower.includes('snack')) {
     mealTimes.push('Snack');
   }
-  
+
   // If no meal times detected, default to both lunch and dinner
   if (mealTimes.length === 0) {
     mealTimes.push('Lunch', 'Dinner');
   }
-  
+
   return mealTimes;
 }
 
-/**
- * Calculate calories for a recipe using the recipe_ingredient junction table
- * and food_products nutritional information
- */
+
+// Function to get calories only (existing or modified)
 async function calculateRecipeCalories(recipeId: number): Promise<number> {
+  const nutrition = await calculateRecipeNutrition(recipeId);
+  return nutrition.calories;
+}
+
+
+
+// New function to calculate nutritional information for a recipe
+async function calculateRecipeNutrition(recipeId: number): Promise<{
+  calories: number;
+  proteins: number;
+  carbs: number;
+  fat: number;
+}> {
   try {
-    const query = `
-      SELECT SUM(fp.energy_kcal_100g * ri.quantity / 100) as total_calories
+    const client = await pool.connect();
+
+    // Query to join recipe_ingredient with food_products to get nutritional info
+    const nutritionQuery = `
+      SELECT 
+        SUM(ri.quantity * fp.energy_kcal_100g / 100) AS total_calories,
+        SUM(ri.quantity * fp.proteins_100g / 100) AS total_proteins,
+        SUM(ri.quantity * fp.carbohydrates_100g / 100) AS total_carbs,
+        SUM(ri.quantity * fp.fat_100g / 100) AS total_fat
       FROM recipe_ingredient ri
       JOIN food_products fp ON ri.ingredient_code = fp.code
       WHERE ri.recipe_id = $1
-      AND ri.unit IN ('g', 'ml', 'gram')
+      AND ri.unit = 'g'  -- Only consider gram measurements for simplicity
     `;
-    
-    const queryPcs = `
-      SELECT SUM(fp.energy_kcal_100g * 0.5) as pcs_calories
-      FROM recipe_ingredient ri 
-      JOIN food_products fp ON ri.ingredient_code = fp.code
-      WHERE ri.recipe_id = $1
-      AND ri.unit IN ('pc', 'pcs', 'piece', 'pieces')
-    `;
-    
-    // Get calories from weighted ingredients
-    const weightResult = await pool.query(query, [recipeId]);
-    let totalCalories = parseFloat(weightResult.rows[0]?.total_calories || '0');
-    
-    // Add calories from piece-based ingredients (est. 50g per piece)
-    const pcsResult = await pool.query(queryPcs, [recipeId]);
-    totalCalories += parseFloat(pcsResult.rows[0]?.pcs_calories || '0');
-    
-    return Math.round(totalCalories);
+
+    const result = await client.query(nutritionQuery, [recipeId]);
+    client.release();
+
+    const nutrition = result.rows[0];
+
+    return {
+      calories: Math.round(nutrition.total_calories || 0),
+      proteins: Math.round(nutrition.total_proteins || 0),
+      carbs: Math.round(nutrition.total_carbs || 0),
+      fat: Math.round(nutrition.total_fat || 0)
+    };
   } catch (error) {
-    console.error(`Error calculating calories for recipe ${recipeId}:`, error);
-    
-    // Fallback to old method if there's an error
-    return 0;
+    console.error(`Error calculating nutrition for recipe ${recipeId}:`, error);
+    return { calories: 0, proteins: 0, carbs: 0, fat: 0 };
   }
 }
