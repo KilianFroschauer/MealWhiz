@@ -144,12 +144,13 @@ recipeRouter.get("/search", async (request, response) => {
  *             ]
  *         description: Filter by allergens to exclude (comma-separated)
  *       - in: query
- *         name: mt
- *         schema:
- *           type: array
- *           items:
- *             type: string
- *         description: Filter by meal times (e.g., breakfast, dinner)
+*         name: mt
+*         schema:
+*           type: array
+*           items:
+*             type: string
+*             enum: [Breakfast, Lunch, Dinner, Snack, Dessert]
+*         description: Filter by meal times (comma-separated)
  *       - in: query
  *         name: tags
  *         schema:
