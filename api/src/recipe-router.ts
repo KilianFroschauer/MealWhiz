@@ -118,6 +118,7 @@ recipeRouter.get("/search", async (request, response) => {
  *           type: array
  *           items:
  *             type: string
+ *             enum: [standard, vegetarian, vegan, pescetarian, keto, paleo, flexitarian]
  *         description: Filter by dietary preferences (comma-separated)
  *       - in: query
  *         name: a
@@ -125,14 +126,31 @@ recipeRouter.get("/search", async (request, response) => {
  *           type: array
  *           items:
  *             type: string
- *         description: Exclude recipes with these allergens (comma-separated)
+ *             enum: [
+ *               'Egg', 
+ *               'Milk or lactose', 
+ *               'Gluten-containing grains',
+ *               'Crustaceans',
+ *               'Fish',
+ *               'Peanut', 
+ *               'Soy',
+ *               'Edible nuts',
+ *               'Celery',
+ *               'Mustard',
+ *               'Sesame',
+ *               'Sulphites',
+ *               'Lupines',
+ *               'Molluscs'
+ *             ]
+ *         description: Filter by allergens to exclude (comma-separated)
  *       - in: query
- *         name: mt
- *         schema:
- *           type: array
- *           items:
- *             type: string
- *         description: Filter by meal times (e.g., breakfast, dinner)
+*         name: mt
+*         schema:
+*           type: array
+*           items:
+*             type: string
+*             enum: [Breakfast, Lunch, Dinner, Snack, Dessert]
+*         description: Filter by meal times (comma-separated)
  *       - in: query
  *         name: tags
  *         schema:
