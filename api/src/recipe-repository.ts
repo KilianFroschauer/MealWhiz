@@ -9,14 +9,15 @@ export interface Recipe {
   desciption: string;
   allergens: string[];
   calories: number;
-  proteins: number; // Added field
-  carbs: number;    // Added field
-  fat: number;      // Added field
+  proteins: number; 
+  carbs: number;    
+  fat: number;      
   time: number;
   difficulty: "easy" | "medium" | "hard";
   mealTimes: string[];
   tags: string[];
-  servings: number; // Added field
+  servings: number; 
+  instructions: string;
 }
 
 export interface SimpleRecipe {
@@ -67,6 +68,7 @@ export async function getRecipeById(id: number): Promise<Recipe | undefined> {
         r.recipe_id, 
         r.title, 
         r.ingredients, 
+        r.instructions,
         r.total_time,
         r.rating,
         r.description,
@@ -260,7 +262,8 @@ async function mapDbRowsToRecipes(rows: any[]): Promise<Recipe[]> {
       difficulty: difficulty,
       mealTimes: determineMealTimes(row),
       tags: row.cuisine ? [row.cuisine] : [],
-      servings: row.servings || 4, // Include the new servings field
+      servings: row.servings || 4, 
+      instructions: row.instructions || '' 
     };
   });
   
@@ -338,13 +341,15 @@ async function calculateRecipeCalories(recipeId: number): Promise<number> {
 
 
 
-// New function to calculate nutritional information for a recipe
-async function calculateRecipeNutrition(recipeId: number): Promise<{
+interface NutritionValues {
   calories: number;
   proteins: number;
   carbs: number;
   fat: number;
-}> {
+}
+
+// New function to calculate nutritional information for a recipe
+async function calculateRecipeNutrition(recipeId: number): Promise<NutritionValues> {
   try {
     const client = await pool.connect();
 
