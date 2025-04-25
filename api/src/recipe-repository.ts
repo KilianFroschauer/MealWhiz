@@ -4,6 +4,7 @@ export interface Recipe {
   id: number;
   name: string;
   ingredients: string[];
+  ingredientsAmount: string[]; 
   ratings: number;
   dietaryPreferences: string[];
   desciption: string;
@@ -238,7 +239,7 @@ export function convertToSimpleRecipe(recipes: Recipe[]): SimpleRecipe[] {
 async function mapDbRowsToRecipes(rows: any[]): Promise<Recipe[]> {
   const recipePromises = rows.map(async row => {
     // Parse ingredients from text to array
-    const ingredients = parseIngredients(row.ingredients);
+    const basicIngredients = parseIngredients(row.ingredients);
     
     // Map difficulty from database to enum value
     const difficulty = mapDifficultyToEnum(row.difficulty);
@@ -246,10 +247,43 @@ async function mapDbRowsToRecipes(rows: any[]): Promise<Recipe[]> {
     // Calculate nutrition info
     const nutrition = await calculateRecipeNutrition(row.recipe_id);
 
+    const ingredientQuery = `
+      SELECT 
+        fp.product_name AS ingredient_name,
+        ri.quantity,
+        ri.unit
+      FROM recipe_ingredient ri
+      JOIN food_products fp ON ri.ingredient_code = fp.code
+      WHERE ri.recipe_id = $1
+      ORDER BY ingredient_name
+    `;
+
+    let ingredients = basicIngredients;
+    let ingredientsAmount: string[] = [];
+    
+    try {
+      const client = await pool.connect();
+      const result = await client.query(ingredientQuery, [row.recipe_id]);
+      client.release();
+      
+      if (result.rows.length > 0) {
+        // If we have structured ingredient data, use it instead
+        ingredients = result.rows.map(r => r.ingredient_name);
+        ingredientsAmount = result.rows.map(r => `${r.quantity} ${r.unit}`);
+      } else {
+        // If no structured data, set empty amounts or try to parse from text
+        ingredientsAmount = basicIngredients.map(() => "");
+      }
+    } catch (err) {
+      console.error(`Error fetching ingredients for recipe ${row.recipe_id}:`, err);
+      ingredientsAmount = basicIngredients.map(() => "");
+    }
+
     return {
       id: row.recipe_id,
       name: row.title,
       ingredients: ingredients,
+      ingredientsAmount: ingredientsAmount,
       ratings: row.rating || 0,
       dietaryPreferences: row.diary_pref ? [row.diary_pref] : [],
       desciption: row.description || '',
