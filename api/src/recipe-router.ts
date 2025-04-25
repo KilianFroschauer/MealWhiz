@@ -126,7 +126,23 @@ recipeRouter.get("/search", async (request, response) => {
  *           type: array
  *           items:
  *             type: string
- *         description: Exclude recipes with these allergens (comma-separated)
+ *             enum: [
+ *               'Egg', 
+ *               'Milk or lactose', 
+ *               'Gluten-containing grains',
+ *               'Crustaceans',
+ *               'Fish',
+ *               'Peanut', 
+ *               'Soy',
+ *               'Edible nuts',
+ *               'Celery',
+ *               'Mustard',
+ *               'Sesame',
+ *               'Sulphites',
+ *               'Lupines',
+ *               'Molluscs'
+ *             ]
+ *         description: Filter by allergens to exclude (comma-separated)
  *       - in: query
  *         name: mt
  *         schema:
