@@ -118,6 +118,7 @@ recipeRouter.get("/search", async (request, response) => {
  *           type: array
  *           items:
  *             type: string
+ *             enum: [standard, vegetarian, vegan, pescetarian, keto, paleo, flexitarian]
  *         description: Filter by dietary preferences (comma-separated)
  *       - in: query
  *         name: a
