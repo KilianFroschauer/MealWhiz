@@ -1,11 +1,11 @@
 "use strict";
-function getRecipeImage(name) {
-    // Placeholder logic: use a default image for now
-    return '../assets/img/Food_Example_06-unsplash.jpg';
+function getRecipeImage(id) {
+    // Use the recipe-specific image if available
+    return `../assets/img/recipe_imgs/${id}.jpg`;
 }
 function createRecipeCard(recipe) {
     const difficultyClass = `badge-difficulty-${recipe.difficulty}`;
-    const imageUrl = getRecipeImage(recipe.name); // Always returns placeholder for now
+    const imageUrl = getRecipeImage(recipe.id);
     // Convert ratings to number if it's a string
     const ratingValue = recipe.ratings !== undefined ? Number(recipe.ratings) : undefined;
     return `
