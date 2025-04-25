@@ -397,7 +397,6 @@ async function calculateRecipeNutrition(recipeId: number): Promise<NutritionValu
       FROM recipe_ingredient ri
       JOIN food_products fp ON ri.ingredient_code = fp.code
       WHERE ri.recipe_id = $1
-      AND ri.unit = 'g'  -- Only consider gram measurements for simplicity
     `;
 
     const result = await client.query(nutritionQuery, [recipeId]);

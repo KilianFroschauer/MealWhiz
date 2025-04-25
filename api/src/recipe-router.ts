@@ -268,6 +268,14 @@ recipeRouter.get("/", async (req, res) => {
  *                   type: array
  *                   items:
  *                     type: string
+ *                 ingredientsAmount:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   description: Quantities and units for each ingredient (e.g., "200 g").
+ *                 instructions:
+ *                   type: string
+ *                   description: Step-by-step cooking instructions (may contain markdown).
  *                 ratings:
  *                   type: number
  *                   description: Rating of the recipe.
@@ -275,6 +283,9 @@ recipeRouter.get("/", async (req, res) => {
  *                   type: array
  *                   items:
  *                     type: string
+ *                 desciption:
+ *                   type: string
+ *                   description: Recipe description or background information.
  *                 allergens:
  *                   type: array
  *                   items:
@@ -282,6 +293,15 @@ recipeRouter.get("/", async (req, res) => {
  *                 calories:
  *                   type: integer
  *                   description: Calories in the recipe.
+ *                 proteins:
+ *                   type: integer
+ *                   description: Total protein content in grams.
+ *                 carbs:
+ *                   type: integer
+ *                   description: Total carbohydrate content in grams.
+ *                 fat:
+ *                   type: integer
+ *                   description: Total fat content in grams.
  *                 time:
  *                   type: integer
  *                   description: Preparation time in minutes.
@@ -297,6 +317,9 @@ recipeRouter.get("/", async (req, res) => {
  *                   type: array
  *                   items:
  *                     type: string
+ *                 servings:
+ *                   type: integer
+ *                   description: Number of servings the recipe makes.
  *       404:
  *         description: Recipe not found
  *         content:
