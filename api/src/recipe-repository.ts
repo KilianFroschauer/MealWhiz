@@ -207,7 +207,13 @@ export async function getFilteredRecipes(filters: {
     }
 
     if (filters.mealTimes?.length) {
-      conditions.push(`r.meal_times && $${paramIndex}::meal_time[]`);
+      conditions.push(`
+        EXISTS (
+          SELECT 1
+          FROM unnest(r.meal_times) AS mt
+          WHERE LOWER(mt::text) = ANY(SELECT LOWER(t) FROM unnest($${paramIndex}::text[]) AS t)
+        )
+      `);
       params.push(filters.mealTimes);
       paramIndex++;
     }
