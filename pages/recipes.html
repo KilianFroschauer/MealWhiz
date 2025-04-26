@@ -131,28 +131,25 @@
     <!-- Fruits Shop Start-->
     <div class="container-fluid food py-5">
         <div class="container py-5">
-            <h1 class="mb-4">Recipes Collection</h1>
+            <h1 class="mb-4">Recipe Collection</h1>
             <div class="row g-4">
                 <div class="col-lg-12">
                     <div class="row g-4">
                         <div class="col-xl-3">
                             <div class="input-group w-100 mx-auto d-flex">
-                                <input type="search" class="form-control p-3" placeholder="keywords"
-                                    aria-describedby="search-icon-1">
-                                <span id="search-icon-1" class="input-group-text p-3"><i
-                                        class="fa fa-search"></i></span>
+                                <input type="search" class="form-control p-3" placeholder="Search recipes" id="recipe-search-input" aria-describedby="recipe-search-icon">
+                                <span id="recipe-search-icon" class="input-group-text p-3"><i class="fa fa-search"></i></span>
                             </div>
                         </div>
                         <div class="col-6"></div>
                         <div class="col-xl-3">
                             <div class="bg-light ps-3 py-3 rounded d-flex justify-content-between mb-4">
-                                <label for="fruits">Default Sorting:</label>
-                                <select id="fruits" name="fruitlist" class="border-0 form-select-sm bg-light me-3"
-                                    form="fruitform">
-                                    <option value="volvo">Popularity</option>
-                                    <option value="saab">Ratings</option>
-                                    <!-- <option value="opel">Organic</option>
-                                        <option value="audi">Fantastic</option> -->
+                                <label for="recipe-sorting">Sort By:</label>
+                                <select id="recipe-sorting" name="recipe-sorting" class="border-0 form-select-sm bg-light me-3">
+                                    <option value="none">No Sorting</option>
+                                    <option value="alpha">Alphabetically</option>
+                                    <!--<option value="popularity">Popularity</option>-->
+                                    <option value="rating">Ratings</option>
                                 </select>
                             </div>
                         </div>

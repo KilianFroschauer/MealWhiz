@@ -38,11 +38,34 @@ function createRecipeCard(recipe) {
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
+// Add sorting functionality for the dropdown
+const sortingDropdown = document.getElementById('recipe-sorting');
+let lastFetchedRecipes = [];
+// Patch renderRecipes to save last fetched recipes
 function renderRecipes(recipes) {
+    lastFetchedRecipes = recipes.slice();
     const list = document.getElementById('recipe-list');
     if (!list)
         return;
     list.innerHTML = recipes.map(createRecipeCard).join('');
+}
+function sortAndRenderRecipes(sortType) {
+    if (!lastFetchedRecipes.length)
+        return;
+    let sorted = lastFetchedRecipes.slice();
+    if (sortType === 'rating') {
+        // Ratings descending
+        sorted.sort((a, b) => (b.ratings ?? 0) - (a.ratings ?? 0));
+    }
+    else if (sortType === 'alpha') {
+        // Alphabetically by name
+        sorted.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    else if (sortType === 'none') {
+        // No sorting, original order
+        sorted = lastFetchedRecipes.slice();
+    }
+    renderRecipes(sorted);
 }
 function setLoadingState(isLoading) {
     const list = document.getElementById('recipe-list');
@@ -147,7 +170,7 @@ function buildRecipeQueryString(filters) {
     return params.toString();
 }
 // Overload fetchAndRenderRecipes to accept filters
-async function fetchAndRenderRecipesWithFilters(filters) {
+let fetchAndRenderRecipesWithFilters = async function (filters) {
     const list = document.getElementById('recipe-list');
     if (!list)
         return;
@@ -166,8 +189,8 @@ async function fetchAndRenderRecipesWithFilters(filters) {
     catch (err) {
         list.innerHTML = '<div class="alert alert-danger">Could not load recipes.</div>';
     }
-}
-async function fetchAndRenderRecipes(query) {
+};
+let fetchAndRenderRecipes = async function (query) {
     const list = document.getElementById('recipe-list');
     if (!list)
         return;
@@ -185,7 +208,7 @@ async function fetchAndRenderRecipes(query) {
     catch (err) {
         list.innerHTML = '<div class="alert alert-danger">Could not load recipes.</div>';
     }
-}
+};
 document.addEventListener('DOMContentLoaded', () => {
     // Check for ?query=... in URL
     const url = new URL(window.location.href);
@@ -318,4 +341,23 @@ document.addEventListener('DOMContentLoaded', () => {
             this.classList.toggle('selected');
         });
     });
+    if (sortingDropdown) {
+        sortingDropdown.addEventListener('change', (e) => {
+            const value = e.target.value;
+            sortAndRenderRecipes(value);
+        });
+    }
+    // Patch fetchAndRenderRecipes and fetchAndRenderRecipesWithFilters to re-sort after fetch
+    const origFetchAndRenderRecipes = fetchAndRenderRecipes;
+    fetchAndRenderRecipes = async function (query) {
+        await origFetchAndRenderRecipes(query);
+        if (sortingDropdown)
+            sortAndRenderRecipes(sortingDropdown.value);
+    };
+    const origFetchAndRenderRecipesWithFilters = fetchAndRenderRecipesWithFilters;
+    fetchAndRenderRecipesWithFilters = async function (filters) {
+        await origFetchAndRenderRecipesWithFilters(filters);
+        if (sortingDropdown)
+            sortAndRenderRecipes(sortingDropdown.value);
+    };
 });

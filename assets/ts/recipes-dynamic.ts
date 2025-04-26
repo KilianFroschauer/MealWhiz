@@ -49,10 +49,32 @@ function capitalize(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+// Add sorting functionality for the dropdown
+const sortingDropdown = document.getElementById('recipe-sorting') as HTMLSelectElement | null;
+let lastFetchedRecipes: RecipeCardData[] = [];
+
+// Patch renderRecipes to save last fetched recipes
 function renderRecipes(recipes: RecipeCardData[]): void {
+    lastFetchedRecipes = recipes.slice();
     const list = document.getElementById('recipe-list');
     if (!list) return;
     list.innerHTML = recipes.map(createRecipeCard).join('');
+}
+
+function sortAndRenderRecipes(sortType: string) {
+    if (!lastFetchedRecipes.length) return;
+    let sorted: RecipeCardData[] = lastFetchedRecipes.slice();
+    if (sortType === 'rating') {
+        // Ratings descending
+        sorted.sort((a, b) => (b.ratings ?? 0) - (a.ratings ?? 0));
+    } else if (sortType === 'alpha') {
+        // Alphabetically by name
+        sorted.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortType === 'none') {
+        // No sorting, original order
+        sorted = lastFetchedRecipes.slice();
+    }
+    renderRecipes(sorted);
 }
 
 function setLoadingState(isLoading: boolean): void {
@@ -156,7 +178,7 @@ function buildRecipeQueryString(filters: Record<string, any>): string {
 }
 
 // Overload fetchAndRenderRecipes to accept filters
-async function fetchAndRenderRecipesWithFilters(filters?: Record<string, any>): Promise<void> {
+let fetchAndRenderRecipesWithFilters = async function(filters?: Record<string, any>): Promise<void> {
     const list = document.getElementById('recipe-list');
     if (!list) return;
     setLoadingState(true);
@@ -172,9 +194,9 @@ async function fetchAndRenderRecipesWithFilters(filters?: Record<string, any>): 
     } catch (err) {
         list.innerHTML = '<div class="alert alert-danger">Could not load recipes.</div>';
     }
-}
+};
 
-async function fetchAndRenderRecipes(query?: string): Promise<void> {
+let fetchAndRenderRecipes = async function(query?: string): Promise<void> {
     const list = document.getElementById('recipe-list');
     if (!list) return;
     setLoadingState(true);
@@ -189,7 +211,7 @@ async function fetchAndRenderRecipes(query?: string): Promise<void> {
     } catch (err) {
         list.innerHTML = '<div class="alert alert-danger">Could not load recipes.</div>';
     }
-}
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     // Check for ?query=... in URL
@@ -316,4 +338,22 @@ document.addEventListener('DOMContentLoaded', () => {
             this.classList.toggle('selected');
         });
     });
+
+    if (sortingDropdown) {
+        sortingDropdown.addEventListener('change', (e) => {
+            const value = (e.target as HTMLSelectElement).value;
+            sortAndRenderRecipes(value);
+        });
+    }
+    // Patch fetchAndRenderRecipes and fetchAndRenderRecipesWithFilters to re-sort after fetch
+    const origFetchAndRenderRecipes = fetchAndRenderRecipes;
+    fetchAndRenderRecipes = async function(query?: string) {
+        await origFetchAndRenderRecipes(query);
+        if (sortingDropdown) sortAndRenderRecipes(sortingDropdown.value);
+    };
+    const origFetchAndRenderRecipesWithFilters = fetchAndRenderRecipesWithFilters;
+    fetchAndRenderRecipesWithFilters = async function(filters?: Record<string, any>) {
+        await origFetchAndRenderRecipesWithFilters(filters);
+        if (sortingDropdown) sortAndRenderRecipes(sortingDropdown.value);
+    };
 });
