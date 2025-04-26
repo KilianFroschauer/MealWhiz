@@ -328,6 +328,25 @@
     height: 250px; /* Set fixed height for all image containers */
 }
 
+.food-img {
+  background: #e0e0e0; /* Match skeleton background */
+  position: relative;
+}
+
+.recipe-img-loading {
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.food-img img {
+  background: #e0e0e0; /* Prevent white flash */
+  transition: opacity 0.4s;
+}
+
+.food-img img:not(.recipe-img-loading) {
+  opacity: 1;
+}
+
 .food .food-item .food-img img {
     transition: 0.5s;
     width: 100%;
@@ -530,4 +549,78 @@
     background-color: #dc3545; /* Custom red color */
     color: white;
   }
+
+/* Skeleton Loader Styles */
+.skeleton-card {
+  background: #f3f3f3;
+  min-height: 340px;
+  position: relative;
+  overflow: hidden;
+}
+.skeleton-img {
+  background: #e0e0e0;
+  height: 250px;
+  border-radius: 10px 10px 0 0;
+  width: 100%;
+  margin-bottom: 0;
+  position: relative;
+  overflow: hidden;
+}
+.skeleton-text {
+  background: #e0e0e0;
+  border-radius: 4px;
+  min-height: 20px;
+  margin-bottom: 10px;
+  width: 80%;
+  position: relative;
+  overflow: hidden;
+}
+.skeleton-title {
+  width: 60%;
+  height: 28px;
+  margin-bottom: 18px;
+}
+.skeleton-badge {
+  width: 60px;
+  height: 22px;
+  background: #e0e0e0;
+  border-radius: 12px;
+  display: inline-block;
+}
+.skeleton-time {
+  width: 50px;
+  height: 18px;
+  display: inline-block;
+}
+.skeleton-rating {
+  width: 40px;
+  height: 18px;
+  background: #e0e0e0;
+  border-radius: 8px;
+  display: inline-block;
+}
+/* Shimmer animation */
+.skeleton-card .skeleton-img,
+.skeleton-card .skeleton-text,
+.skeleton-card .skeleton-badge,
+.skeleton-card .skeleton-time,
+.skeleton-card .skeleton-rating {
+  position: relative;
+  overflow: hidden;
+}
+.skeleton-card .skeleton-img::after,
+.skeleton-card .skeleton-text::after,
+.skeleton-card .skeleton-badge::after,
+.skeleton-card .skeleton-time::after,
+.skeleton-card .skeleton-rating::after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0; left: -150px; height: 100%; width: 150px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: skeleton-shimmer 1.2s infinite;
+}
+@keyframes skeleton-shimmer {
+  100% { left: 100%; }
+}
 

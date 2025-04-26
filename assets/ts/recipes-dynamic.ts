@@ -17,12 +17,14 @@ function createRecipeCard(recipe: RecipeCardData): string {
     const imageUrl = getRecipeImage(recipe.id);
     // Convert ratings to number if it's a string
     const ratingValue = recipe.ratings !== undefined ? Number(recipe.ratings) : undefined;
+    // Add a skeleton overlay that will be removed on image load
     return `
     <div class="col-md-6 col-lg-6 col-xl-4">
       <a href="recipe-view.html?id=${recipe.id}" class="text-decoration-none">
-        <div class="rounded position-relative food-item">
-          <div class="food-img">
-            <img src="${imageUrl}" class="img-fluid w-100 rounded-top" alt="${recipe.name}">
+        <div class="rounded position-relative food-item card-has-skeleton">
+          <div class="food-img position-relative">
+            <img src="${imageUrl}" class="img-fluid w-100 rounded-top recipe-img-loading" alt="${recipe.name}" loading="lazy" onload="this.parentElement.querySelector('.skeleton-img-overlay')?.classList.add('d-none'); this.classList.remove('recipe-img-loading'); this.closest('.card-has-skeleton')?.classList.remove('card-has-skeleton');">
+            <div class="skeleton-img-overlay skeleton-img position-absolute top-0 start-0 w-100 h-100"></div>
           </div>
           <div class="p-4 border border-secondary border-top-0 rounded-bottom">
             <h4 class="text-dark">${recipe.name}</h4>
@@ -57,7 +59,24 @@ function setLoadingState(isLoading: boolean): void {
     const list = document.getElementById('recipe-list');
     if (!list) return;
     if (isLoading) {
-        list.innerHTML = '<div class="text-center w-100 py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+        // Render 6 skeleton cards
+        list.innerHTML = Array(6).fill('').map(() => `
+        <div class="col-md-6 col-lg-6 col-xl-4">
+          <div class="rounded position-relative food-item skeleton-card">
+            <div class="food-img skeleton-img"></div>
+            <div class="p-4 border border-secondary border-top-0 rounded-bottom">
+              <div class="skeleton-text skeleton-title mb-3"></div>
+              <div class="d-flex mb-3">
+                <div class="skeleton-badge me-2"></div>
+                <div class="skeleton-text skeleton-time ms-2"></div>
+              </div>
+              <div class="d-flex justify-content-end">
+                <div class="skeleton-rating"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        `).join('');
     }
 }
 
