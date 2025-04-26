@@ -515,6 +515,39 @@
 .nav.nav-tabs .nav-link.active {
     border-bottom: 2px solid var(--bs-secondary) !important;
 }
+
+/* Fix pagination so page items are inline and not stacked */
+#recipe-pagination.pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+    padding-left: 0;
+    margin-bottom: 0;
+    border-radius: 0.75rem;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+#recipe-pagination .page-item {
+    display: inline-block;
+}
+#recipe-pagination .page-link {
+    display: inline-block;
+    min-width: 40px;
+    text-align: center;
+    border-radius: 0.5rem !important;
+    margin: 0 2px;
+}
+
+#recipe-list > .col-md-6,
+#recipe-list > .col-lg-6,
+#recipe-list > .col-xl-4 {
+    margin-top: 1rem;
+}
+#recipe-list {
+    margin-top: 1rem;
+}
 /*** Single Page End ***/
 
 

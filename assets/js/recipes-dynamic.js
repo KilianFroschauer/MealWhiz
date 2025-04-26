@@ -42,13 +42,13 @@ function capitalize(str) {
 const sortingDropdown = document.getElementById('recipe-sorting');
 let lastFetchedRecipes = [];
 // Patch renderRecipes to save last fetched recipes
-function renderRecipes(recipes) {
+let renderRecipes = function (recipes) {
     lastFetchedRecipes = recipes.slice();
     const list = document.getElementById('recipe-list');
     if (!list)
         return;
     list.innerHTML = recipes.map(createRecipeCard).join('');
-}
+};
 function sortAndRenderRecipes(sortType) {
     if (!lastFetchedRecipes.length)
         return;
@@ -209,6 +209,109 @@ let fetchAndRenderRecipes = async function (query) {
         list.innerHTML = '<div class="alert alert-danger">Could not load recipes.</div>';
     }
 };
+// --- PAGINATION LOGIC ---
+let currentPage = 1;
+let recipesPerPage = 9;
+const paginationDropdown = document.getElementById('recipes-per-page');
+const paginationContainer = document.getElementById('recipe-pagination');
+function renderRecipesPaged(recipes) {
+    lastFetchedRecipes = recipes.slice();
+    updatePagination();
+}
+function updatePagination() {
+    if (!paginationContainer)
+        return;
+    const totalRecipes = lastFetchedRecipes.length;
+    const totalPages = Math.ceil(totalRecipes / recipesPerPage) || 1;
+    if (currentPage > totalPages)
+        currentPage = totalPages;
+    // Render only the recipes for the current page
+    const startIdx = (currentPage - 1) * recipesPerPage;
+    const endIdx = startIdx + recipesPerPage;
+    const pagedRecipes = lastFetchedRecipes.slice(startIdx, endIdx);
+    const list = document.getElementById('recipe-list');
+    if (list)
+        list.innerHTML = pagedRecipes.map(createRecipeCard).join('');
+    // Render pagination controls
+    let html = '';
+    html += `<li class="page-item${currentPage === 1 ? ' disabled' : ''}"><a class="page-link" href="#" data-page="${currentPage - 1}">Previous</a></li>`;
+    for (let i = 1; i <= totalPages; i++) {
+        html += `<li class="page-item${i === currentPage ? ' active' : ''}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+    }
+    html += `<li class="page-item${currentPage === totalPages ? ' disabled' : ''}"><a class="page-link" href="#" data-page="${currentPage + 1}">Next</a></li>`;
+    paginationContainer.innerHTML = html;
+}
+if (paginationContainer) {
+    paginationContainer.addEventListener('click', function (e) {
+        const target = e.target;
+        if (target.tagName === 'A' && target.hasAttribute('data-page')) {
+            e.preventDefault();
+            const page = parseInt(target.getAttribute('data-page'));
+            if (!isNaN(page) && page >= 1 && page <= Math.ceil(lastFetchedRecipes.length / recipesPerPage)) {
+                currentPage = page;
+                updatePagination();
+            }
+        }
+    });
+}
+if (paginationDropdown) {
+    paginationDropdown.addEventListener('change', function () {
+        recipesPerPage = parseInt(this.value);
+        currentPage = 1;
+        updatePagination();
+    });
+}
+// Patch renderRecipes to use pagination
+renderRecipes = renderRecipesPaged;
+// --- FEATURED RECIPES LOGIC ---
+function renderFeaturedRecipes(recipes) {
+    const container = document.getElementById('featured-recipes');
+    if (!container)
+        return;
+    if (!recipes.length) {
+        container.innerHTML = '<div class="alert alert-info">No featured recipes found.</div>';
+        return;
+    }
+    container.innerHTML = recipes.map(r => `
+        <a href="recipe-view.html?id=${r.id}" class="text-decoration-none text-dark">
+            <div class="d-flex align-items-center justify-content-start mb-3 featured-recipe-card" style="cursor:pointer;">
+                <div class="rounded me-3" style="width: 80px; height: 80px; overflow: hidden;">
+                    <img src="${getRecipeImage(r.id)}" class="img-fluid rounded" alt="${r.name}">
+                </div>
+                <div>
+                    <h6 class="mb-1">${r.name}</h6>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="badge badge-difficulty-${r.difficulty} me-2">${capitalize(r.difficulty)}</span>
+                        <span class="small text-muted"><i class="far fa-clock me-1"></i>${r.time} min</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-star text-warning me-1"></i>
+                        <span class="fw-bold">${Number(r.ratings).toFixed(1)}</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    `).join('');
+}
+async function fetchAndRenderFeaturedRecipes() {
+    const container = document.getElementById('featured-recipes');
+    if (!container)
+        return;
+    container.innerHTML = '<div class="spinner-border text-primary" role="status"></div>';
+    try {
+        // Fetch top 3 recipes by rating (or random if you prefer)
+        const res = await fetch('http://localhost:3000/recipes?minRating=4.5');
+        if (!res.ok)
+            throw new Error('Failed to fetch featured recipes');
+        let recipes = await res.json();
+        // Sort by rating descending, take top 3
+        recipes = recipes.sort((a, b) => (b.ratings ?? 0) - (a.ratings ?? 0)).slice(0, 3);
+        renderFeaturedRecipes(recipes);
+    }
+    catch (e) {
+        container.innerHTML = '<div class="alert alert-danger">Could not load featured recipes.</div>';
+    }
+}
 document.addEventListener('DOMContentLoaded', () => {
     // Check for ?query=... in URL
     const url = new URL(window.location.href);
@@ -360,4 +463,5 @@ document.addEventListener('DOMContentLoaded', () => {
         if (sortingDropdown)
             sortAndRenderRecipes(sortingDropdown.value);
     };
+    fetchAndRenderFeaturedRecipes();
 });

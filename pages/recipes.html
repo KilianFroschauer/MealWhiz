@@ -143,13 +143,22 @@
                         </div>
                         <div class="col-6"></div>
                         <div class="col-xl-3">
-                            <div class="bg-light ps-3 py-3 rounded d-flex justify-content-between mb-4">
-                                <label for="recipe-sorting">Sort By:</label>
+                            <div class="bg-light ps-3 py-2 pe-3 rounded d-flex align-items-center justify-content-start gap-3 flex-wrap" style="box-shadow:0 2px 8px rgba(0,0,0,0.04); width: fit-content; min-width: 0; margin-top: -12px; overflow: visible; position: relative; z-index: 2;">
+                                <label for="recipe-sorting" class="me-2 mb-0">Sort By:</label>
                                 <select id="recipe-sorting" name="recipe-sorting" class="border-0 form-select-sm bg-light me-3">
                                     <option value="none">No Sorting</option>
                                     <option value="alpha">Alphabetically</option>
                                     <!--<option value="popularity">Popularity</option>-->
                                     <option value="rating">Ratings</option>
+                                </select>
+                                <label for="recipes-per-page" class="me-2 mb-0">Recipes per page:</label>
+                                <select id="recipes-per-page" name="recipes-per-page" class="border-0 form-select-sm bg-light">
+                                    <option value="6">6</option>
+                                    <option value="9" selected>9</option>
+                                    <option value="12">12</option>
+                                    <option value="24">24</option>
+                                    <option value="48">48</option>
+                                    <option value="96">96</option>
                                 </select>
                             </div>
                         </div>
@@ -545,56 +554,7 @@
 
                                 <div class="col-lg-12">
                                     <h4 class="mb-3">Featured Recipes</h4>
-                                    <div class="d-flex align-items-center justify-content-start mb-3">
-                                        <div class="rounded me-3" style="width: 80px; height: 80px; overflow: hidden;">
-                                            <img src="../assets/img/Food_Example_01-unsplash.jpg" class="img-fluid rounded" alt="Pasta Carbonara">
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-1">French Toast</h6>
-                                            <div class="d-flex align-items-center mb-1">
-                                                <span class="badge badge-difficulty-easy me-2">Easy</span>
-                                                <span class="small text-muted"><i class="far fa-clock me-1"></i>10 min</span>
-                                            </div>
-                                            <div class="d-flex align-items-center">
-                                                <i class="fas fa-star text-warning me-1"></i>
-                                                <span class="fw-bold">4.5</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="d-flex align-items-center justify-content-start mb-3">
-                                        <div class="rounded me-3" style="width: 80px; height: 80px; overflow: hidden;">
-                                            <img src="../assets/img/Food_Example_02-unsplash.jpg" class="img-fluid rounded" alt="Mediterranean Salad">
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-1">Raspberry Pie</h6>
-                                            <div class="d-flex align-items-center mb-1">
-                                                <span class="badge badge-difficulty-medium me-2">Medium</span>
-                                                <span class="small text-muted"><i class="far fa-clock me-1"></i>100 min</span>
-                                            </div>
-                                            <div class="d-flex align-items-center">
-                                                <i class="fas fa-star text-warning me-1"></i>
-                                                <span class="fw-bold">4.3</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="d-flex align-items-center justify-content-start">
-                                        <div class="rounded me-3" style="width: 80px; height: 80px; overflow: hidden;">
-                                            <img src="../assets/img/Food_Example_03-unsplash.jpg" class="img-fluid rounded" alt="Grilled Steak">
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-1">Poke Bowl</h6>
-                                            <div class="d-flex align-items-center mb-1">
-                                                <span class="badge badge-difficulty-easy me-2">Easy</span>
-                                                <span class="small text-muted"><i class="far fa-clock me-1"></i>20 min</span>
-                                            </div>
-                                            <div class="d-flex align-items-center">
-                                                <i class="fas fa-star text-warning me-1"></i>
-                                                <span class="fw-bold">4.7</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <div id="featured-recipes" class="d-flex flex-column gap-3"></div>
                                 </div>
                                 <!--<div class="col-lg-12">
                                     <div class="position-relative">
@@ -611,6 +571,10 @@
                         <div class="col-lg-9">
                             <!-- Dynamic Recipe List -->
                             <div id="recipe-list" class="row g-4 justify-content-center"></div>
+                            <!-- Pagination Controls -->
+                            <nav id="recipe-pagination-nav" aria-label="Recipe pagination" class="mt-4 d-flex justify-content-center">
+                                <ul id="recipe-pagination" class="pagination flex-wrap"></ul>
+                            </nav>
                             <!-- End Dynamic Recipe List -->
                             <!-- The static cards below are removed and replaced by the dynamic container above -->
                         </div>
@@ -740,6 +704,13 @@
     <!-- Template Javascript -->
     <script src="../assets/js/main.js"></script>
     <script src="../assets/js/recipes-dynamic.js"></script>
+    <style>
+        #recipes-per-page {
+            position: relative;
+            z-index: 10;
+            background: #f8f9fa;
+        }
+    </style>
 </body>
 
 </html>
