@@ -219,6 +219,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    // Add event listener for the right-side search button below "Recipes Collection"
+    const rightSideSearchBtn = document.querySelector('.col-xl-3 .input-group .input-group-text');
+    const rightSideSearchInput = document.querySelector('.col-xl-3 .input-group input[type="search"]');
+    if (rightSideSearchBtn && rightSideSearchInput) {
+        rightSideSearchBtn.addEventListener('click', () => {
+            const query = rightSideSearchInput.value.trim();
+            if (query.length > 0) {
+                // Set all sidebar search inputs to this value
+                document.querySelectorAll('.input-group input[type="search"]').forEach(inp => inp.value = query);
+                fetchAndRenderRecipes(query);
+            }
+        });
+    }
     // Add event listener for Apply Filters button
     const applyBtn = document.getElementById('applyFiltersBtn');
     if (applyBtn) {

@@ -67,6 +67,32 @@ document.addEventListener('DOMContentLoaded', (): void => {
         });
     });
 
+    // Hero search bar button functionality
+    const heroSearchBar = document.querySelector('.hero-header input[type="search"]') as HTMLInputElement;
+    const heroSearchBtn = document.querySelector('.hero-header button[type="submit"]');
+    if (heroSearchBar && heroSearchBtn) {
+        heroSearchBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const query = heroSearchBar.value.trim();
+            if (query.length > 0) {
+                window.location.href = location.origin + "/pages/recipes.html?query=" + encodeURIComponent(query);
+            }
+        });
+    }
+
+    // Modal search bar button functionality (works on all pages)
+    const modalSearchBtn = document.querySelector('#searchModal .input-group-text');
+    const modalSearchInput = document.querySelector('#searchModal input[type="search"]') as HTMLInputElement;
+    if (modalSearchBtn && modalSearchInput) {
+        modalSearchBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const query = modalSearchInput.value.trim();
+            if (query.length > 0) {
+                window.location.href = location.origin + "/pages/recipes.html?query=" + encodeURIComponent(query);
+            }
+        });
+    }
+
     // Testimonial carousel
     initCarousels();
 
