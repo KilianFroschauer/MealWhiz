@@ -385,9 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (applyBtn) {
         applyBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            console.log('Apply Filters clicked'); // Debug: confirm handler
             const filters = collectRecipeFilters();
-            console.log('Collected filters:', filters); // Debug: show filters
             fetchAndRenderRecipesWithFilters(filters);
         });
     }

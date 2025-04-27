@@ -76,12 +76,6 @@ document.addEventListener('DOMContentLoaded', (): void => {
     
     // Initialize competitive cooking form
     initCompetitiveCookingForm();
-    
-    // Timer functionality if needed
-    setupTimers();
-    
-    // Simulate spectator activity if on the battle page
-    updateSpectatorActivity();
 });
 
 function hideModal(modalElement: HTMLElement): void {
@@ -119,30 +113,5 @@ function initCompetitiveCookingForm(): void {
         // In a real application, this would dynamically update challenge details
         // based on the selected challenge type
         console.log('Challenge type changed:', challengeTypeSelect.value);
-    }
-}
-
-function setupTimers(): void {
-    // Timer functionality code would go here
-    console.log('Timers set up');
-}
-
-function updateSpectatorActivity(): void {
-    const spectatorCountElements = document.querySelectorAll('.spectator-count');
-    
-    if (spectatorCountElements.length > 0) {
-        setInterval(() => {
-            spectatorCountElements.forEach(el => {
-                const text = el.textContent || '';
-                const match = text.match(/\d+/);
-                if (match) {
-                    const currentCount = parseInt(match[0]);
-                    // Random increase or decrease by 0, 1, or 2 viewers
-                    const change = Math.floor(Math.random() * 5) - 2;
-                    const newCount = Math.max(1, currentCount + change);
-                    el.innerHTML = `<i class="fas fa-eye me-1"></i> ${newCount} watching`;
-                }
-            });
-        }, 5000);
     }
 }

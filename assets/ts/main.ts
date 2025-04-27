@@ -94,8 +94,7 @@ document.addEventListener('DOMContentLoaded', (): void => {
     }
 
     // Testimonial carousel
-    initCarousels();
-
+    // If you implement a carousel, replace this placeholder
     // Product Quantity
     const quantityButtons = document.querySelectorAll('.quantity button');
     quantityButtons.forEach((button) => {
@@ -121,19 +120,6 @@ document.addEventListener('DOMContentLoaded', (): void => {
     });
 
 });
-
-// Initialize carousels
-function initCarousels(): void {
-    // This is where we would initialize owl carousel
-    // Since we want to remove jQuery dependencies, we would replace the jQuery code
-    // with vanilla JS or use a TypeScript compatible carousel library
-
-    // For now, we'll just add a comment as a placeholder
-    console.log('Carousels should be initialized here');
-    
-    // When implementing a carousel in vanilla JS, you'll need to handle all the
-    // functionality that owl.carousel.js provided, or use a different library
-}
 
 // --- REMOVE RECIPE CARD LOGIC FROM THIS FILE TO AVOID DUPLICATES ---
 // (getRecipeImage, createRecipeCard, capitalize, renderRecipes, fetchAndRenderRecipes)
