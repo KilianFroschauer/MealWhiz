@@ -92,6 +92,23 @@ function setLoadingState(isLoading) {
         `).join('');
     }
 }
+// Map checkbox IDs to allergen IDs for filtering
+const allergenIdMap = {
+    "allergy-eggs": 1,
+    "allergy-milk": 2,
+    "allergy-gluten": 3,
+    "allergy-crustaceans": 4,
+    "allergy-fish": 5,
+    "allergy-peanut": 6,
+    "allergy-soy": 7,
+    "allergy-nuts": 8,
+    "allergy-celery": 9,
+    "allergy-mustard": 10,
+    "allergy-sesame": 11,
+    "allergy-sulphites": 12,
+    "allergy-lupines": 13,
+    "allergy-molluscs": 14
+};
 // Helper: Collect filter values from the sidebar and build query params
 function collectRecipeFilters() {
     const filters = {};
@@ -108,7 +125,7 @@ function collectRecipeFilters() {
     // Allergens (allergy-*)
     const aChecked = Array.from(document.querySelectorAll('input[id^="allergy-"]:checked'));
     if (aChecked.length) {
-        filters.a = aChecked.map(cb => cb.id.replace('allergy-', ''));
+        filters.a = aChecked.map(cb => allergenIdMap[cb.id]).filter(id => id !== undefined);
     }
     // Meal Times (meal-*)
     const mtChecked = Array.from(document.querySelectorAll('input[id^="meal-"]:checked'));
@@ -127,7 +144,7 @@ function collectRecipeFilters() {
     }
     // Max Preparation Time (range)
     const timeRange = document.getElementById('timeRange');
-    if (timeRange && timeRange.value) {
+    if (timeRange && timeRange.value && timeRange.value !== timeRange.max) {
         filters.maxTime = timeRange.value;
     }
     // Calories (min/max)
@@ -217,6 +234,11 @@ const paginationContainer = document.getElementById('recipe-pagination');
 function renderRecipesPaged(recipes) {
     lastFetchedRecipes = recipes.slice();
     updatePagination();
+    // Show warning if no recipes found
+    const list = document.getElementById('recipe-list');
+    if (list && recipes.length === 0) {
+        list.innerHTML = '<div class="alert alert-warning text-center">No recipes found matching your filters.</div>';
+    }
 }
 function updatePagination() {
     if (!paginationContainer)

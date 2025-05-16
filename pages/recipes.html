@@ -403,12 +403,26 @@
                                             <div class="collapse" id="timeCollapse">
                                                 <div class="d-flex align-items-center">
                                                     <input type="range" class="form-range w-75" id="timeRange"
-                                                        name="timeRange" min="10" max="120" step="5" value="120"
-                                                        oninput="timeValue.textContent = timeRange.value + ' min'">
-                                                    <span id="timeValue" class="ms-2">120 min</span>
+                                                        name="timeRange" min="10" max="120" step="5" value="120">
+                                                    <span id="timeValue" class="ms-2">No limit</span>
                                                 </div>
                                             </div>
                                         </div>
+                                        <script>
+                                            // Preparation time slider label logic
+                                            const timeRange = document.getElementById('timeRange');
+                                            const timeValue = document.getElementById('timeValue');
+                                            function updateTimeLabel() {
+                                                if (parseInt(timeRange.value) === 120) {
+                                                    timeValue.textContent = 'No limit';
+                                                } else {
+                                                    timeValue.textContent = timeRange.value + ' min';
+                                                }
+                                            }
+                                            timeRange.addEventListener('input', updateTimeLabel);
+                                            // Ensure correct label on page load
+                                            updateTimeLabel();
+                                        </script>
 
                                         <!-- Calories -->
                                         <div class="mb-4">

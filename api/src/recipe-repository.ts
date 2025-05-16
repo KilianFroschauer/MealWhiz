@@ -193,7 +193,7 @@ export async function getFilteredRecipes(filters: {
         NOT EXISTS (
           SELECT 1 FROM recipe_allergen ra
           JOIN allergens a ON ra.allergen_id = a.allergens_id
-          WHERE ra.recipe_id = r.recipe_id AND a.allergen = ANY($${paramIndex})
+          WHERE ra.recipe_id = r.recipe_id AND a.allergens_id = ANY($${paramIndex})
         )
       `);
       params.push(filters.allergens);
