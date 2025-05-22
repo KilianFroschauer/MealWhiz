@@ -68,8 +68,32 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+    // Hero search bar button functionality
+    const heroSearchBar = document.querySelector('.hero-header input[type="search"]');
+    const heroSearchBtn = document.querySelector('.hero-header button[type="submit"]');
+    if (heroSearchBar && heroSearchBtn) {
+        heroSearchBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const query = heroSearchBar.value.trim();
+            if (query.length > 0) {
+                window.location.href = location.origin + "/pages/recipes.html?query=" + encodeURIComponent(query);
+            }
+        });
+    }
+    // Modal search bar button functionality (works on all pages)
+    const modalSearchBtn = document.querySelector('#searchModal .input-group-text');
+    const modalSearchInput = document.querySelector('#searchModal input[type="search"]');
+    if (modalSearchBtn && modalSearchInput) {
+        modalSearchBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const query = modalSearchInput.value.trim();
+            if (query.length > 0) {
+                window.location.href = location.origin + "/pages/recipes.html?query=" + encodeURIComponent(query);
+            }
+        });
+    }
     // Testimonial carousel
-    initCarousels();
+    // If you implement a carousel, replace this placeholder
     // Product Quantity
     const quantityButtons = document.querySelectorAll('.quantity button');
     quantityButtons.forEach((button) => {
@@ -94,15 +118,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
-// Initialize carousels
-function initCarousels() {
-    // This is where we would initialize owl carousel
-    // Since we want to remove jQuery dependencies, we would replace the jQuery code
-    // with vanilla JS or use a TypeScript compatible carousel library
-    // For now, we'll just add a comment as a placeholder
-    console.log('Carousels should be initialized here');
-    // When implementing a carousel in vanilla JS, you'll need to handle all the
-    // functionality that owl.carousel.js provided, or use a different library
-}
 // --- REMOVE RECIPE CARD LOGIC FROM THIS FILE TO AVOID DUPLICATES ---
 // (getRecipeImage, createRecipeCard, capitalize, renderRecipes, fetchAndRenderRecipes)

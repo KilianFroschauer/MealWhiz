@@ -8,12 +8,14 @@ function createRecipeCard(recipe) {
     const imageUrl = getRecipeImage(recipe.id);
     // Convert ratings to number if it's a string
     const ratingValue = recipe.ratings !== undefined ? Number(recipe.ratings) : undefined;
+    // Add a skeleton overlay that will be removed on image load
     return `
     <div class="col-md-6 col-lg-6 col-xl-4">
       <a href="recipe-view.html?id=${recipe.id}" class="text-decoration-none">
-        <div class="rounded position-relative food-item">
-          <div class="food-img">
-            <img src="${imageUrl}" class="img-fluid w-100 rounded-top" alt="${recipe.name}">
+        <div class="rounded position-relative food-item card-has-skeleton">
+          <div class="food-img position-relative">
+            <img src="${imageUrl}" class="img-fluid w-100 rounded-top recipe-img-loading" alt="${recipe.name}" loading="lazy" onload="this.parentElement.querySelector('.skeleton-img-overlay')?.classList.add('d-none'); this.classList.remove('recipe-img-loading'); this.closest('.card-has-skeleton')?.classList.remove('card-has-skeleton');">
+            <div class="skeleton-img-overlay skeleton-img position-absolute top-0 start-0 w-100 h-100"></div>
           </div>
           <div class="p-4 border border-secondary border-top-0 rounded-bottom">
             <h4 class="text-dark">${recipe.name}</h4>
@@ -36,20 +38,77 @@ function createRecipeCard(recipe) {
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
-function renderRecipes(recipes) {
+// Add sorting functionality for the dropdown
+const sortingDropdown = document.getElementById('recipe-sorting');
+let lastFetchedRecipes = [];
+// Patch renderRecipes to save last fetched recipes
+let renderRecipes = function (recipes) {
+    lastFetchedRecipes = recipes.slice();
     const list = document.getElementById('recipe-list');
     if (!list)
         return;
     list.innerHTML = recipes.map(createRecipeCard).join('');
+};
+function sortAndRenderRecipes(sortType) {
+    if (!lastFetchedRecipes.length)
+        return;
+    let sorted = lastFetchedRecipes.slice();
+    if (sortType === 'rating') {
+        // Ratings descending
+        sorted.sort((a, b) => (b.ratings ?? 0) - (a.ratings ?? 0));
+    }
+    else if (sortType === 'alpha') {
+        // Alphabetically by name
+        sorted.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    else if (sortType === 'none') {
+        // No sorting, original order
+        sorted = lastFetchedRecipes.slice();
+    }
+    renderRecipes(sorted);
 }
 function setLoadingState(isLoading) {
     const list = document.getElementById('recipe-list');
     if (!list)
         return;
     if (isLoading) {
-        list.innerHTML = '<div class="text-center w-100 py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+        // Render 6 skeleton cards
+        list.innerHTML = Array(6).fill('').map(() => `
+        <div class="col-md-6 col-lg-6 col-xl-4">
+          <div class="rounded position-relative food-item skeleton-card">
+            <div class="food-img skeleton-img"></div>
+            <div class="p-4 border border-secondary border-top-0 rounded-bottom">
+              <div class="skeleton-text skeleton-title mb-3"></div>
+              <div class="d-flex mb-3">
+                <div class="skeleton-badge me-2"></div>
+                <div class="skeleton-text skeleton-time ms-2"></div>
+              </div>
+              <div class="d-flex justify-content-end">
+                <div class="skeleton-rating"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        `).join('');
     }
 }
+// Map checkbox IDs to allergen IDs for filtering
+const allergenIdMap = {
+    "allergy-eggs": 1,
+    "allergy-milk": 2,
+    "allergy-gluten": 3,
+    "allergy-crustaceans": 4,
+    "allergy-fish": 5,
+    "allergy-peanut": 6,
+    "allergy-soy": 7,
+    "allergy-nuts": 8,
+    "allergy-celery": 9,
+    "allergy-mustard": 10,
+    "allergy-sesame": 11,
+    "allergy-sulphites": 12,
+    "allergy-lupines": 13,
+    "allergy-molluscs": 14
+};
 // Helper: Collect filter values from the sidebar and build query params
 function collectRecipeFilters() {
     const filters = {};
@@ -66,7 +125,7 @@ function collectRecipeFilters() {
     // Allergens (allergy-*)
     const aChecked = Array.from(document.querySelectorAll('input[id^="allergy-"]:checked'));
     if (aChecked.length) {
-        filters.a = aChecked.map(cb => cb.id.replace('allergy-', ''));
+        filters.a = aChecked.map(cb => allergenIdMap[cb.id]).filter(id => id !== undefined);
     }
     // Meal Times (meal-*)
     const mtChecked = Array.from(document.querySelectorAll('input[id^="meal-"]:checked'));
@@ -85,7 +144,7 @@ function collectRecipeFilters() {
     }
     // Max Preparation Time (range)
     const timeRange = document.getElementById('timeRange');
-    if (timeRange && timeRange.value) {
+    if (timeRange && timeRange.value && timeRange.value !== timeRange.max) {
         filters.maxTime = timeRange.value;
     }
     // Calories (min/max)
@@ -128,7 +187,7 @@ function buildRecipeQueryString(filters) {
     return params.toString();
 }
 // Overload fetchAndRenderRecipes to accept filters
-async function fetchAndRenderRecipesWithFilters(filters) {
+let fetchAndRenderRecipesWithFilters = async function (filters) {
     const list = document.getElementById('recipe-list');
     if (!list)
         return;
@@ -147,8 +206,8 @@ async function fetchAndRenderRecipesWithFilters(filters) {
     catch (err) {
         list.innerHTML = '<div class="alert alert-danger">Could not load recipes.</div>';
     }
-}
-async function fetchAndRenderRecipes(query) {
+};
+let fetchAndRenderRecipes = async function (query) {
     const list = document.getElementById('recipe-list');
     if (!list)
         return;
@@ -165,6 +224,114 @@ async function fetchAndRenderRecipes(query) {
     }
     catch (err) {
         list.innerHTML = '<div class="alert alert-danger">Could not load recipes.</div>';
+    }
+};
+// --- PAGINATION LOGIC ---
+let currentPage = 1;
+let recipesPerPage = 9;
+const paginationDropdown = document.getElementById('recipes-per-page');
+const paginationContainer = document.getElementById('recipe-pagination');
+function renderRecipesPaged(recipes) {
+    lastFetchedRecipes = recipes.slice();
+    updatePagination();
+    // Show warning if no recipes found
+    const list = document.getElementById('recipe-list');
+    if (list && recipes.length === 0) {
+        list.innerHTML = '<div class="alert alert-warning text-center">No recipes found matching your filters.</div>';
+    }
+}
+function updatePagination() {
+    if (!paginationContainer)
+        return;
+    const totalRecipes = lastFetchedRecipes.length;
+    const totalPages = Math.ceil(totalRecipes / recipesPerPage) || 1;
+    if (currentPage > totalPages)
+        currentPage = totalPages;
+    // Render only the recipes for the current page
+    const startIdx = (currentPage - 1) * recipesPerPage;
+    const endIdx = startIdx + recipesPerPage;
+    const pagedRecipes = lastFetchedRecipes.slice(startIdx, endIdx);
+    const list = document.getElementById('recipe-list');
+    if (list)
+        list.innerHTML = pagedRecipes.map(createRecipeCard).join('');
+    // Render pagination controls
+    let html = '';
+    html += `<li class="page-item${currentPage === 1 ? ' disabled' : ''}"><a class="page-link" href="#" data-page="${currentPage - 1}">Previous</a></li>`;
+    for (let i = 1; i <= totalPages; i++) {
+        html += `<li class="page-item${i === currentPage ? ' active' : ''}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+    }
+    html += `<li class="page-item${currentPage === totalPages ? ' disabled' : ''}"><a class="page-link" href="#" data-page="${currentPage + 1}">Next</a></li>`;
+    paginationContainer.innerHTML = html;
+}
+if (paginationContainer) {
+    paginationContainer.addEventListener('click', function (e) {
+        const target = e.target;
+        if (target.tagName === 'A' && target.hasAttribute('data-page')) {
+            e.preventDefault();
+            const page = parseInt(target.getAttribute('data-page'));
+            if (!isNaN(page) && page >= 1 && page <= Math.ceil(lastFetchedRecipes.length / recipesPerPage)) {
+                currentPage = page;
+                updatePagination();
+            }
+        }
+    });
+}
+if (paginationDropdown) {
+    paginationDropdown.addEventListener('change', function () {
+        recipesPerPage = parseInt(this.value);
+        currentPage = 1;
+        updatePagination();
+    });
+}
+// Patch renderRecipes to use pagination
+renderRecipes = renderRecipesPaged;
+// --- FEATURED RECIPES LOGIC ---
+function renderFeaturedRecipes(recipes) {
+    const container = document.getElementById('featured-recipes');
+    if (!container)
+        return;
+    if (!recipes.length) {
+        container.innerHTML = '<div class="alert alert-info">No featured recipes found.</div>';
+        return;
+    }
+    container.innerHTML = recipes.map(r => `
+        <a href="recipe-view.html?id=${r.id}" class="text-decoration-none text-dark">
+            <div class="d-flex align-items-center justify-content-start mb-3 featured-recipe-card" style="cursor:pointer;">
+                <div class="rounded me-3" style="width: 80px; height: 80px; overflow: hidden;">
+                    <img src="${getRecipeImage(r.id)}" class="img-fluid rounded" alt="${r.name}">
+                </div>
+                <div>
+                    <h6 class="mb-1">${r.name}</h6>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="badge badge-difficulty-${r.difficulty} me-2">${capitalize(r.difficulty)}</span>
+                        <span class="small text-muted"><i class="far fa-clock me-1"></i>${r.time} min</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-star text-warning me-1"></i>
+                        <span class="fw-bold">${Number(r.ratings).toFixed(1)}</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    `).join('');
+}
+async function fetchAndRenderFeaturedRecipes() {
+    const container = document.getElementById('featured-recipes');
+    if (!container)
+        return;
+    container.innerHTML = '<div class="spinner-border text-primary" role="status"></div>';
+    try {
+        // Fetch top 3 recipes by rating (or random if you prefer)
+        const res = await fetch('http://localhost:3000/recipes?minRating=4.5');
+        if (!res.ok)
+            throw new Error('Failed to fetch featured recipes');
+        let recipes = await res.json();
+        // Sort by rating descending, take top 3
+        recipes = recipes.sort((a, b) => (b.ratings ?? 0) - (a.ratings ?? 0)).slice(0, 3);
+        renderFeaturedRecipes(recipes);
+    }
+    catch (e) {
+        container.innerHTML = '<div class="alert alert-danger">Could not load featured recipes.</div>';
     }
 }
 document.addEventListener('DOMContentLoaded', () => {
@@ -219,14 +386,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    // Add event listener for the right-side search button below "Recipes Collection"
+    const rightSideSearchBtn = document.querySelector('.col-xl-3 .input-group .input-group-text');
+    const rightSideSearchInput = document.querySelector('.col-xl-3 .input-group input[type="search"]');
+    if (rightSideSearchBtn && rightSideSearchInput) {
+        rightSideSearchBtn.addEventListener('click', () => {
+            const query = rightSideSearchInput.value.trim();
+            if (query.length > 0) {
+                // Set all sidebar search inputs to this value
+                document.querySelectorAll('.input-group input[type="search"]').forEach(inp => inp.value = query);
+                fetchAndRenderRecipes(query);
+            }
+        });
+    }
     // Add event listener for Apply Filters button
     const applyBtn = document.getElementById('applyFiltersBtn');
     if (applyBtn) {
         applyBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            console.log('Apply Filters clicked'); // Debug: confirm handler
             const filters = collectRecipeFilters();
-            console.log('Collected filters:', filters); // Debug: show filters
             fetchAndRenderRecipesWithFilters(filters);
         });
     }
@@ -286,4 +464,24 @@ document.addEventListener('DOMContentLoaded', () => {
             this.classList.toggle('selected');
         });
     });
+    if (sortingDropdown) {
+        sortingDropdown.addEventListener('change', (e) => {
+            const value = e.target.value;
+            sortAndRenderRecipes(value);
+        });
+    }
+    // Patch fetchAndRenderRecipes and fetchAndRenderRecipesWithFilters to re-sort after fetch
+    const origFetchAndRenderRecipes = fetchAndRenderRecipes;
+    fetchAndRenderRecipes = async function (query) {
+        await origFetchAndRenderRecipes(query);
+        if (sortingDropdown)
+            sortAndRenderRecipes(sortingDropdown.value);
+    };
+    const origFetchAndRenderRecipesWithFilters = fetchAndRenderRecipesWithFilters;
+    fetchAndRenderRecipesWithFilters = async function (filters) {
+        await origFetchAndRenderRecipesWithFilters(filters);
+        if (sortingDropdown)
+            sortAndRenderRecipes(sortingDropdown.value);
+    };
+    fetchAndRenderFeaturedRecipes();
 });

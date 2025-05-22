@@ -1,0 +1,94 @@
+body {
+  min-height: 100vh;
+  background: linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)), url('../img/hero-knife-cutting-pixabay.jpg') center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-register-container {
+  background: #fff;
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  padding: 2.5rem 2rem 2rem 2rem;
+  max-width: 400px;
+  width: 100%;
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.login-register-container h1 {
+  font-family: 'K2D', 'Raleway', Arial, sans-serif;
+  font-weight: 900;
+  color: var(--bs-primary, #ffb524);
+  margin-bottom: 1.5rem;
+  font-size: 2.2rem;
+  letter-spacing: 1px;
+}
+
+.login-register-container form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.login-register-container input[type="text"],
+.login-register-container input[type="password"] {
+  border-radius: 0.75rem;
+  border: 1px solid #e0e0e0;
+  padding: 0.9rem 1.1rem;
+  font-size: 1.1rem;
+  background: #f8f9fa;
+  transition: border-color 0.2s;
+}
+
+.login-register-container input:focus {
+  border-color: var(--bs-primary, #ffb524);
+  outline: none;
+  background: #fff;
+}
+
+.login-register-container button[type="submit"] {
+  background: var(--bs-primary, #ffb524);
+  color: #fff;
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.9rem 1.1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  transition: background 0.2s;
+  margin-top: 0.5rem;
+}
+
+.login-register-container button[type="submit"]:hover {
+  background: #e6a91e;
+}
+
+.login-register-container p {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: #333;
+}
+
+.login-register-container a {
+  color: var(--bs-primary, #ffb524);
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.login-register-container a:hover {
+  color: #e6a91e;
+}
+
+@media (max-width: 500px) {
+  .login-register-container {
+    padding: 1.2rem 0.5rem 1.5rem 0.5rem;
+  }
+  .login-register-container h1 {
+    font-size: 1.5rem;
+  }
+}
