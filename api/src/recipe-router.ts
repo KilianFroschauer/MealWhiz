@@ -12,6 +12,8 @@ const parseArrayParam = (param: string | string[] | undefined) =>
  * @swagger
  * /recipes/search:
  *   get:
+ *     tags:
+ *       - recipe
  *     summary: Search for recipes based on query
  *     description: This endpoint allows searching for recipes by name, ingredients, or tags using a query string.
  *     parameters:
@@ -76,6 +78,8 @@ recipeRouter.get("/search", async (request, response) => {
  * @swagger
  * /recipes:
  *   get:
+ *     tags:
+ *       - recipe
  *     summary: Get filtered recipes
  *     description: Retrieve a list of recipes based on various filters.
  *     parameters:
@@ -242,6 +246,8 @@ recipeRouter.get("/", async (req, res) => {
  * @swagger
  * /recipes/{id}:
  *   get:
+ *     tags:
+ *       - recipe
  *     summary: Get a specific recipe
  *     description: Retrieve a single recipe by its ID.
  *     parameters:

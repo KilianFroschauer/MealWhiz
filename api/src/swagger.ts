@@ -15,8 +15,18 @@ const swaggerOptions = {
         url: "http://localhost:3000",
       },
     ],
+    tags: [
+      {
+        name: "recipe",
+        description: "Recipe operations"
+      },
+      {
+        name: "cookoff", 
+        description: "Cooking event operations"
+      }
+    ]
   },
-  apis: ["./src/index.ts", "./src/recipe-router.ts"],
+  apis: ["./src/index.ts", "./src/recipe-router.ts", "./src/event-router.ts"],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);

@@ -2,6 +2,7 @@ import express from "express";
 import cors from 'cors';
 import { setupSwagger } from "./swagger";
 import { recipeRouter } from "./recipe-router";
+import { eventRouter } from "./event-router";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,6 +14,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use("/recipes", recipeRouter);
+app.use("/events", eventRouter);
 
 setupSwagger(app);
 

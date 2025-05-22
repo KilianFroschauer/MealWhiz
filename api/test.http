@@ -51,3 +51,38 @@ Accept: application/json
 ### Testcase: TC-011-04
 GET http://localhost:3000/recipes?dabk=def
 Accept: application/json
+
+
+### 1. Event erstellen
+POST http://localhost:3000/events
+Content-Type: application/json
+
+{
+    "mode": "competitive",
+    "challengeType": "Speed Cooking",
+    "difficulty": "medium"
+}
+
+### 2. Event als Opponent beitreten
+POST http://localhost:3000/events/4/join
+Content-Type: application/json
+
+{
+    "role": "opponent"
+}
+
+### 3. Event als Zuschauer beitreten
+POST http://localhost:3000/events/4/join
+Content-Type: application/json
+
+{
+    "role": "spectator"
+}
+
+### 4. Live Events abrufen
+GET http://localhost:3000/events/live
+Accept: application/json
+
+### 5. Details eines bestimmten Events abrufen
+GET http://localhost:3000/events/4
+Accept: application/json
