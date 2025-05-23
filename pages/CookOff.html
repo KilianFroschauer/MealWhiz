@@ -105,6 +105,26 @@
     </div>
     <!-- Modal Search End -->
 
+    <!-- Join Lobby Confirmation Modal Start -->
+    <div class="modal fade" id="joinLobbyConfirmationModal" tabindex="-1" aria-labelledby="joinLobbyConfirmationModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog" style="z-index: 1100;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="joinLobbyConfirmationModalLabel">Confirm Join</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="joinLobbyConfirmationBody">
+                    <!-- Content will be set by JavaScript: e.g., "Are you sure you want to join lobby 'LobbyName'?" -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-primary" id="confirmJoinYesBtn">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Join Lobby Confirmation Modal End -->
+
 
     <!-- Single Page Header start -->
     <div class="container-fluid page-header py-5">
