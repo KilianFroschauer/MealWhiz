@@ -3,93 +3,139 @@
     <head>
         <meta charset="UTF-8" />
         <title>Mein Warenkorb</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
         <style>
             body {
-                padding: 2rem;
-                background-color: #f8f9fa;
-            }
-            .cart-container {
-                max-width: 700px;
+                font-family: "Segoe UI", sans-serif;
+                background-color: #f2f2f2;
+                padding: 40px;
+                max-width: 600px;
                 margin: auto;
-                background: white;
-                padding: 2rem;
-                border-radius: 1rem;
-                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            }
+
+            h1 {
+                text-align: center;
+                color: #333;
+            }
+
+            .form-group {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+
+            input,
+            button {
+                padding: 8px;
+                font-size: 1rem;
+            }
+
+            button {
+                background-color: #3498db;
+                color: white;
+                border: none;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+
+            button:hover {
+                background-color: #2980b9;
+            }
+
+            .cart-item {
+                background-color: white;
+                margin: 8px 0;
+                padding: 10px;
+                border-radius: 5px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            }
+
+            #message {
+                color: #e74c3c;
+                margin-top: 10px;
             }
         </style>
     </head>
     <body>
-        <div class="cart-container">
-            <h2 class="mb-4">🛒 Dein Einkaufswagen</h2>
+        <h1>🛒 Mein Warenkorb</h1>
 
-            <form id="addForm" class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <input type="text" class="form-control" id="ingredient" placeholder="Zutat" required />
-                </div>
-                <div class="col-md-4">
-                    <input
-                        type="number"
-                        class="form-control"
-                        id="quantity"
-                        placeholder="Menge"
-                        value="1"
-                        min="1"
-                        required
-                    />
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">Hinzufügen</button>
-                </div>
-            </form>
-
-            <ul class="list-group" id="cartList">
-                <!-- Dynamisch befüllt -->
-            </ul>
+        <div class="form-group">
+            <input type="text" id="ingredient" placeholder="Zutat" />
+            <input type="number" id="quantity" placeholder="Menge" />
         </div>
 
+        <div class="form-group">
+            <button onclick="addToCart()">Hinzufügen / Aktualisieren</button>
+            <button onclick="deleteFromCart()">Löschen</button>
+            <button onclick="loadCart()">Warenkorb laden</button>
+        </div>
+
+        <div id="cart"></div>
+        <div id="message"></div>
+
         <script>
-            async function fetchCart() {
-                const res = await fetch("/api/cart");
-                const cart = await res.json();
-                const list = document.getElementById("cartList");
-                list.innerHTML = "";
-                cart.forEach((item) => {
-                    const li = document.createElement("li");
-                    li.className = "list-group-item d-flex justify-content-between align-items-center";
-                    li.innerHTML = `
-          <span><strong>${item.ingredient}</strong> &times; ${item.quantity}</span>
-          <button class="btn btn-sm btn-danger" onclick="deleteItem('${item.ingredient}')">Entfernen</button>
-        `;
-                    list.appendChild(li);
+            const apiBase = "http://localhost:3000"; // ggf. anpassen
+
+            async function loadCart() {
+                const res = await fetch(`${apiBase}/cart`, {
+                    method: "GET",
+                    credentials: "include",
                 });
+
+                const cartDiv = document.getElementById("cart");
+                cartDiv.innerHTML = "";
+
+                if (res.ok) {
+                    const items = await res.json();
+                    if (items.length === 0) {
+                        cartDiv.innerHTML = "<p>Warenkorb ist leer.</p>";
+                    } else {
+                        items.forEach((item) => {
+                            const el = document.createElement("div");
+                            el.className = "cart-item";
+                            el.textContent = `${item.ingredient} – ${item.quantity}`;
+                            cartDiv.appendChild(el);
+                        });
+                    }
+                } else {
+                    showMessage(await res.text());
+                }
             }
 
-            async function deleteItem(ingredient) {
-                await fetch("/api/cart", {
-                    method: "DELETE",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ ingredient }),
-                });
-                fetchCart();
-            }
-
-            document.getElementById("addForm").addEventListener("submit", async (e) => {
-                e.preventDefault();
+            async function addToCart() {
                 const ingredient = document.getElementById("ingredient").value;
                 const quantity = parseInt(document.getElementById("quantity").value);
 
-                await fetch("/api/cart", {
+                const res = await fetch(`${apiBase}/cart`, {
                     method: "POST",
+                    credentials: "include",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ ingredient, quantity }),
                 });
 
-                e.target.reset();
-                fetchCart();
-            });
+                showMessage(await res.text());
+                loadCart();
+            }
 
-            fetchCart();
+            async function deleteFromCart() {
+                const ingredient = document.getElementById("ingredient").value;
+
+                const res = await fetch(`${apiBase}/cart`, {
+                    method: "DELETE",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ ingredient }),
+                });
+
+                showMessage(await res.text());
+                loadCart();
+            }
+
+            function showMessage(msg) {
+                document.getElementById("message").textContent = msg;
+            }
+
+            // Auto-laden beim Start
+            loadCart();
         </script>
     </body>
 </html>

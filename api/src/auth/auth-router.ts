@@ -1,6 +1,8 @@
 import express from "express";
 import { authenticateUser, registerUser } from "./auth-handler";
+import pool from "../database";
 import "express-session";
+import { Request, Response } from "express";
 
 declare module "express-session" {
     interface SessionData {
