@@ -425,7 +425,7 @@ async function fetchAndRenderFeaturedRecipes(): Promise<void> {
     container.innerHTML = '<div class="text-muted small p-2">Loading featured...</div>';
     try {
         // Example: Fetch recipes with a minimum rating of 4.5.
-        const res = await fetch('http://localhost:3000/recipes?minRating=4.5&limit=5'); // Add limit
+        const res = await fetch('http://localhost:3000/recipes?minRating=4.5'); // Add limit
         if (!res.ok) throw new Error('Failed to fetch featured recipes');
         let recipes: RecipeCardData[] = await res.json();
         // Sort by rating (descending) and take the top 3.

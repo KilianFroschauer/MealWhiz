@@ -14,8 +14,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     carouselInner.innerHTML = `<div class="d-flex justify-content-center align-items-center" style="height:200px;"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>`;
     try {
         // Fetch recipes from the API. Here, it's fetching recipes with a minimum rating of 4.5.
-        // The API might also support parameters like `?featured=true` or `?limit=3&sortBy=rating_desc`.
-        const res = await fetch('http://localhost:3000/recipes?minRating=4.5&limit=5'); // Fetch a bit more to ensure variety if some images fail
+        // The API might also support parameters like `?featured=true`.
+        const res = await fetch('http://localhost:3000/recipes?minRating=4.5'); // Fetch a bit more to ensure variety if some images fail
         if (!res.ok) {
             throw new Error(`Failed to fetch recipes: ${res.statusText}`);
         }

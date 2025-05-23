@@ -76,7 +76,7 @@ function renderRecipe(recipe) {
                             <i class="fa fa-star text-warning me-1"></i>
                             <span class="ms-2">(${recipe.ratings})</span>
                         </div>
-                        <p class="mb-4">${recipe.desciption || ''}</p> {/* Corrected typo: description */}
+                        <p class="mb-4">${recipe.desciption || ''}</p> 
                         <div class="mb-4">
                             <h5 class="fw-bold mb-2">Dietary Information:</h5>
                             ${recipe.dietaryPreferences.length > 0 ? recipe.dietaryPreferences.map(dp => `<span class="badge bg-success me-2">${dp}</span>`).join('') : '<span class="text-muted">None</span>'}
@@ -104,7 +104,7 @@ function renderRecipe(recipe) {
                     </div>
                     <div class="col-lg-12">
                         <div class="row">
-                            <div class="col-lg-3 d-none d-lg-block"> {/* Sidebar navigation for larger screens */}
+                            <div class="col-lg-3 d-none d-lg-block"> 
                                 <div class="sticky-top" style="top: 120px;">
                                     <div class="bg-light p-3 rounded mb-4">
                                         <h5 class="fw-bold mb-3">Chapters</h5>
@@ -115,12 +115,12 @@ function renderRecipe(recipe) {
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-9"> {/* Main content area for ingredients/instructions */}
+                            <div class="col-lg-9"> 
                                 <ul class="nav nav-tabs mb-4">
                                     <li class="nav-item">
                                         <a class="nav-link active" data-bs-toggle="tab" href="#recipe-content">Recipe</a>
                                     </li>
-                                    {/* Additional tabs like "Reviews" could be added here */}
+                                    
                                 </ul>
                                 <div class="tab-content">
                                     <div id="recipe-content" class="tab-pane fade show active">
@@ -141,7 +141,7 @@ function renderRecipe(recipe) {
                     </div>
                 </div>
             </div>
-            {/* Sidebar for related recipes or ads could go in col-lg-4 col-xl-3 */}
+            
         </div>
     `;
 }
