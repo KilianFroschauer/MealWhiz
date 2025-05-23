@@ -30,7 +30,7 @@ export async function authenticateUser(username: string, password: string): Prom
         const hashedPassword = result.rows[0].user_password;
 
         console.log(hashedPassword);
-        console.log(bcrypt.hash(password, 10));
+        console.log(await bcrypt.hash(password, 10));
 
         return await bcrypt.compare(password, hashedPassword);
     } catch (err) {
