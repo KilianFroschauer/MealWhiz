@@ -16,10 +16,15 @@ async function getUserId(username: string): Promise<number | null> {
 }
 
 cartRouter.get("/", async (req: Request, res: Response) => {
-    if (!req.session?.user) return res.status(401).send("Nicht eingeloggt");
-
+    if (!req.session?.user) {
+        res.status(401).send("Nicht eingeloggt");
+        return;
+    }
     const userId = await getUserId(req.session.user);
-    if (!userId) return res.status(404).send("Benutzer nicht gefunden");
+    if (!userId) {
+        res.status(404).send("Benutzer nicht gefunden");
+        return;
+    }
 
     try {
         const result = await pool.query("SELECT ingredients, quantity FROM shopping_cart WHERE user_id = $1", [userId]);
@@ -33,12 +38,15 @@ cartRouter.get("/", async (req: Request, res: Response) => {
 cartRouter.post("/", async (req: Request, res: Response) => {
     const { ingredient, quantity } = req.body;
     if (!req.session?.user || !ingredient || typeof quantity !== "number") {
-        return res.status(400).send("Ungültige Anfrage");
+        res.status(400).send("Ungültige Anfrage");
+        return;
     }
 
     const userId = await getUserId(req.session.user);
-    if (!userId) return res.status(404).send("Benutzer nicht gefunden");
-
+    if (!userId) {
+        res.status(404).send("Benutzer nicht gefunden");
+        return;
+    }
     try {
         await pool.query(
             `
@@ -60,11 +68,15 @@ cartRouter.post("/", async (req: Request, res: Response) => {
 cartRouter.delete("/", async (req: Request, res: Response) => {
     const { ingredient } = req.body;
     if (!req.session?.user || !ingredient) {
-        return res.status(400).send("Ungültige Anfrage");
+        res.status(400).send("Ungültige Anfrage");
+        return;
     }
 
     const userId = await getUserId(req.session.user);
-    if (!userId) return res.status(404).send("Benutzer nicht gefunden");
+    if (!userId) {
+        res.status(404).send("Benutzer nicht gefunden");
+        return;
+    }
 
     try {
         await pool.query("DELETE FROM shopping_cart WHERE user_id = $1 AND ingredients = $2", [userId, ingredient]);
