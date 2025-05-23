@@ -1,6 +1,6 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import cors from 'cors';
-import { setupSwagger } from "./swagger";
+import { setupSwagger } from "./config/swagger.config";
 import { recipeRouter } from "./recipe-router";
 import { eventRouter } from "./event-router";
 import router from "./auth/auth-router";
@@ -15,28 +15,27 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
-
-app.use(session({
-    secret: 'your secret key', // Replace with a strong secret
-    resave: false,
-    saveUninitialized: false, // Set to true if you want to save sessions that are new but not modified
-    cookie: {
-        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-        httpOnly: true, // Prevents client-side JS from accessing the cookie
-        maxAge: 1000 * 60 * 60 * 24 // Optional: e.g., 1 day
-    }
-}));
-
 app.use("/recipes", recipeRouter);
 app.use("/events", eventRouter);
 app.use('/', router);
 
-setupSwagger(app);
-
-app.get("/", (request, response) => {
-    response.send("Mealwhiz api!")
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date() });
 });
 
+// Swagger documentation
+setupSwagger(app);
+
+// TODO: Add authentication middleware
+// TODO: Add error handling middleware
+
+// 404 handler
+app.use((req: Request, res: Response) => {
+  res.status(404).json({ error: 'Not Found' });
+});
+
+// Start server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
     console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
