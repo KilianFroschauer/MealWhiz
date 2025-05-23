@@ -190,6 +190,67 @@ export async function getLiveEvents(): Promise<any[]> {
 }
 
 /**
+ * Gets events by mode and status
+ */
+export async function getEventsByFilter(mode: string, status: string): Promise<Event[]> {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(
+      `SELECT e.id, e.mode, e.status, e.challenge_type, e.difficulty,
+              e.start_time, e.stream_url, e.created_at,
+              h.user_name as host_name,
+              o.user_name as opponent_name,
+              e.host_user_id, e.opponent_user_id
+       FROM events e
+       JOIN "user" h ON e.host_user_id = h.user_id
+       LEFT JOIN "user" o ON e.opponent_user_id = o.user_id
+       WHERE e.mode = $1 AND e.status = $2
+       ORDER BY e.created_at DESC`,
+      [mode, status]
+    );
+
+    // Get participants for each event (similar to getEventById)
+    const eventsWithParticipants = await Promise.all(result.rows.map(async (eventRow) => {
+      const participantsResult = await client.query(
+        `SELECT er.user_id, u.user_name, er.role, er.joined_at
+         FROM event_roles er
+         JOIN "user" u ON er.user_id = u.user_id
+         WHERE er.event_id = $1`,
+        [eventRow.id]
+      );
+      const participants = participantsResult.rows.map(p => ({
+        userId: p.user_id,
+        username: p.user_name,
+        role: p.role,
+        joinedAt: p.joined_at
+      }));
+      return {
+        id: eventRow.id,
+        mode: eventRow.mode,
+        status: eventRow.status,
+        hostUserId: eventRow.host_user_id,
+        hostName: eventRow.host_name,
+        opponentUserId: eventRow.opponent_user_id,
+        opponentName: eventRow.opponent_name,
+        challengeType: eventRow.challenge_type,
+        difficulty: eventRow.difficulty,
+        startTime: eventRow.start_time,
+        endTime: eventRow.end_time,
+        streamUrl: eventRow.stream_url,
+        createdAt: eventRow.created_at,
+        participants
+      };
+    }));
+    return eventsWithParticipants;
+  } catch (error) {
+    console.error('Error fetching events by filter:', error);
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+/**
  * Join an event as opponent or spectator
  */
 export async function joinEvent(eventId: number, userId: number, role: 'opponent' | 'spectator'): Promise<void> {
