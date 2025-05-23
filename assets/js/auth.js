@@ -55,13 +55,20 @@ document.addEventListener("DOMContentLoaded", () => {
         registerForm.addEventListener("submit", async (e) => {
             e.preventDefault(); // Prevents the default form submission behavior.
             // Gets the username and password values from the form inputs.
-            const username = registerForm.username.value; // Assuming your form input for username is named 'username'
+            const username = registerForm.username.value;
             const password = registerForm.password.value;
+            const confirmPassword = registerForm.confirmPassword?.value; // Get confirm password value
+            // Check if passwords match
+            if (password !== confirmPassword) {
+                alert("Passwords do not match!");
+                return; // Stop submission if passwords don't match
+            }
             // Sends a POST request to the /register endpoint with the credentials.
             const res = await fetch("http://127.0.0.1:3000/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 // Ensure the body matches what your backend /register expects
+                // The backend /register endpoint only needs username and password, not confirmPassword
                 body: JSON.stringify({ username, password }),
             });
             console.log("Response status:", res.status); // Logs the response status for debugging.
@@ -71,8 +78,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert(text); // Displays the server's error response.
             }
             else {
-                console.log("Registration successful:", text);
-                alert(text);
+                console.log("Registration successful. Response data:", text);
+                alert("Registration successful! You can now log in.");
+                window.location.href = "/pages/login.html";
             }
         });
     }

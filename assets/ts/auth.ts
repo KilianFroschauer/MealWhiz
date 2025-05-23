@@ -6,6 +6,7 @@
 type AuthForm = HTMLFormElement & {
     username: HTMLInputElement;
     password: HTMLInputElement;
+    confirmPassword?: HTMLInputElement; // Added for registration form, make it optional
 };
 
 // Waits for the HTML document to be fully loaded before executing the script.
@@ -67,14 +68,22 @@ document.addEventListener("DOMContentLoaded", () => {
         registerForm.addEventListener("submit", async (e: Event) => {
             e.preventDefault(); // Prevents the default form submission behavior.
             // Gets the username and password values from the form inputs.
-            const username = registerForm.username.value; // Assuming your form input for username is named 'username'
+            const username = registerForm.username.value;
             const password = registerForm.password.value;
+            const confirmPassword = registerForm.confirmPassword?.value; // Get confirm password value
+
+            // Check if passwords match
+            if (password !== confirmPassword) {
+                alert("Passwords do not match!");
+                return; // Stop submission if passwords don't match
+            }
 
             // Sends a POST request to the /register endpoint with the credentials.
             const res = await fetch("http://127.0.0.1:3000/register", { // Ensure this path matches your backend route
                 method: "POST",
                 headers: { "Content-Type": "application/json" }, // Sets the content type to JSON.
                 // Ensure the body matches what your backend /register expects
+                // The backend /register endpoint only needs username and password, not confirmPassword
                 body: JSON.stringify({ username, password }),
             });
 
@@ -86,8 +95,9 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!res.ok) {
                 alert(text); // Displays the server's error response.
             } else {
-                console.log("Registration successful:", text);
-                alert(text);
+                console.log("Registration successful. Response data:", text);
+                alert("Registration successful! You can now log in."); 
+                window.location.href = "/pages/login.html";
             }
         });
     }

@@ -94,5 +94,51 @@ authRouter.post("/login", async (request, response) => {
     }
 });
 
-// ... (rest of your auth-router.ts, e.g., register, logout routes if they exist)
+// login - unprotected route
+authRouter.post("/register", async (request, response) => {
+    const { username, password }: UserCredentials = request.body; // Destructure for clarity and type safety
+    console.log("Registration attempt with credentials:", { username, password });
 
+    // Basic validation
+    if (!username || !password) {
+        return response.status(StatusCodes.BAD_REQUEST).json({ message: "Username and password are required." });
+    }
+    // Example: Minimum password length (adjust as needed)
+    if (password.length < 6) {
+        return response.status(StatusCodes.BAD_REQUEST).json({ message: "Password must be at least 6 characters long." });
+    }
+
+    try {
+        // Check if user already exists
+        const existingUser = await pool.query(
+            'SELECT user_id FROM "user" WHERE user_name = $1',
+            [username]
+        );
+
+        if (existingUser.rows.length > 0) {
+            console.log("Registration failed: User already exists with username:", username);
+            // Return to ensure no further code in the try block is executed for this case
+            return response.status(StatusCodes.CONFLICT).json({ message: "User already exists" });
+        }
+
+        // Hash the password before storing it
+        const saltRounds = 10; // It's good practice to define salt rounds
+        const hashedPassword = bcrypt.hashSync(password, saltRounds);
+
+        // Insert new user into the database
+        const result = await pool.query(
+            'INSERT INTO "user" (user_name, user_password) VALUES ($1, $2) RETURNING user_id',
+            [username, hashedPassword]
+        );
+
+        const userId = result.rows[0].user_id;
+        console.log("User registered successfully with ID:", userId);
+        // Send a JSON object for consistency
+        response.status(StatusCodes.CREATED).json({ message: "User registered successfully", userId: userId });
+    } catch (error) {
+        console.error("Registration error:", error);
+        // Check for specific database errors if needed, e.g., unique constraint violation
+        // if not caught by the first check (though the first check should handle it for user_name)
+        response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Registration failed due to a server error" });
+    }
+});
