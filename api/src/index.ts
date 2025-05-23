@@ -15,6 +15,15 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
+
+app.use(
+    session({
+        secret: "mealonaut",
+        resave: false,
+        saveUninitialized: false,
+    })
+);
+
 app.use("/recipes", recipeRouter);
 app.use("/events", eventRouter);
 app.use('/', router);
