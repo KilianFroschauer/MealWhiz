@@ -3,6 +3,8 @@ import cors from 'cors';
 import { setupSwagger } from "./config/swagger.config";
 import { recipeRouter } from "./recipe-router";
 import { eventRouter } from "./event-router";
+import router from "./auth/auth-router";
+import session from "express-session";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,9 +16,17 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Routes
+app.use(
+    session({
+        secret: "mealonaut",
+        resave: false,
+        saveUninitialized: false,
+    })
+);
+
 app.use("/recipes", recipeRouter);
 app.use("/events", eventRouter);
+app.use('/', router);
 
 // Health check endpoint
 app.get("/health", (req, res) => {
