@@ -3,7 +3,7 @@ import cors from "cors";
 import { setupSwagger } from "./config/swagger.config";
 import { recipeRouter } from "./recipe-router";
 import { eventRouter } from "./event-router";
-import router from "./auth/auth-router";
+import { authRouter } from "./auth/auth-router";
 import session from "express-session";
 import cartRouter from "./cart-router";
 import testRouter from "./test-router";
@@ -11,26 +11,46 @@ import testRouter from "./test-router";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const allowedOrigins = [
+    'http://127.0.0.1:5500', // Common for VS Code Live Server
+    'http://localhost:5500',  // Another common Live Server port
+    // Add any other origins your frontend might be served from
+];
+
 app.use(
     cors({
-        origin: "*",
+        origin: function (origin, callback) {
+            // Allow requests with no origin (like mobile apps or curl requests)
+            // or if the origin is in the allowedOrigins list.
+            if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
+        credentials: true, // This is crucial for allowing cookies/session data
     })
 );
 app.use(express.json());
 
 app.use(
-    session({
-        secret: "mealonaut",
+    session({ // TODO envirnment variable
+        secret: "mealonaut", // Consider a more complex secret, perhaps from env variables
         resave: false,
         saveUninitialized: false,
+        cookie: { // Optional: configure cookie properties
+            secure: false, // Set to true if your API is served over HTTPS
+            httpOnly: true, // Prevents client-side JS from accessing the cookie
+            // sameSite: 'lax' // Helps mitigate CSRF attacks. 'none' if cross-site, then secure:true is needed.
+        }
     })
 );
 
 app.use("/recipes", recipeRouter);
 app.use("/events", eventRouter);
-app.use("/", router);
+app.use("/", authRouter);
 app.use("/cart", cartRouter);
 
 // Health check endpoint

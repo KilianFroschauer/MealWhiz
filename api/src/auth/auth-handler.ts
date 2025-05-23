@@ -1,40 +1,47 @@
-import bcrypt from "bcrypt";
-import pool from "../database";
+import { NextFunction, Request, Response } from "express";
+import { StatusCodes } from "http-status-codes";
+import jwt, { JwtPayload } from "jsonwebtoken"
 
-export async function registerUser(username: string, password: string): Promise<boolean> {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const client = await pool.connect();
+export interface AuthRequest extends Request {
+    payload: JwtPayload;
+}
+
+export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
 
     try {
-        await client.query('INSERT INTO "user" (user_name, user_password, rating) VALUES ($1, $2, $3)', [
-            username,
-            hashedPassword,
-            null,
-        ]);
-        return true;
+        // check if the jwt payload contains an admin role
+        // TODO: How to access the jwt from the authentication middleware?
+        const payload = (req as AuthRequest).payload;
+        if (payload.user.role === "admin") {
+            next();
+        } else {
+            res.status(401).send("Admin role required");
+        }
     } catch (err) {
-        console.error("Registrierungsfehler:", err);
-        return false;
+        // the request has not been authorized before
+        res.status(401).send("Authentication required");
     }
 }
 
-export async function authenticateUser(username: string, password: string): Promise<boolean> {
+export const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
     try {
-        const client = await pool.connect();
-
-        console.log("in auth");
-        const result = await client.query('SELECT user_password FROM "user" WHERE user_name = $1', [username]);
-        console.log("request sent");
-        if (result.rows.length === 0) return false;
-
-        const hashedPassword = result.rows[0].user_password;
-
-        console.log(hashedPassword);
-        console.log(await bcrypt.hash(password, 10));
-
-        return await bcrypt.compare(password, hashedPassword);
-    } catch (err) {
-        console.error("Loginfehler:", err);
-        return false;
+        const token = req.header('Authorization')?.replace('Bearer ', '');
+        if (!token) {
+            // If you send a response here, you MUST return
+            // res.status(401).send("No token provided");
+            // return;
+            throw new Error("No bearer token available");
+        }
+        const decoded: string | JwtPayload = jwt.verify(token, "SECRET_KEY");
+        (req as AuthRequest).payload = decoded as JwtPayload; // Attach payload
+        next(); // Calls the next middleware or route handler
+    } catch (err: any) {
+        // If an error occurs (e.g., token invalid, expired)
+        console.error("Authentication error:", err.message);
+        res.status(401).send("Unauthorized: Invalid or expired token."); // Sending a response
+        // If you send a response here, you should NOT call next()
+        // OR if you call next(), the route handler must be aware that a response might have been sent.
+        // For typical auth middleware, you send the error response and stop.
+        return; // Explicitly return to prevent calling next() if it was outside the catch
     }
-}
+};

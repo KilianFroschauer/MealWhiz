@@ -92,12 +92,21 @@
                         items.forEach((item) => {
                             const el = document.createElement("div");
                             el.className = "cart-item";
-                            el.textContent = `${item.ingredient} – ${item.quantity}`;
+                            // Ensure 'item.ingredients' matches the column name from your DB query in cart-router.ts
+                            // Your DB query selects "ingredients", so item.ingredients should be correct.
+                            el.textContent = `${item.ingredients} – ${item.quantity}`; 
                             cartDiv.appendChild(el);
                         });
                     }
                 } else {
-                    showMessage(await res.text());
+                    const errorText = await res.text();
+                    if (res.status === 401) {
+                        showMessage("Bitte zuerst einloggen, um den Warenkorb zu sehen.");
+                        // Optional: Redirect to login page
+                        // window.location.href = '/login.html'; 
+                    } else {
+                        showMessage(errorText);
+                    }
                 }
             }
 

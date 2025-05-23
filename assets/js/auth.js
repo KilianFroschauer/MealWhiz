@@ -12,26 +12,41 @@ document.addEventListener("DOMContentLoaded", () => {
         loginForm.addEventListener("submit", async (e) => {
             e.preventDefault(); // Prevents the default form submission behavior.
             // Gets the username and password values from the form inputs.
-            const username = loginForm.username.value;
+            const username = loginForm.username.value; // Assuming your form input for username is named 'username'
             const password = loginForm.password.value;
+            console.log("Login attempt with credentials:", { username, password });
             // Sends a POST request to the /login endpoint with the credentials.
             const res = await fetch("http://127.0.0.1:3000/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password }), // Converts the data to a JSON string.
+                // Ensure the body matches what your backend /login expects (e.g., email or username)
+                body: JSON.stringify({ username, password }), // Sending 'username' as 'email' if backend expects email
+                // Or change to { username: username, password } if backend expects username
             });
-            // Parses the server's response as text.
-            const text = await res.text();
-            // Only display an alert if the server response indicates an error (e.g., status 4xx or 5xx).
             if (!res.ok) {
-                alert(text); // Displays the server's error response.
+                const errorText = await res.text(); // Or res.json() if error response is JSON
+                alert(errorText); // Displays the server's error response.
             }
             else {
                 // Login was successful.
-                // You can add code here to handle successful login, like redirecting the user
-                // or updating the UI. For now, no popup will be shown on success.
-                console.log("Login successful:", text);
-                // Example: window.location.href = "/dashboard"; // Redirect to a dashboard page
+                const data = await res.json(); // Parse the JSON response
+                console.log("Login successful. Response data:", data);
+                console.log("Access token received:", data.accessToken);
+                if (data.accessToken) {
+                    console.log("Access token received:", data.accessToken);
+                    localStorage.setItem('accessToken', data.accessToken); // Store the token
+                    console.log("Access token stored in localStorage.");
+                    // Optionally store userClaims or expiresAt if needed client-side
+                    // localStorage.setItem('userClaims', JSON.stringify(data.userClaims));
+                    // localStorage.setItem('tokenExpiresAt', data.expiresAt);
+                    // Redirect to a protected page or the main page after successful login
+                    // Replace "index.html" or "/dashboard.html" with the actual page you want to redirect to.
+                    window.location.href = "/index.html"; // Or e.g., "/pages/dashboard.html" or just "/" if your server handles that
+                }
+                else {
+                    console.error("Login response did not include an accessToken.");
+                    alert("Login successful, but no token received. Please contact support.");
+                }
             }
         });
     }
@@ -40,28 +55,24 @@ document.addEventListener("DOMContentLoaded", () => {
         registerForm.addEventListener("submit", async (e) => {
             e.preventDefault(); // Prevents the default form submission behavior.
             // Gets the username and password values from the form inputs.
-            const username = registerForm.username.value;
+            const username = registerForm.username.value; // Assuming your form input for username is named 'username'
             const password = registerForm.password.value;
             // Sends a POST request to the /register endpoint with the credentials.
             const res = await fetch("http://127.0.0.1:3000/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password }), // Converts the data to a JSON string.
+                // Ensure the body matches what your backend /register expects
+                body: JSON.stringify({ username, password }),
             });
             console.log("Response status:", res.status); // Logs the response status for debugging.
-            console.log("Response headers:", res.headers); // Logs the response headers for debugging.
-            // Parses the server's response as text.
-            const text = await res.text();
-            // Only display an alert if the server response indicates an error.
+            // console.log("Response headers:", res.headers); // Logs the response headers for debugging.
+            const text = await res.text(); // Or res.json() if response is JSON
             if (!res.ok) {
                 alert(text); // Displays the server's error response.
             }
             else {
-                // Registration was successful.
-                // You might want to inform the user or redirect.
                 console.log("Registration successful:", text);
-                alert(text); // Or, if you want to show the success message from the server: alert(text);
-                // If you want no popup on successful registration either, remove the alert above.
+                alert(text);
             }
         });
     }
