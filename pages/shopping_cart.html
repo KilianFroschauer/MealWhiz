@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="de">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Mein Warenkorb</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <style>
+            body {
+                padding: 2rem;
+                background-color: #f8f9fa;
+            }
+            .cart-container {
+                max-width: 700px;
+                margin: auto;
+                background: white;
+                padding: 2rem;
+                border-radius: 1rem;
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="cart-container">
+            <h2 class="mb-4">🛒 Dein Einkaufswagen</h2>
+
+            <form id="addForm" class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="ingredient" placeholder="Zutat" required />
+                </div>
+                <div class="col-md-4">
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="quantity"
+                        placeholder="Menge"
+                        value="1"
+                        min="1"
+                        required
+                    />
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Hinzufügen</button>
+                </div>
+            </form>
+
+            <ul class="list-group" id="cartList">
+                <!-- Dynamisch befüllt -->
+            </ul>
+        </div>
+
+        <script>
+            async function fetchCart() {
+                const res = await fetch("/api/cart");
+                const cart = await res.json();
+                const list = document.getElementById("cartList");
+                list.innerHTML = "";
+                cart.forEach((item) => {
+                    const li = document.createElement("li");
+                    li.className = "list-group-item d-flex justify-content-between align-items-center";
+                    li.innerHTML = `
+          <span><strong>${item.ingredient}</strong> &times; ${item.quantity}</span>
+          <button class="btn btn-sm btn-danger" onclick="deleteItem('${item.ingredient}')">Entfernen</button>
+        `;
+                    list.appendChild(li);
+                });
+            }
+
+            async function deleteItem(ingredient) {
+                await fetch("/api/cart", {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ ingredient }),
+                });
+                fetchCart();
+            }
+
+            document.getElementById("addForm").addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const ingredient = document.getElementById("ingredient").value;
+                const quantity = parseInt(document.getElementById("quantity").value);
+
+                await fetch("/api/cart", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ ingredient, quantity }),
+                });
+
+                e.target.reset();
+                fetchCart();
+            });
+
+            fetchCart();
+        </script>
+    </body>
+</html>
