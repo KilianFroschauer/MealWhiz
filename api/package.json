@@ -2,12 +2,12 @@
     "name": "api",
     "version": "1.0.0",
     "description": "The api for Mealwhiz",
-    "main": "index.js",
+    "main": "server.js",
     "scripts": {
-        "start": "ts-node src/index.ts",
-        "dev": "nodemon src/index.ts",
+        "start": "ts-node src/server.ts",
+        "dev": "nodemon src/server.ts",
         "build": "tsc",
-        "serve": "node dist/index.js",
+        "serve": "node dist/server.js",
         "test": "jest"
     },
     "jest": {

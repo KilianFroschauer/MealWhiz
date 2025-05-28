@@ -1,7 +1,7 @@
 import request from 'supertest';
 import express from 'express';
-import { recipeRouter } from '../recipe-router';
-import { Recipe } from '../recipe-repository';
+import { recipeRouter } from '../routes/recipe.routes';
+import { Recipe } from '../repository/recipe.repository';
 
 const app = express();
 app.use('/recipes', recipeRouter);

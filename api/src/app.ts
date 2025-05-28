@@ -1,12 +1,11 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { setupSwagger } from "./config/swagger.config";
-import { recipeRouter } from "./recipe-router";
-import { eventRouter } from "./event-router";
-import { authRouter } from "./auth/auth-router";
+import { recipeRouter } from "./routes/recipe.routes";
+import { eventRouter } from "./routes/event.routes";
+import { authRouter } from "./routes/auth.routes";
 import session from "express-session";
-import cartRouter from "./cart-router";
-import testRouter from "./test-router";
+import cartRouter from "./routes/cart.routes";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -69,8 +68,4 @@ app.use((req: Request, res: Response) => {
     res.status(404).json({ error: "Not Found" });
 });
 
-// Start server
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
-});
+export default app;

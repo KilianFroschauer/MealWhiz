@@ -75,10 +75,29 @@
         <script>
             const apiBase = "http://localhost:3000"; // ggf. anpassen
 
+            // Helper function to get the token and prepare headers
+            function getAuthHeaders() {
+                const token = localStorage.getItem('accessToken');
+                const headers = {
+                    "Content-Type": "application/json",
+                };
+                if (token) {
+                    headers["Authorization"] = `Bearer ${token}`;
+                }
+                return headers;
+            }
+
             async function loadCart() {
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    showMessage("Bitte zuerst einloggen, um den Warenkorb zu sehen.");
+                    document.getElementById("cart").innerHTML = ""; // Clear cart display
+                    return;
+                }
+
                 const res = await fetch(`${apiBase}/cart`, {
                     method: "GET",
-                    credentials: "include",
+                    headers: getAuthHeaders(), // Use helper to include Authorization header
                 });
 
                 const cartDiv = document.getElementById("cart");
@@ -92,8 +111,6 @@
                         items.forEach((item) => {
                             const el = document.createElement("div");
                             el.className = "cart-item";
-                            // Ensure 'item.ingredients' matches the column name from your DB query in cart-router.ts
-                            // Your DB query selects "ingredients", so item.ingredients should be correct.
                             el.textContent = `${item.ingredients} – ${item.quantity}`; 
                             cartDiv.appendChild(el);
                         });
@@ -101,9 +118,10 @@
                 } else {
                     const errorText = await res.text();
                     if (res.status === 401) {
-                        showMessage("Bitte zuerst einloggen, um den Warenkorb zu sehen.");
+                        showMessage("Sitzung ungültig oder abgelaufen. Bitte erneut einloggen.");
                         // Optional: Redirect to login page
-                        // window.location.href = '/login.html'; 
+                        // localStorage.removeItem('accessToken'); // Clear invalid token
+                        // window.location.href = '/pages/login.html'; 
                     } else {
                         showMessage(errorText);
                     }
@@ -111,32 +129,67 @@
             }
 
             async function addToCart() {
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    showMessage("Bitte zuerst einloggen, um Artikel hinzuzufügen.");
+                    return;
+                }
+
                 const ingredient = document.getElementById("ingredient").value;
-                const quantity = parseInt(document.getElementById("quantity").value);
+                const quantityInput = document.getElementById("quantity").value;
+                
+                if (!ingredient || !quantityInput) {
+                    showMessage("Bitte Zutat und Menge eingeben.");
+                    return;
+                }
+                const quantity = parseInt(quantityInput);
+                if (isNaN(quantity) || quantity <= 0) {
+                    showMessage("Bitte eine gültige Menge eingeben.");
+                    return;
+                }
+
 
                 const res = await fetch(`${apiBase}/cart`, {
                     method: "POST",
-                    credentials: "include",
-                    headers: { "Content-Type": "application/json" },
+                    headers: getAuthHeaders(), // Use helper to include Authorization header
                     body: JSON.stringify({ ingredient, quantity }),
                 });
 
-                showMessage(await res.text());
-                loadCart();
+                const responseText = await res.text();
+                showMessage(responseText);
+                if (res.ok) {
+                    loadCart(); // Reload cart only on success
+                } else if (res.status === 401) {
+                     showMessage("Sitzung ungültig oder abgelaufen. Bitte erneut einloggen.");
+                }
             }
 
             async function deleteFromCart() {
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    showMessage("Bitte zuerst einloggen, um Artikel zu löschen.");
+                    return;
+                }
+
                 const ingredient = document.getElementById("ingredient").value;
+                if (!ingredient) {
+                    showMessage("Bitte Zutat zum Löschen eingeben.");
+                    return;
+                }
 
                 const res = await fetch(`${apiBase}/cart`, {
                     method: "DELETE",
-                    credentials: "include",
-                    headers: { "Content-Type": "application/json" },
+                    headers: getAuthHeaders(), // Use helper to include Authorization header
                     body: JSON.stringify({ ingredient }),
                 });
 
-                showMessage(await res.text());
-                loadCart();
+                const responseText = await res.text();
+                showMessage(responseText);
+                if (res.ok) {
+                    loadCart(); // Reload cart only on success
+                } else if (res.status === 401) {
+                     showMessage("Sitzung ungültig oder abgelaufen. Bitte erneut einloggen.");
+                }
             }
 
             function showMessage(msg) {

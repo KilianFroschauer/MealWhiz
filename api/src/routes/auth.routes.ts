@@ -3,8 +3,8 @@ import { StatusCodes } from "http-status-codes";
 // import { users } from "./data/user-store"; // No longer needed for this route
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { isAdmin, isAuthenticated } from "./auth-handler";
-import pool from "../database"; // Assuming database.ts is in the src directory
+import { isAdmin, isAuthenticated } from "../auth/auth-handler";
+import { pool } from "../config"; // Assuming database.ts is in the src directory
 
 export interface UserCredentials {
     username: string; // If this field actually contains the username, consider renaming it to 'username'

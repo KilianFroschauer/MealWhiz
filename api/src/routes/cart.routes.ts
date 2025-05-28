@@ -1,10 +1,10 @@
 import express, { Request, Response } from "express";
-import pool from "./database";
-import { isAuthenticated, AuthRequest } from "./auth/auth-handler"; // Assuming AuthRequest is exported from auth-handler
+import { pool } from "../config";
+import { isAuthenticated, AuthRequest } from "../auth/auth-handler"; // Assuming AuthRequest is exported from auth-handler
 
 // Removed: declare module "express-session" and import "express-session" as sessions are not used with JWT for this.
 
-const cartRouter = express.Router();
+export const cartRouter = express.Router();
 
 // The getUserId function might still be useful if you only have username from JWT,
 // but if JWT payload directly contains userId, it might be less needed here.
@@ -54,6 +54,8 @@ cartRouter.post("/", isAuthenticated, async (req: Request, res: Response) => {
     } else if (authReq.payload && typeof authReq.payload.userId === 'number') {
         userId = authReq.payload.userId;
     }
+
+    console.log("User ID from token:", userId); // Good for debugging
 
     if (!userId) {
         res.status(401).send("Benutzeridentifikation im Token ungültig oder nicht gefunden.");

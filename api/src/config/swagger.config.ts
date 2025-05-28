@@ -26,7 +26,7 @@ const swaggerOptions = {
       }
     ]
   },
-  apis: ["./src/index.ts", "./src/recipe-router.ts", "./src/event-router.ts"],
+  apis: ["./src/routes/*.ts"],
 };
 
 /**

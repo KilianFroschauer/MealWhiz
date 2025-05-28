@@ -1,5 +1,5 @@
 import express, { Router, RequestHandler } from "express";
-import { generateStreamUrl, createEvent, getEventById, getLiveEvents, joinEvent, getEventsByFilter } from './event-repository';
+import { generateStreamUrl, createEvent, getEventById, getLiveEvents, joinEvent, getEventsByFilter } from '../repository/event.repository';
 
 export const eventRouter: Router = express.Router();
 

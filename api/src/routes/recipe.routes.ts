@@ -1,12 +1,15 @@
 import express from "express";
-import { StatusCodes } from "http-status-codes";
-import { convertToSimpleRecipe, getAllRecipes, getFilteredRecipes, getRecipeById, Recipe } from "./recipe-repository";
+import { RecipeController } from "../controller/recipe.controller";
 
 export const recipeRouter = express.Router();
+const recipeController = new RecipeController();
 
-// Convert query params to arrays (handles single or multiple values)
-const parseArrayParam = (param: string | string[] | undefined) =>
-    param ? (Array.isArray(param) ? param : param.split(",")) : [];
+/**
+ * @swagger
+ * tags:
+ *   name: recipe
+ *   description: API endpoints for managing recipes
+ */
 
 /**
  * @swagger
@@ -56,23 +59,7 @@ const parseArrayParam = (param: string | string[] | undefined) =>
  *                   type: string
  *                   example: "Query parameter is required"
  */
-recipeRouter.get("/search", async (request, response) => {
-    try {
-        const query = request.query.query as string | undefined;
-
-        if (!query || typeof query !== "string") {
-            response.status(400).json({ error: "Query parameter is required" });
-        }
-        else {
-            const searchResults = await getFilteredRecipes({ query });
-            response.status(200).json(convertToSimpleRecipe(searchResults));
-        }
-
-    } catch (error) {
-        console.error('Error in search endpoint:', error);
-        response.status(500).json({ error: "Internal server error" });
-    }
-});
+recipeRouter.get("/search", recipeController.searchRecipes);
 
 /**
  * @swagger
@@ -192,55 +179,7 @@ recipeRouter.get("/search", async (request, response) => {
  *                     enum: [easy, medium, hard]
  *                     description: Difficulty level of the recipe.
  */
-recipeRouter.get("/", async (req, res) => {
-    try {
-
-        // Define all valid query parameters
-        const validParams = [
-            'name', 'minRating', 'maxCal', 'minCal', 'diff', 'maxTime',
-            'dp', 'a', 'mt', 'tags', 'ing'
-        ];
-
-        // Check for invalid parameters
-        const invalidParams = Object.keys(req.query).filter(param => !validParams.includes(param));
-
-        // If invalid parameters were found, return a 400 error
-        if (invalidParams.length > 0) {
-            res.status(400).json({
-                error: `Invalid query parameter(s): ${invalidParams.join(', ')}`,
-                validParameters: validParams
-            });
-        }
-        else {
-
-            // Get parameter
-            const { name, minRating, maxCal, minCal, diff, maxTime } = req.query;
-            const dietaryPreferences = parseArrayParam(req.query.dp as string | string[] | undefined);
-            const allergens = parseArrayParam(req.query.a as string | string[] | undefined);
-            const mealTimes = parseArrayParam(req.query.mt as string | string[] | undefined);
-            const tags = parseArrayParam(req.query.tags as string | string[] | undefined);
-            const ingredients = parseArrayParam(req.query.ing as string | string[] | undefined);
-
-            const filteredRecipes = await getFilteredRecipes({
-                name: name ? (name as string) : undefined,
-                minRating: minRating ? parseFloat(minRating as string) : undefined,
-                maxCal: maxCal ? parseInt(maxCal as string) : undefined,
-                minCal: minCal ? parseInt(minCal as string) : undefined,
-                diff: diff as string,
-                maxTime: maxTime ? parseInt(maxTime as string) : undefined,
-                dietaryPreferences: dietaryPreferences as string[],
-                allergens: allergens as string[],
-                mealTimes: mealTimes as string[],
-                tags: tags as string[],
-                ingredients: ingredients.join(",")
-            });
-            res.status(200).json(convertToSimpleRecipe(filteredRecipes));
-        }
-    } catch (error) {
-        console.error('Error in filter endpoint:', error);
-        res.status(500).json({ error: "Internal server error" });
-    }
-});
+recipeRouter.get("/", recipeController.getFilteredRecipes);
 
 /**
  * @swagger
@@ -337,25 +276,4 @@ recipeRouter.get("/", async (req, res) => {
  *                   type: string
  *                   example: "Recipe not found"
  */
-recipeRouter.get("/:id", async (request, response) => {
-    try {
-        const recipeId = parseInt(request.params.id);
-
-        if (isNaN(recipeId)) {
-            response.status(400).json({ error: "Invalid recipe ID" });
-        }
-        else {
-
-            const recipe = await getRecipeById(recipeId);
-
-            if (recipe) {
-                response.status(200).send(recipe);
-            } else {
-                response.status(404).send({ error: "Recipe not found" });
-            }
-        }
-    } catch (error) {
-        console.error(`Error fetching recipe ${request.params.id}:`, error);
-        response.status(500).json({ error: "Internal server error" });
-    }
-});
+recipeRouter.get("/:id", recipeController.getRecipeById);
