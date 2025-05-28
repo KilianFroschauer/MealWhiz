@@ -5,7 +5,7 @@ export interface Recipe {
   ingredientsAmount: string[]; 
   ratings: number;
   dietaryPreferences: string[];
-  desciption: string;
+  description: string;
   allergens: string[];
   calories: number;
   proteins: number; 
@@ -26,3 +26,25 @@ export interface SimpleRecipe {
   ratings: number;
   difficulty: "easy" | "medium" | "hard";
 }
+
+export interface NutritionValues {
+  calories: number;
+  proteins: number;
+  carbs: number;
+  fat: number;
+}
+
+export type RecipeFilterOptions = {
+ query?: string;
+  name?: string;
+  minRating?: number;
+  maxCal?: number;
+  minCal?: number;
+  diff?: string;
+  maxTime?: number;
+  dietaryPreferences?: string[];
+  allergens?: string[];
+  mealTimes?: string[];
+  tags?: string[];
+  ingredients?: string;
+};

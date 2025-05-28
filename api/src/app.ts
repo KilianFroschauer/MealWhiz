@@ -1,10 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { setupSwagger } from "./config/swagger.config";
-import { recipeRouter } from "./routes/recipe.routes";
-import { eventRouter } from "./routes/event.routes";
-import { authRouter } from "./routes/auth.routes";
-import cartRouter from "./routes/cart.routes";
+import mainRouter from "./routes/index.routes";
 
 const app = express();
 
@@ -32,10 +29,7 @@ app.use(
 );
 app.use(express.json());
 
-app.use("/recipes", recipeRouter);
-app.use("/events", eventRouter);
-app.use("/", authRouter);
-app.use("/cart", cartRouter);
+app.use('/', mainRouter)
 
 // Health check endpoint
 app.get("/health", (req, res) => {

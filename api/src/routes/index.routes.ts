@@ -8,7 +8,7 @@ const mainRouter = Router();
 
 mainRouter.use('/recipes', recipeRouter);
 mainRouter.use('/events', eventRouter);
-mainRouter.use('/auth', authRouter);
+mainRouter.use('/', authRouter);
 mainRouter.use('/cart', cartRouter);
 
 export default mainRouter;

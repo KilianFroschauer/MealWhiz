@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { getAllRecipes, getRecipeById, getFilteredRecipes, convertToSimpleRecipe } from '../repository/recipe.repository';
-
+import { getAllRecipes, getRecipeById, getFilteredRecipes } from '../repository/recipe.repository';
+import { convertToSimpleRecipe } from '../utils/recipe.utils';
 // Convert query params to arrays (handles single or multiple values)
 const parseArrayParam = (param: string | string[] | undefined) =>
     param ? (Array.isArray(param) ? param : param.split(",")) : [];

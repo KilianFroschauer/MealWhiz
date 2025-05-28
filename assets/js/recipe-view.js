@@ -76,7 +76,7 @@ function renderRecipe(recipe) {
                             <i class="fa fa-star text-warning me-1"></i>
                             <span class="ms-2">(${recipe.ratings})</span>
                         </div>
-                        <p class="mb-4">${recipe.desciption || ''}</p> 
+                        <p class="mb-4">${recipe.description || ''}</p> 
                         <div class="mb-4">
                             <h5 class="fw-bold mb-2">Dietary Information:</h5>
                             ${recipe.dietaryPreferences.length > 0 ? recipe.dietaryPreferences.map(dp => `<span class="badge bg-success me-2">${dp}</span>`).join('') : '<span class="text-muted">None</span>'}
