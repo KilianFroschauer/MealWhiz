@@ -6,6 +6,13 @@ import { isAuthenticated, AuthRequest } from "../auth/auth-handler"; // Assuming
 
 export const cartRouter = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Cart
+ *   description: Shopping cart management
+ */
+
 // The getUserId function might still be useful if you only have username from JWT,
 // but if JWT payload directly contains userId, it might be less needed here.
 // For this example, we'll assume the JWT payload gives us the userId directly.
@@ -14,6 +21,37 @@ export const cartRouter = express.Router();
 //     return result.rows[0]?.id || null;
 // }
 
+/**
+ * @swagger
+ * /cart:
+ *   get:
+ *     summary: Retrieve the user's shopping cart
+ *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: A list of items in the shopping cart.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   ingredients:
+ *                     type: string
+ *                     description: The name of the ingredient.
+ *                     example: "Tomatoes"
+ *                   quantity:
+ *                     type: number
+ *                     description: The quantity of the ingredient.
+ *                     example: 2
+ *       401:
+ *         description: Unauthorized - User identification in token invalid or not found.
+ *       500:
+ *         description: Server error while retrieving the shopping cart.
+ */
 cartRouter.get("/", isAuthenticated, async (req: Request, res: Response) => {
     // Cast req to AuthRequest to access the payload
     const authReq = req as AuthRequest;
@@ -44,6 +82,47 @@ cartRouter.get("/", isAuthenticated, async (req: Request, res: Response) => {
     }
 });
 
+/**
+ * @swagger
+ * /cart:
+ *   post:
+ *     summary: Add or update an item in the shopping cart
+ *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - ingredient
+ *               - quantity
+ *             properties:
+ *               ingredient:
+ *                 type: string
+ *                 description: The name of the ingredient.
+ *                 example: "Flour"
+ *               quantity:
+ *                 type: number
+ *                 description: The quantity of the ingredient.
+ *                 example: 1
+ *     responses:
+ *       200:
+ *         description: Item saved/updated in the cart.
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Eintrag im Warenkorb gespeichert/aktualisiert
+ *       400:
+ *         description: Invalid request - ingredient and quantity required.
+ *       401:
+ *         description: Unauthorized - User identification in token invalid or not found.
+ *       500:
+ *         description: Server error while adding to the shopping cart.
+ */
 cartRouter.post("/", isAuthenticated, async (req: Request, res: Response) => {
     const authReq = req as AuthRequest;
     const { ingredient, quantity } = req.body;
@@ -84,6 +163,44 @@ cartRouter.post("/", isAuthenticated, async (req: Request, res: Response) => {
     }
 });
 
+/**
+ * @swagger
+ * /cart:
+ *   delete:
+ *     summary: Remove an item from the shopping cart
+ *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - ingredient
+ *             properties:
+ *               ingredient:
+ *                 type: string
+ *                 description: The name of the ingredient to remove.
+ *                 example: "Tomatoes"
+ *     responses:
+ *       200:
+ *         description: Item removed from the cart.
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Eintrag aus dem Warenkorb gelöscht
+ *       400:
+ *         description: Invalid request - ingredient required.
+ *       401:
+ *         description: Unauthorized - User identification in token invalid or not found.
+ *       404:
+ *         description: Item not found in the cart or already deleted.
+ *       500:
+ *         description: Server error while deleting from the shopping cart.
+ */
 cartRouter.delete("/", isAuthenticated, async (req: Request, res: Response) => {
     const authReq = req as AuthRequest;
     const { ingredient } = req.body; // Assuming ingredient name is sent in the body
