@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import jwt, { JwtPayload } from "jsonwebtoken"
+import { env } from "process";
 
 export interface AuthRequest extends Request {
     payload: JwtPayload;
@@ -32,7 +33,16 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
             // return;
             throw new Error("No bearer token available");
         }
-        const decoded: string | JwtPayload = jwt.verify(token, "SECRET_KEY");
+
+        const secret = process.env.JWT_SECRET;
+        if (!secret) {
+            console.error("JWT_SECRET is not defined in environment variables. Ensure .env file is loaded correctly.");
+            // It's crucial to not proceed if the secret is missing.
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server configuration error.");
+            return;
+        }
+
+        const decoded: string | JwtPayload = jwt.verify(token, secret);
         (req as AuthRequest).payload = decoded as JwtPayload; // Attach payload
         next(); // Calls the next middleware or route handler
     } catch (err: any) {

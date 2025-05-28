@@ -4,11 +4,9 @@ import { setupSwagger } from "./config/swagger.config";
 import { recipeRouter } from "./routes/recipe.routes";
 import { eventRouter } from "./routes/event.routes";
 import { authRouter } from "./routes/auth.routes";
-import session from "express-session";
 import cartRouter from "./routes/cart.routes";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 const allowedOrigins = [
     'http://127.0.0.1:5500', // Common for VS Code Live Server
@@ -33,19 +31,6 @@ app.use(
     })
 );
 app.use(express.json());
-
-app.use(
-    session({ // TODO envirnment variable
-        secret: "mealonaut", // Consider a more complex secret, perhaps from env variables
-        resave: false,
-        saveUninitialized: false,
-        cookie: { // Optional: configure cookie properties
-            secure: false, // Set to true if your API is served over HTTPS
-            httpOnly: true, // Prevents client-side JS from accessing the cookie
-            // sameSite: 'lax' // Helps mitigate CSRF attacks. 'none' if cross-site, then secure:true is needed.
-        }
-    })
-);
 
 app.use("/recipes", recipeRouter);
 app.use("/events", eventRouter);

@@ -167,12 +167,21 @@ authRouter.post("/login", async (request, response) => {
         };
         const minutes = 15;
         const expiresAt = new Date(Date.now() + minutes * 60000);
+
+        // Ensure JWT_SECRET is available for signing
+        const secret = process.env.JWT_SECRET;
+        if (!secret) {
+            console.error("JWT_SECRET is not defined. Cannot sign token.");
+            // This is a server configuration issue.
+            return response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Server configuration error, cannot issue token." });
+        }
+
         const token = jwt.sign(
             {
                 user: userClaims, // The 'user' object within the token payload
                 exp: expiresAt.getTime() / 1000,
             },
-            "SECRET_KEY" // Store your secret key in an environment variable
+            secret // Use the secret from .env
         );
 
         response.status(StatusCodes.OK).json({
