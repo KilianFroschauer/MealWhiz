@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import { pool } from "../config";
-import { isAuthenticated, AuthRequest } from "../auth/auth-handler"; // Assuming AuthRequest is exported from auth-handler
+import { isAuthenticated, AuthRequest } from "../middlewares/auth.middlware"; // Assuming AuthRequest is exported from auth-handler
 
 // Removed: declare module "express-session" and import "express-session" as sessions are not used with JWT for this.
 

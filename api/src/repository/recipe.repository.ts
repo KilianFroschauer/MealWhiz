@@ -248,7 +248,7 @@ async function mapDbRowsToRecipes(rows: any[]): Promise<Recipe[]> {
       name: row.title,
       ingredients: ingredients,
       ingredientsAmount: ingredientsAmount,
-      ratings: row.rating || 0,
+      ratings: parseFloat(row.rating) || 0,
       dietaryPreferences: row.diary_pref ? [row.diary_pref] : [],
       description: row.description || '',
       allergens: row.allergen_list || [],

@@ -1,14 +1,21 @@
-import express, { Router, RequestHandler } from "express";
-import { generateStreamUrl, createEvent, getEventById, getLiveEvents, joinEvent, getEventsByFilter } from '../repository/event.repository';
+import express, { Router } from "express";
+import { EventController } from '../controller/event.controller';
 
 export const eventRouter: Router = express.Router();
+const eventController = new EventController();
+
+/**
+ * @swagger
+ * tags:
+ *   name: Cookoff
+ *   description: API endpoints for managing cooking events
+ */
 
 /**
  * @swagger
  * /events:
  *   post:
- *     tags:
- *       - cookoff
+ *     tags: [Cookoff]
  *     summary: Create a new cooking event
  *     description: Creates a new cooking event (casual or competitive)
  *     security:
@@ -49,74 +56,97 @@ export const eventRouter: Router = express.Router();
  *                   type: string
  *                   description: URL for the streaming session
  */
-eventRouter.post("/", async (req, res, next) => {
-    try {
-        const { mode, challengeType, difficulty } = req.body;
-        const hostUserId = 1; // Placeholder for actual user ID from auth
+eventRouter.post("/", eventController.createNewEvent);
 
-        if (!mode || !challengeType || !difficulty) {
-            res.status(400).json({ error: "Missing required fields" });
-            return;
-        }
-        if (mode !== 'casual' && mode !== 'competitive') {
-            res.status(400).json({ error: "Mode must be either 'casual' or 'competitive'" });
-            return;
-        }
-
-        const streamUrl = generateStreamUrl();
-        const eventId = await createEvent({
-            mode: mode as 'casual' | 'competitive',
-            challengeType,
-            difficulty,
-            hostUserId,
-            streamUrl
-        });
-        res.status(201).json({ id: eventId, streamUrl });
-    } catch (error) {
-        console.error("Error creating event:", error);
-        next(error);
-    }
-});
-
-// --- Route Handler for GET /events ---
-eventRouter.get("/", async (req, res, next) => {
-    try {
-        const modeQuery = req.query.mode as string | undefined;
-        const statusQuery = req.query.status as string | undefined;
-        let internalStatus: 'pending' | 'live' | 'ended';
-
-        // Validate mode
-        if (!modeQuery || (modeQuery !== 'casual' && modeQuery !== 'competitive')) {
-            res.status(400).json({ error: "Invalid or missing 'mode' query parameter. Must be 'casual' or 'competitive'." });
-            return;
-        }
-
-        // Validate and map status
-        if (statusQuery === 'open') {
-            internalStatus = 'pending';
-        } else if (statusQuery === 'pending' || statusQuery === 'live' || statusQuery === 'ended') {
-            internalStatus = statusQuery; // statusQuery is already one of 'pending', 'live', 'ended'
-        } else {
-            // This covers undefined, null, or any other invalid string for statusQuery
-            res.status(400).json({ error: "Invalid or missing 'status' query parameter. Accepted values are 'open', 'pending', 'live', or 'ended'." });
-            return;
-        }
-
-        // At this point, modeQuery and internalStatus are validated and correctly typed
-        const events = await getEventsByFilter(modeQuery, internalStatus);
-        res.status(200).json(events);
-    } catch (error) {
-        console.error("Error fetching events by filter:", error);
-        next(error);
-    }
-});
+/**
+ * @swagger
+ * /events:
+ *   get:
+ *     tags: [Cookoff]
+ *     summary: Get events by filter
+ *     description: Retrieves a list of cooking events based on specified mode and status filters.
+ *     parameters:
+ *       - in: query
+ *         name: mode
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [casual, competitive]
+ *         description: The mode of the events to filter by (casual or competitive).
+ *       - in: query
+ *         name: status
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [open, pending, live, ended]
+ *         description: The status of the events to filter by. 'open' maps to 'pending' internally.
+ *     responses:
+ *       200:
+ *         description: A list of events matching the filters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object # Define a more specific event schema if available or needed
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     description: The event ID.
+ *                   mode:
+ *                     type: string
+ *                     enum: [casual, competitive]
+ *                     description: Event mode.
+ *                   challengeType:
+ *                     type: string
+ *                     description: Type of cooking challenge.
+ *                   difficulty:
+ *                     type: string
+ *                     description: Difficulty level.
+ *                   status:
+ *                     type: string
+ *                     enum: [pending, live, ended]
+ *                     description: Current status of the event.
+ *                   hostUserId:
+ *                     type: integer
+ *                     description: ID of the host user.
+ *                   opponentUserId:
+ *                     type: integer
+ *                     nullable: true
+ *                     description: ID of the opponent user, if any.
+ *                   streamUrl:
+ *                     type: string
+ *                     description: URL for the streaming session.
+ *                   startTime:
+ *                     type: string
+ *                     format: date-time
+ *                     nullable: true
+ *                     description: Timestamp when the event started or is scheduled to start.
+ *                   endTime:
+ *                     type: string
+ *                     format: date-time
+ *                     nullable: true
+ *                     description: Timestamp when the event ended.
+ *       400:
+ *         description: Invalid or missing query parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid or missing 'mode' query parameter. Must be 'casual' or 'competitive'."
+ *       500:
+ *         description: Internal server error.
+ */
+eventRouter.get("/", eventController.getFilteredEvents);
 
 /**
  * @swagger
  * /events/{id}/join:
  *   post:
- *     tags:
- *       - cookoff
+ *     tags: [Cookoff]
  *     summary: Join an event as participant or spectator
  *     security:
  *       - bearerAuth: []
@@ -143,49 +173,13 @@ eventRouter.get("/", async (req, res, next) => {
  *       200:
  *         description: Successfully joined event
  */
-eventRouter.post("/:id/join", async (req, res, next) => {
-    try {
-        const eventId = parseInt(req.params.id);
-        if (isNaN(eventId)) {
-            res.status(400).json({ error: "Invalid event ID." });
-            return;
-        }
-        const userId = 1; // Placeholder for actual user ID
-        const { role } = req.body;
-
-        if (!role || (role !== 'opponent' && role !== 'spectator')) {
-            res.status(400).json({ error: "Role must be either 'opponent' or 'spectator'" });
-            return;
-        }
-
-        const event = await getEventById(eventId);
-        if (!event) {
-            res.status(404).json({ error: "Event not found" });
-            return;
-        }
-        if (event.status !== 'pending') {
-            res.status(400).json({ error: "Cannot join an event that is not pending" });
-            return;
-        }
-        if (role === 'opponent' && event.opponentUserId) {
-            res.status(400).json({ error: "This event already has an opponent" });
-            return;
-        }
-
-        await joinEvent(eventId, userId, role as 'opponent' | 'spectator');
-        res.status(200).json({ message: `Successfully joined event as ${role}` });
-    } catch (error) {
-        console.error(`Error joining event:`, error);
-        next(error);
-    }
-});
+eventRouter.post("/:id/join", eventController.joinExistingEvent);
 
 /**
  * @swagger
  * /events/live:
  *   get:
- *     tags:
- *       - cookoff
+ *     tags: [Cookoff]
  *     summary: Get all live events
  *     description: Returns a list of currently live cooking events
  *     responses:
@@ -218,22 +212,13 @@ eventRouter.post("/:id/join", async (req, res, next) => {
  *                   spectatorCount:
  *                     type: integer
  */
-eventRouter.get("/live", async (req, res, next) => {
-    try {
-        const liveEvents = await getLiveEvents();
-        res.status(200).json(liveEvents);
-    } catch (error) {
-        console.error("Error fetching live events:", error);
-        next(error);
-    }
-});
+eventRouter.get("/live", eventController.getAllLiveEvents);
 
 /**
  * @swagger
  * /events/{id}:
  *   get:
- *     tags:
- *       - cookoff
+ *     tags: [Cookoff]
  *     summary: Get details of a specific event
  *     parameters:
  *       - in: path
@@ -248,21 +233,4 @@ eventRouter.get("/live", async (req, res, next) => {
  *       404:
  *         description: Event not found
  */
-eventRouter.get("/:id", async (req, res, next) => {
-    try {
-        const eventId = parseInt(req.params.id);
-        if (isNaN(eventId)) {
-            res.status(400).json({ error: "Invalid event ID." });
-            return;
-        }
-        const event = await getEventById(eventId);
-        if (!event) {
-            res.status(404).json({ error: "Event not found" });
-            return;
-        }
-        res.status(200).json(event);
-    } catch (error) {
-        console.error(`Error fetching event ${req.params.id}:`, error);
-        next(error);
-    }
-});
+eventRouter.get("/:id", eventController.getEventDetailsById);

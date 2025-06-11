@@ -21,10 +21,27 @@ const swaggerOptions = {
         description: "Recipe operations"
       },
       {
-        name: "cookoff",
-        description: "Cooking event operations"
+        name: "Cookoff",
+        description: "API endpoints for managing cooking events"
+      },
+      {
+        name: "Authentication",
+        description: "User authentication and management"
+      },
+      {
+        name: "Cart",
+        description: "Shopping cart management"
       }
-    ]
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        }
+      }
+    },
   },
   apis: ["./src/routes/*.ts"],
 };
