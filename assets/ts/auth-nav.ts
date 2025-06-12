@@ -60,7 +60,7 @@ async function validateToken(): Promise<boolean> {
     // Check if token is valid by making a lightweight API call
     try {
         const apiBase: string = "http://localhost:3000";
-        const response = await fetch(`${apiBase}/auth/validate-token`, {
+        const response = await fetch(`${apiBase}/validate-token`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`

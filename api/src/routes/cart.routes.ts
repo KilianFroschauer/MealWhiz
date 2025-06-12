@@ -12,14 +12,6 @@ export const cartRouter = express.Router();
  *   description: Shopping cart management
  */
 
-// The getUserId function might still be useful if you only have username from JWT,
-// but if JWT payload directly contains userId, it might be less needed here.
-// For this example, we'll assume the JWT payload gives us the userId directly.
-// async function getUserId(username: string): Promise<number | null> {
-//     const result = await pool.query('SELECT id FROM "user" WHERE user_name = $1', [username]);
-//     return result.rows[0]?.id || null;
-// }
-
 /**
  * @swagger
  * /cart:
@@ -46,6 +38,10 @@ export const cartRouter = express.Router();
  *                     type: number
  *                     description: The quantity of the ingredient.
  *                     example: 2
+ *                   unit:
+ *                     type: string
+ *                     description: The unit of measurement.
+ *                     example: "piece"
  *       401:
  *         description: Unauthorized - User identification in token invalid or not found.
  *       500:
@@ -62,22 +58,22 @@ cartRouter.get("/", isAuthenticated, async (req: Request, res: Response) => {
     } else if (authReq.payload && typeof authReq.payload.userId === 'number') { // Alternative structure
         userId = authReq.payload.userId;
     }
-    // console.log("User ID from token:", userId); // Good for debugging
 
     if (!userId) {
-        // This case should ideally be caught by isAuthenticated if token is invalid or malformed
-        // Or if the token doesn't contain the expected userId.
-        res.status(401).send("Benutzeridentifikation im Token ungültig oder nicht gefunden."); // LINE 34 (approx)
-        return; // IMPORTANT: Ensure you return after sending a response
+        res.status(401).send("Benutzeridentifikation im Token ungültig oder nicht gefunden.");
+        return;
     }
 
     try {
-        // console.log("Fetching cart for userId:", userId); // Good for debugging
-        const result = await pool.query("SELECT ingredients, quantity FROM shopping_cart WHERE user_id = $1", [userId]);
-        res.json(result.rows); // This is another response
+        // Update query to include the unit column
+        const result = await pool.query(
+            "SELECT ingredients, quantity, unit FROM shopping_cart WHERE user_id = $1", 
+            [userId]
+        );
+        res.json(result.rows);
     } catch (err) {
         console.error("Fehler beim Abrufen des Warenkorbs:", err);
-        res.status(500).send("Serverfehler beim Abrufen des Warenkorbs"); // This is another response
+        res.status(500).send("Serverfehler beim Abrufen des Warenkorbs");
     }
 });
 
@@ -124,7 +120,7 @@ cartRouter.get("/", isAuthenticated, async (req: Request, res: Response) => {
  */
 cartRouter.post("/", isAuthenticated, async (req: Request, res: Response) => {
     const authReq = req as AuthRequest;
-    const { ingredient, quantity } = req.body;
+    const { ingredient, quantity, unit } = req.body; // Extract unit from request
     let userId: number | undefined;
 
     if (authReq.payload && authReq.payload.user && typeof authReq.payload.user.userId === 'number') {
@@ -148,12 +144,12 @@ cartRouter.post("/", isAuthenticated, async (req: Request, res: Response) => {
     try {
         await pool.query(
             `
-            INSERT INTO shopping_cart (user_id, ingredients, quantity)
-            VALUES ($1, $2, $3)
+            INSERT INTO shopping_cart (user_id, ingredients, quantity, unit)
+            VALUES ($1, $2, $3, $4)
             ON CONFLICT (user_id, ingredients)
-            DO UPDATE SET quantity = EXCLUDED.quantity
+            DO UPDATE SET quantity = EXCLUDED.quantity, unit = EXCLUDED.unit
         `,
-            [userId, ingredient, quantity]
+            [userId, ingredient, quantity, unit || 'piece'] // Default to 'piece' if no unit provided
         );
         res.send("Eintrag im Warenkorb gespeichert/aktualisiert");
     } catch (err) {
@@ -316,11 +312,11 @@ cartRouter.post("/recipe/:recipeId", isAuthenticated, async (req: Request, res: 
         const quantity = i < quantities.length ? parseFloat(quantities[i] || '1') : 1;
         
         await pool.query(
-            `INSERT INTO shopping_cart (user_id, ingredients, quantity)
-            VALUES ($1, $2, $3)
+            `INSERT INTO shopping_cart (user_id, ingredients, quantity, unit)
+            VALUES ($1, $2, $3, $4)
             ON CONFLICT (user_id, ingredients)
             DO UPDATE SET quantity = shopping_cart.quantity + $3`,
-            [userId, ingredientsArray[i], quantity]
+            [userId, ingredientsArray[i], quantity, 'piece'] // Default to piece for recipe ingredients
         );
     }
 
@@ -381,8 +377,9 @@ cartRouter.get("/export/:format", isAuthenticated, async (req: Request, res: Res
     }
 
     try {
+        // Update query to include the unit column
         const result = await pool.query(
-            "SELECT ingredients, quantity FROM shopping_cart WHERE user_id = $1",
+            "SELECT ingredients, quantity, unit FROM shopping_cart WHERE user_id = $1",
             [userId]
         );
 
@@ -392,11 +389,11 @@ cartRouter.get("/export/:format", isAuthenticated, async (req: Request, res: Res
             res.setHeader('Content-Disposition', 'attachment; filename=shopping-list.csv');
             
             // CSV header
-            res.write('Ingredient,Quantity\n');
+            res.write('Ingredient;Quantity;Unit\n');
             
             // Add rows
             result.rows.forEach(item => {
-                res.write(`"${item.ingredients}",${item.quantity}\n`);
+                res.write(`"${item.ingredients}";${item.quantity};"${item.unit || 'piece'}"\n`);
             });
             
             res.end();
@@ -428,12 +425,14 @@ cartRouter.get("/export/:format", isAuthenticated, async (req: Request, res: Res
             // Create a table-like structure for items
             let y = doc.y;
             const startX = 50;
-            const colWidth = 250;
+            const colWidth = 200;  // Make columns narrower to fit unit
+            const unitWidth = 100;
             
             // Headers
             doc.font('Helvetica-Bold')
                .text('Ingredient', startX, y)
-               .text('Quantity', startX + colWidth, y);
+               .text('Quantity', startX + colWidth, y)
+               .text('Unit', startX + colWidth + unitWidth, y);
             
             doc.moveDown();
             y = doc.y;
@@ -441,8 +440,10 @@ cartRouter.get("/export/:format", isAuthenticated, async (req: Request, res: Res
             
             // Add each shopping list item
             result.rows.forEach(item => {
+                const unit = item.unit || 'piece';
                 doc.text(item.ingredients, startX, y)
-                   .text(item.quantity.toString(), startX + colWidth, y);
+                   .text(item.quantity.toString(), startX + colWidth, y)
+                   .text(unit, startX + colWidth + unitWidth, y);
                 y = doc.y + 10;
                 doc.y = y;
             });
@@ -462,6 +463,50 @@ cartRouter.get("/export/:format", isAuthenticated, async (req: Request, res: Res
     } catch (err) {
         console.error("Fehler beim Exportieren der Einkaufsliste:", err);
         res.status(500).send("Serverfehler beim Exportieren der Einkaufsliste");
+    }
+});
+
+/**
+ * @swagger
+ * /cart/all:
+ *   delete:
+ *     summary: Delete all items from the shopping cart
+ *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: All items removed from cart
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
+cartRouter.delete("/all", isAuthenticated, async (req: Request, res: Response) => {
+    const authReq = req as AuthRequest;
+    let userId: number | undefined;
+
+    // Extract userId from token
+    if (authReq.payload && authReq.payload.user && typeof authReq.payload.user.userId === 'number') {
+        userId = authReq.payload.user.userId;
+    } else if (authReq.payload && typeof authReq.payload.userId === 'number') {
+        userId = authReq.payload.userId;
+    }
+
+    if (!userId) {
+        res.status(401).send("Benutzeridentifikation im Token ungültig oder nicht gefunden.");
+        return;
+    }
+
+    try {
+        await pool.query(
+            "DELETE FROM shopping_cart WHERE user_id = $1",
+            [userId]
+        );
+        res.send("Alle Einträge im Warenkorb gelöscht");
+    } catch (err) {
+        console.error("Fehler beim Löschen aller Einträge im Warenkorb:", err);
+        res.status(500).send("Serverfehler beim Löschen aller Einträge im Warenkorb");
     }
 });
 

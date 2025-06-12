@@ -29,6 +29,13 @@
 
     <!-- Additional shopping cart styles -->
     <style>
+        .unit-display {
+            margin: 0 8px 0 2px;
+            color: #6c757d;
+            font-size: 0.9rem;
+            min-width: 30px;
+        }
+
         .cart-item {
             display: flex;
             justify-content: space-between;
@@ -97,7 +104,7 @@
             </div>-->
         <div class="container px-0">
             <nav class="navbar navbar-light bg-white navbar-expand-xl">
-                <a href="index.html" class="navbar-brand d-flex align-items-center">
+                <a href="../index.html" class="navbar-brand d-flex align-items-center">
                     <img src="../assets/img/Logo-Whizard-cropped-tranparent.png" alt="MealWhiz Logo"
                         style="height: 65px; margin-right: 10px" />
                     <h1 class="m-0"
@@ -185,6 +192,12 @@
                                 <input type="text" id="ingredient" class="form-control" placeholder="Add ingredient">
                                 <input type="number" id="quantity" class="form-control" placeholder="Qty" min="1"
                                     value="1">
+                                <select id="unit" class="form-control" style="max-width: 120px;">
+                                    <option value="piece" selected>piece</option>
+                                    <option value="g">g</option>
+                                    <option value="kg">kg</option>
+                                    <option value="liter">liter</option>
+                                </select>
                                 <button class="btn btn-primary" onclick="addToCart()">
                                     <i class="fas fa-plus me-1"></i> Add
                                 </button>
@@ -205,9 +218,14 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <button class="btn btn-outline-secondary" onclick="loadCart()">
-                                <i class="fas fa-sync-alt me-1"></i> Refresh
-                            </button>
+                            <div>
+                                <button class="btn btn-outline-secondary me-2" onclick="loadCart()">
+                                    <i class="fas fa-sync-alt me-1"></i> Refresh
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="deleteAllFromCart()">
+                                    <i class="fas fa-trash-alt me-1"></i> Clear All
+                                </button>
+                            </div>
 
                             <div class="dropdown">
                                 <button class="btn btn-success dropdown-toggle" type="button" id="exportDropdown"
@@ -379,33 +397,37 @@
 
                     if (items.length === 0) {
                         cartDiv.innerHTML = `
-                            <div class="text-center py-4 text-muted">
-                                <i class="fas fa-shopping-basket fa-3x mb-3"></i>
-                                <p>Your shopping list is empty.</p>
-                            </div>`;
+                    <div class="text-center py-4 text-muted">
+                        <i class="fas fa-shopping-basket fa-3x mb-3"></i>
+                        <p>Your shopping list is empty.</p>
+                    </div>`;
                     } else {
                         let html = '';
 
                         items.forEach((item) => {
+                            // Get unit or default to "piece" if none exists
+                            const unit = item.unit || 'piece';
+
                             html += `
-                            <div class="cart-item">
-                                <span>${item.ingredients}</span>
-                                <div class="quantity-control">
-                                    <button class="btn-quantity decrease-qty" data-ingredient="${item.ingredients}">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                    <input type="number" value="${item.quantity}" min="1" 
-                                           class="mx-2 item-quantity" 
-                                           data-ingredient="${item.ingredients}" 
-                                           onchange="updateQuantity('${item.ingredients}', this.value)">
-                                    <button class="btn-quantity increase-qty" data-ingredient="${item.ingredients}">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger ms-2" onclick="deleteFromCart('${item.ingredients}')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>`;
+                    <div class="cart-item">
+                        <span>${item.ingredients}</span>
+                        <div class="quantity-control">
+                            <button class="btn-quantity decrease-qty" data-ingredient="${item.ingredients}">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="text" value="${item.quantity}" min="1" 
+                                   class="mx-2 item-quantity" 
+                                   data-ingredient="${item.ingredients}" 
+                                   onchange="updateQuantity('${item.ingredients}', this.value)">
+                            <span class="unit-display">${unit}</span>
+                            <button class="btn-quantity increase-qty" data-ingredient="${item.ingredients}">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger ms-2" onclick="deleteFromCart('${item.ingredients}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>`;
                         });
 
                         cartDiv.innerHTML = html;
@@ -450,6 +472,7 @@
 
             const ingredient = document.getElementById("ingredient").value;
             const quantityInput = document.getElementById("quantity").value;
+            const unit = document.getElementById("unit").value; // Get selected unit
 
             if (!ingredient || !quantityInput) {
                 showMessage("Please enter both ingredient and quantity", true);
@@ -466,12 +489,13 @@
                 const res = await fetch(`${apiBase}/cart`, {
                     method: "POST",
                     headers: getAuthHeaders(),
-                    body: JSON.stringify({ ingredient, quantity }),
+                    body: JSON.stringify({ ingredient, quantity, unit }), // Include unit in the request
                 });
 
                 if (res.ok) {
                     document.getElementById("ingredient").value = "";
                     document.getElementById("quantity").value = "1";
+                    // Keep the unit selection as is for convenience
                     loadCart();
                     showMessage("Item added to shopping list", false);
                 } else {
@@ -523,13 +547,30 @@
 
             try {
                 const res = await fetch(`${apiBase}/cart`, {
-                    method: "POST", // Using POST as your API uses it for updates too
-                    headers: getAuthHeaders(),
-                    body: JSON.stringify({ ingredient, quantity }),
+                    method: "GET",
+                    headers: getAuthHeaders()
                 });
 
                 if (res.ok) {
-                    // No need to reload entire cart, update was successful
+                    const items = await res.json();
+                    const item = items.find(i => i.ingredients === ingredient);
+
+                    if (item) {
+                        // Update with preserved unit
+                        const updateRes = await fetch(`${apiBase}/cart`, {
+                            method: "POST",
+                            headers: getAuthHeaders(),
+                            body: JSON.stringify({
+                                ingredient,
+                                quantity,
+                                unit: item.unit || 'piece'
+                            }),
+                        });
+
+                        if (!updateRes.ok) {
+                            handleError(updateRes);
+                        }
+                    }
                 } else {
                     handleError(res);
                 }
@@ -537,6 +578,35 @@
                 console.error("Error updating quantity:", error);
                 showMessage("Error updating quantity", true);
                 loadCart(); // Reload to restore correct state
+            }
+        }
+
+        async function deleteAllFromCart() {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                showMessage("Please log in to clear your shopping list", true);
+                return;
+            }
+
+            try {
+                const res = await fetch(`${apiBase}/cart/all`, {
+                    method: "DELETE",
+                    headers: getAuthHeaders(),
+                });
+
+                if (res.ok) {
+                    document.getElementById("cart").innerHTML = `
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-shopping-basket fa-3x mb-3"></i>
+                            <p>Your shopping list is empty.</p>
+                        </div>`;
+                    showMessage("All items removed from shopping list", false);
+                } else {
+                    handleError(res);
+                }
+            } catch (error) {
+                console.error("Error clearing cart:", error);
+                showMessage("Error clearing shopping list", true);
             }
         }
 
