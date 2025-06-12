@@ -25,6 +25,145 @@ function showError(message) {
         container.innerHTML = `<div class='alert alert-danger mt-5 text-center' style='font-size:1.5rem'>${message}</div>`;
     }
 }
+/**
+ * Validates the JWT token by checking:
+ * 1. If it exists
+ * 2. If it's not expired (by making a lightweight API call)
+ * @returns Promise resolving to boolean indicating if token is valid
+ */
+async function isUserLoggedIn() {
+    const token = localStorage.getItem('accessToken');
+    // No token means not logged in
+    if (!token) {
+        return false;
+    }
+    // Check if token is valid by making a lightweight API call
+    try {
+        const apiBase = "http://localhost:3000";
+        const response = await fetch(`${apiBase}/validate-token`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        // If response is OK, token is valid
+        if (response.ok) {
+            return true;
+        }
+        // If unauthorized response, token is expired or invalid
+        if (response.status === 401) {
+            console.log('Token expired or invalid. Logging out...');
+            logout();
+            return false;
+        }
+        // For other errors, assume token might be valid
+        return true;
+    }
+    catch (error) {
+        console.error('Error validating token:', error);
+        // If network error, assume token is valid (to prevent logout when offline)
+        return true;
+    }
+}
+// Render rating component for logged-in users
+async function renderRatingComponent(recipe, container) {
+    const ratingContainer = document.createElement('div');
+    ratingContainer.className = 'my-4 border-top pt-4';
+    ratingContainer.innerHTML = `
+        <h5 class="fw-bold mb-3">Rate this recipe</h5>
+        ${await isUserLoggedIn() ? `
+            <div class="d-flex align-items-center recipe-rating-component">
+                <div class="star-rating">
+                    <i class="far fa-star" data-rating="1"></i>
+                    <i class="far fa-star" data-rating="2"></i>
+                    <i class="far fa-star" data-rating="3"></i>
+                    <i class="far fa-star" data-rating="4"></i>
+                    <i class="far fa-star" data-rating="5"></i>
+                </div>
+                <span class="ms-3 rating-message">Click to rate</span>
+            </div>
+        ` : `
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <a href="login.html" class="alert-link">Log in</a> to rate this recipe
+            </div>
+        `}
+    `;
+    container.appendChild(ratingContainer);
+    // Only add event listeners if user is logged in
+    if (await isUserLoggedIn()) {
+        const stars = ratingContainer.querySelectorAll('.star-rating i');
+        const ratingMessage = ratingContainer.querySelector('.rating-message');
+        // Highlight stars on hover
+        stars.forEach(star => {
+            star.addEventListener('mouseover', () => {
+                const rating = parseInt(star.getAttribute('data-rating') || '0');
+                updateStarsDisplay(stars, rating, 'hover');
+                if (ratingMessage)
+                    ratingMessage.textContent = `${rating} star${rating !== 1 ? 's' : ''}`;
+            });
+        });
+        // Reset stars when not hovering
+        ratingContainer.querySelector('.star-rating')?.addEventListener('mouseleave', () => {
+            updateStarsDisplay(stars, 0, 'reset');
+            if (ratingMessage)
+                ratingMessage.textContent = 'Click to rate';
+        });
+        // Handle click to submit rating
+        stars.forEach(star => {
+            star.addEventListener('click', async () => {
+                const rating = parseInt(star.getAttribute('data-rating') || '0');
+                await submitRating(recipe.id, rating, stars, ratingMessage);
+            });
+        });
+    }
+}
+// Update the star display based on interaction
+function updateStarsDisplay(stars, rating, mode) {
+    stars.forEach((star, index) => {
+        if (mode === 'reset') {
+            star.className = 'far fa-star';
+        }
+        else {
+            star.className = (index < rating) ? 'fas fa-star text-warning' : 'far fa-star';
+        }
+    });
+}
+// Submit the rating to the API
+async function submitRating(recipeId, rating, stars, messageElement) {
+    try {
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch(`http://localhost:3000/recipes/${recipeId}/rate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ rating })
+        });
+        if (!response.ok) {
+            throw new Error('Failed to submit rating');
+        }
+        const result = await response.json();
+        // Update UI to show successful rating
+        updateStarsDisplay(stars, rating, 'set');
+        messageElement.textContent = `Thank you! You rated ${rating} star${rating !== 1 ? 's' : ''}`;
+        messageElement.className = 'ms-3 rating-message text-success';
+        // Update the displayed average rating
+        const ratingDisplay = document.querySelector('.recipe-rating-display');
+        if (ratingDisplay && result.newRating) {
+            ratingDisplay.textContent = result.newRating.toFixed(1);
+        }
+        // Show toast notification
+        alert('Rating submitted successfully!');
+    }
+    catch (error) {
+        console.error('Error submitting rating:', error);
+        messageElement.textContent = 'Failed to submit rating. Please try again.';
+        messageElement.className = 'ms-3 rating-message text-danger';
+        alert('Error submitting rating');
+    }
+}
 // Renders the fetched recipe details into the HTML structure.
 function renderRecipe(recipe) {
     setLoading(false); // Hide loader.
@@ -144,6 +283,11 @@ function renderRecipe(recipe) {
             
         </div>
     `;
+    // Add the rating component after the recipe content is loaded
+    const recipeContentTab = container.querySelector('#recipe-content');
+    if (recipeContentTab) {
+        renderRatingComponent(recipe, recipeContentTab);
+    }
 }
 // Asynchronously loads the recipe data.
 async function loadRecipe() {

@@ -267,3 +267,70 @@ async function mapDbRowsToRecipes(rows: any[]): Promise<Recipe[]> {
   
   return Promise.all(recipePromises);
 }
+
+/**
+ * Updates the rating for a recipe from a specific user
+ * @param recipeId The ID of the recipe being rated
+ * @param rating The rating value (1-5)
+ * @param userId The ID of the user submitting the rating
+ * @returns The updated recipe with the new average rating
+ */
+export async function updateRecipeRating(recipeId: number, rating: number, userId: number): Promise<Recipe | undefined> {
+  const client = await pool.connect();
+  
+  try {
+    await client.query('BEGIN');
+    
+    // First check if recipe exists
+    const recipeCheck = await client.query('SELECT recipe_id FROM recipe WHERE recipe_id = $1', [recipeId]);
+    if (recipeCheck.rows.length === 0) {
+      return undefined; // Recipe not found
+    }
+    
+    // Check if user has already rated this recipe
+    const existingRating = await client.query(
+      'SELECT * FROM user_recipe_ratings WHERE user_id = $1 AND recipe_id = $2',
+      [userId, recipeId]
+    );
+    
+    if (existingRating.rows.length > 0) {
+      // Update existing rating
+      await client.query(
+        'UPDATE user_recipe_ratings SET rating = $1, updated_at = NOW() WHERE user_id = $2 AND recipe_id = $3',
+        [rating, userId, recipeId]
+      );
+    } else {
+      // Insert new rating
+      await client.query(
+        'INSERT INTO user_recipe_ratings (user_id, recipe_id, rating, created_at, updated_at) VALUES ($1, $2, $3, NOW(), NOW())',
+        [userId, recipeId, rating]
+      );
+    }
+    
+    // Calculate new average rating
+    const avgResult = await client.query(
+      'SELECT AVG(rating) as avg_rating FROM user_recipe_ratings WHERE recipe_id = $1',
+      [recipeId]
+    );
+    
+    const avgRating = parseFloat(avgResult.rows[0].avg_rating);
+    
+    // Update the recipe with new average rating
+    await client.query(
+      'UPDATE recipe SET rating = $1 WHERE recipe_id = $2',
+      [avgRating, recipeId]
+    );
+    
+    await client.query('COMMIT');
+    
+    // Fetch the updated recipe
+    return await getRecipeById(recipeId);
+    
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('Error updating recipe rating:', error);
+    throw error;
+  } finally {
+    client.release();
+  }
+}

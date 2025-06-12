@@ -268,7 +268,7 @@ authRouter.put("/users/update", isAuthenticated, authController.updateCurrentUse
 
 /**
  * @swagger
- * /auth/validate-token:
+ * /validate-token:
  *   get:
  *     summary: Validate JWT token
  *     description: Checks if the current JWT token is still valid
