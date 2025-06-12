@@ -13,7 +13,6 @@ const authController = new AuthController();
  *   description: User authentication and management
  */
 
-// TODO: Secure /users route
 /**
  * @swagger
  * /users:
@@ -151,3 +150,118 @@ authRouter.post("/login", authController.loginUser);
  *         description: Internal server error
  */
 authRouter.post("/register", authController.registerUser);
+
+/**
+ * @swagger
+ * /users/me:
+ *   get:
+ *     summary: Get current user profile
+ *     description: Retrieves the profile information of the currently authenticated user
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userId:
+ *                   type: number
+ *                   example: 1
+ *                 username:
+ *                   type: string
+ *                   example: johndoe
+ *                 email:
+ *                   type: string
+ *                   nullable: true
+ *                   example: john@example.com
+ *                 bio:
+ *                   type: string
+ *                   nullable: true
+ *                   example: I love cooking Italian food
+ *                 joinDate:
+ *                   type: string
+ *                   format: date-time
+ *                   example: 2023-01-15T00:00:00.000Z
+ *       401:
+ *         description: Unauthorized - invalid or missing token
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error
+ */
+authRouter.get("/users/me", isAuthenticated, authController.getCurrentUser);
+
+/**
+ * @swagger
+ * /users/update:
+ *   put:
+ *     summary: Update current user profile
+ *     description: Updates the profile information of the currently authenticated user
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: johndoe2
+ *                 description: New username
+ *               email:
+ *                 type: string
+ *                 example: john.new@example.com
+ *                 description: New email address
+ *               bio:
+ *                 type: string
+ *                 example: Food enthusiast from Italy
+ *                 description: User biography
+ *               password:
+ *                 type: string
+ *                 example: newSecretPassword
+ *                 description: New password (will be hashed)
+ *     responses:
+ *       200:
+ *         description: User profile updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userId:
+ *                   type: number
+ *                   example: 1
+ *                 username:
+ *                   type: string
+ *                   example: johndoe2
+ *                 email:
+ *                   type: string
+ *                   nullable: true
+ *                   example: john.new@example.com
+ *                 bio:
+ *                   type: string
+ *                   nullable: true
+ *                   example: Food enthusiast from Italy
+ *                 joinDate:
+ *                   type: string
+ *                   format: date-time
+ *                   example: 2023-01-15T00:00:00.000Z
+ *       400:
+ *         description: Bad request - invalid data provided
+ *       401:
+ *         description: Unauthorized - invalid or missing token
+ *       404:
+ *         description: User not found
+ *       409:
+ *         description: Conflict - username already exists
+ *       500:
+ *         description: Server error
+ */
+authRouter.put("/users/update", isAuthenticated, authController.updateCurrentUser);

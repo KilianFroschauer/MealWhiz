@@ -1,8 +1,7 @@
 import express, { Request, Response } from "express";
 import { pool } from "../config";
 import { isAuthenticated, AuthRequest } from "../middlewares/auth.middlware"; // Assuming AuthRequest is exported from auth-handler
-
-// Removed: declare module "express-session" and import "express-session" as sessions are not used with JWT for this.
+import PDFDocument from 'pdfkit';
 
 export const cartRouter = express.Router();
 
@@ -278,37 +277,58 @@ cartRouter.post("/recipe/:recipeId", isAuthenticated, async (req: Request, res: 
     }
 
     try {
-        // Get recipe ingredients
-        const recipeResult = await pool.query(
-            `SELECT ingredients, ingredientsAmount FROM recipe WHERE recipe_id = $1`,
-            [recipeId]
-        );
+    // Get recipe ingredients using the junction table
+    // This approach doesn't rely on array_length with a text column
+    const recipeResult = await pool.query(
+        `SELECT r.ingredients,
+                ARRAY(
+                    SELECT ri.quantity::text 
+                    FROM recipe_ingredient ri 
+                    WHERE ri.recipe_id = r.recipe_id
+                    ORDER BY ri.ingredient_code
+                ) as quantities
+         FROM recipe r
+         WHERE r.recipe_id = $1`,
+        [recipeId]
+    );
 
-        if (recipeResult.rows.length === 0) {
-            res.status(404).send("Rezept nicht gefunden");
-            return;
-        }
-
-        const recipe = recipeResult.rows[0];
-        const ingredients = recipe.ingredients;
-        const amounts = recipe.ingredientsAmount;
-
-        // Add each ingredient to shopping cart
-        for (let i = 0; i < ingredients.length; i++) {
-            await pool.query(
-                `INSERT INTO shopping_cart (user_id, ingredients, quantity)
-                VALUES ($1, $2, $3)
-                ON CONFLICT (user_id, ingredients)
-                DO UPDATE SET quantity = shopping_cart.quantity + $3`,
-                [userId, ingredients[i], amounts[i] || 1]
-            );
-        }
-
-        res.send("Rezeptzutaten zum Warenkorb hinzugefügt");
-    } catch (err) {
-        console.error("Fehler beim Hinzufügen der Rezeptzutaten:", err);
-        res.status(500).send("Serverfehler beim Hinzufügen der Rezeptzutaten");
+    if (recipeResult.rows.length === 0) {
+        res.status(404).send("Rezept nicht gefunden");
+        return;
     }
+
+    const recipe = recipeResult.rows[0];
+    const ingredients = recipe.ingredients;
+    
+    // Handle ingredients based on whether it's stored as text or array
+    // If it's stored as a comma-separated string, split it
+    const ingredientsArray = Array.isArray(ingredients) 
+        ? ingredients 
+        : typeof ingredients === 'string'
+            ? ingredients.split(',').map(item => item.trim())
+            : [];
+    
+    const quantities = recipe.quantities || [];
+
+    // Add each ingredient to shopping cart
+    for (let i = 0; i < ingredientsArray.length; i++) {
+        // Default to 1 if no quantity is available for this index
+        const quantity = i < quantities.length ? parseFloat(quantities[i] || '1') : 1;
+        
+        await pool.query(
+            `INSERT INTO shopping_cart (user_id, ingredients, quantity)
+            VALUES ($1, $2, $3)
+            ON CONFLICT (user_id, ingredients)
+            DO UPDATE SET quantity = shopping_cart.quantity + $3`,
+            [userId, ingredientsArray[i], quantity]
+        );
+    }
+
+    res.send("Rezeptzutaten zum Warenkorb hinzugefügt");
+} catch (err) {
+    console.error("Fehler beim Hinzufügen der Rezeptzutaten:", err);
+    res.status(500).send("Serverfehler beim Hinzufügen der Rezeptzutaten");
+}
 });
 
 /**
@@ -382,9 +402,59 @@ cartRouter.get("/export/:format", isAuthenticated, async (req: Request, res: Res
             res.end();
         } 
         else if (format === "pdf") {
-            // For PDF you'll need a library like pdfkit
-            // This is a simplified example
-            res.status(501).send("PDF export wird bald verfügbar sein");
+            // Create a PDF document
+            const doc = new PDFDocument();
+            
+            // Set response headers
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', 'attachment; filename=shopping-list.pdf');
+            
+            // Pipe the PDF directly to the response
+            doc.pipe(res);
+            
+            // Add content to the PDF
+            doc.fontSize(20).text('MealWhiz Shopping List', {
+                align: 'center'
+            });
+
+            // Add date
+            doc.fontSize(12)
+               .text(`Generated on ${new Date().toLocaleDateString()}`, {
+                   align: 'center'
+               });
+            
+            doc.moveDown(2);
+            
+            // Create a table-like structure for items
+            let y = doc.y;
+            const startX = 50;
+            const colWidth = 250;
+            
+            // Headers
+            doc.font('Helvetica-Bold')
+               .text('Ingredient', startX, y)
+               .text('Quantity', startX + colWidth, y);
+            
+            doc.moveDown();
+            y = doc.y;
+            doc.font('Helvetica');
+            
+            // Add each shopping list item
+            result.rows.forEach(item => {
+                doc.text(item.ingredients, startX, y)
+                   .text(item.quantity.toString(), startX + colWidth, y);
+                y = doc.y + 10;
+                doc.y = y;
+            });
+            
+            // Add footer
+            doc.moveDown(2);
+            doc.fontSize(10).text('Thank you for using MealWhiz!', {
+                align: 'center'
+            });
+            
+            // Finalize the PDF
+            doc.end();
         }
         else {
             res.status(400).send("Ungültiges Exportformat. Unterstützte Formate: pdf, csv");
