@@ -316,4 +316,15 @@ export class AuthController {
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Failed to update user profile");
         }
     }
+
+    /**
+     * Validates if the current JWT token is still valid.
+     * @param {Request} req - Express request object.
+     * @param {Response} res - Express response object.
+     * @returns {Promise<void>}
+     */
+    async validateToken(req: Request, res: Response): Promise<void> {
+        // If this route is reached with isAuthenticated middleware, token is valid
+        res.status(StatusCodes.OK).json({ valid: true });
+    }
 }

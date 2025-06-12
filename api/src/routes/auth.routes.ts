@@ -265,3 +265,28 @@ authRouter.get("/users/me", isAuthenticated, authController.getCurrentUser);
  *         description: Server error
  */
 authRouter.put("/users/update", isAuthenticated, authController.updateCurrentUser);
+
+/**
+ * @swagger
+ * /auth/validate-token:
+ *   get:
+ *     summary: Validate JWT token
+ *     description: Checks if the current JWT token is still valid
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Token is valid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 valid:
+ *                   type: boolean
+ *                   example: true
+ *       401:
+ *         description: Token is invalid or expired
+ */
+authRouter.get("/validate-token", isAuthenticated, authController.validateToken);
