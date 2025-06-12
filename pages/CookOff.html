@@ -74,6 +74,12 @@
                             class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4"
                             data-bs-toggle="modal" data-bs-target="#searchModal"><i
                                 class="fas fa-search text-primary"></i></button>
+                        <a href="shopping_cart.html" class="position-relative me-4 my-auto cart-icon">
+                            <i class="fa fa-shopping-bag fa-2x"></i>
+                            <span
+                                class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
+                                style="top: -5px; left: 15px; height: 20px; min-width: 20px;" id="cart-count">0</span>
+                        </a>
                         <a href="login.html" class="my-auto">
                             <i class="fas fa-user fa-2x"></i>
                         </a>
@@ -106,7 +112,8 @@
     <!-- Modal Search End -->
 
     <!-- Join Lobby Confirmation Modal Start -->
-    <div class="modal fade" id="joinLobbyConfirmationModal" tabindex="-1" aria-labelledby="joinLobbyConfirmationModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal fade" id="joinLobbyConfirmationModal" tabindex="-1"
+        aria-labelledby="joinLobbyConfirmationModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog" style="z-index: 1100;">
             <div class="modal-content">
                 <div class="modal-header">
@@ -145,15 +152,17 @@
                 <h1 class="display-5">Choose Your CookOff Experience</h1>
                 <p class="fs-5">Select the cooking experience that matches your mood today!</p>
             </div>
-            
+
             <div class="row g-4">
                 <!-- Competitive Mode Card -->
                 <div class="col-lg-6">
                     <div class="card h-100 cookoff-mode-card">
                         <div class="position-relative">
-                            <img src="../assets/img/competitiv_cooking-unsplash.jpg" class="card-img-top" alt="Competitive CookOff" style="height: 300px; object-fit: cover;">
+                            <img src="../assets/img/competitiv_cooking-unsplash.jpg" class="card-img-top"
+                                alt="Competitive CookOff" style="height: 300px; object-fit: cover;">
                             <div class="position-absolute top-0 start-0 m-3">
-                                <span class="badge bg-danger px-3 py-2"><i class="fas fa-trophy me-1"></i> COMPETITIVE</span>
+                                <span class="badge bg-danger px-3 py-2"><i class="fas fa-trophy me-1"></i>
+                                    COMPETITIVE</span>
                             </div>
                         </div>
                         <div class="card-body text-center py-4">
@@ -180,17 +189,20 @@
                                     <span>Match history tracking</span>
                                 </div>
                             </div>
-                            <p class="card-text">Challenge another chef in a timed cooking battle with viewers voting for the best creation!</p>
-                            <button class="btn btn-primary btn-lg px-4 py-3 mt-2" data-bs-toggle="modal" data-bs-target="#competitiveModeModal">Enter Competition</button>
+                            <p class="card-text">Challenge another chef in a timed cooking battle with viewers voting
+                                for the best creation!</p>
+                            <button class="btn btn-primary btn-lg px-4 py-3 mt-2" data-bs-toggle="modal"
+                                data-bs-target="#competitiveModeModal">Enter Competition</button>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Casual Mode Card -->
                 <div class="col-lg-6">
                     <div class="card h-100 cookoff-mode-card">
                         <div class="position-relative">
-                            <img src="../assets/img/casual_cooking-unsplash.jpg" class="card-img-top" alt="Casual CookOff" style="height: 300px; object-fit: cover;">
+                            <img src="../assets/img/casual_cooking-unsplash.jpg" class="card-img-top"
+                                alt="Casual CookOff" style="height: 300px; object-fit: cover;">
                             <div class="position-absolute top-0 start-0 m-3">
                                 <span class="badge bg-info px-3 py-2"><i class="fas fa-coffee me-1"></i> CASUAL</span>
                             </div>
@@ -219,13 +231,15 @@
                                     <span>Skip or connect at any time</span>
                                 </div>
                             </div>
-                            <p class="card-text">Connect with a fellow cooking enthusiast and chat while you both cook - no pressure, just fun!</p>
-                            <button class="btn btn-info btn-lg px-4 py-3 mt-2 text-white" data-bs-toggle="modal" data-bs-target="#casualModeModal">Start Casual Cooking</button>
+                            <p class="card-text">Connect with a fellow cooking enthusiast and chat while you both cook -
+                                no pressure, just fun!</p>
+                            <button class="btn btn-info btn-lg px-4 py-3 mt-2 text-white" data-bs-toggle="modal"
+                                data-bs-target="#casualModeModal">Start Casual Cooking</button>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Stats Section -->
             <div class="row mt-5 pt-4">
                 <div class="col-12">
@@ -260,7 +274,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Featured CookOffs -->
             <div class="row mt-5">
                 <div class="col-12">
@@ -269,7 +283,8 @@
                         <div class="col-md-4">
                             <div class="card h-100">
                                 <div class="position-relative">
-                                    <img src="../assets/img/Food_Example_02-unsplash.jpg" class="card-img-top" alt="Past Challenge" style="height: 200px; object-fit: cover;">
+                                    <img src="../assets/img/Food_Example_02-unsplash.jpg" class="card-img-top"
+                                        alt="Past Challenge" style="height: 200px; object-fit: cover;">
                                     <div class="position-absolute top-0 start-0 m-3">
                                         <span class="badge bg-danger px-3 py-2">COMPETITIVE</span>
                                     </div>
@@ -283,14 +298,16 @@
                                     </div>
                                 </div>
                                 <div class="card-footer bg-white">
-                                    <a href="CookOff-Battle.html" class="btn btn-outline-primary w-100">Enter Competition</a>
+                                    <a href="CookOff-Battle.html" class="btn btn-outline-primary w-100">Enter
+                                        Competition</a>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="card h-100">
                                 <div class="position-relative">
-                                    <img src="../assets/img/Food_Example_03-unsplash.jpg" class="card-img-top" alt="Past Challenge" style="height: 200px; object-fit: cover;">
+                                    <img src="../assets/img/Food_Example_03-unsplash.jpg" class="card-img-top"
+                                        alt="Past Challenge" style="height: 200px; object-fit: cover;">
                                     <div class="position-absolute top-0 start-0 m-3">
                                         <span class="badge bg-danger px-3 py-2">COMPETITIVE</span>
                                     </div>
@@ -304,14 +321,16 @@
                                     </div>
                                 </div>
                                 <div class="card-footer bg-white">
-                                    <a href="CookOff-Battle.html" class="btn btn-outline-primary w-100">Enter Competition</a>
+                                    <a href="CookOff-Battle.html" class="btn btn-outline-primary w-100">Enter
+                                        Competition</a>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="card h-100">
                                 <div class="position-relative">
-                                    <img src="../assets/img/Food_Example_05-unsplash.jpg" class="card-img-top" alt="Past Challenge" style="height: 200px; object-fit: cover;">
+                                    <img src="../assets/img/Food_Example_05-unsplash.jpg" class="card-img-top"
+                                        alt="Past Challenge" style="height: 200px; object-fit: cover;">
                                     <div class="position-absolute top-0 start-0 m-3">
                                         <span class="badge bg-danger px-3 py-2">COMPETITIVE</span>
                                     </div>
@@ -325,7 +344,8 @@
                                     </div>
                                 </div>
                                 <div class="card-footer bg-white">
-                                    <a href="CookOff-Battle.html" class="btn btn-outline-primary w-100">Enter Competition</a>
+                                    <a href="CookOff-Battle.html" class="btn btn-outline-primary w-100">Enter
+                                        Competition</a>
                                 </div>
                             </div>
                         </div>
@@ -444,20 +464,23 @@
             class="fa fa-arrow-up"></i></a>
 
     <!-- Casual Mode Modal -->
-    <div class="modal fade" id="casualModeModal" tabindex="-1" aria-labelledby="casualModeModalLabel" aria-hidden="true">
+    <div class="modal fade" id="casualModeModal" tabindex="-1" aria-labelledby="casualModeModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-info text-white">
                     <h5 class="modal-title" id="casualModeModalLabel">Casual Cooking Mode</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="text-center mb-4">
-                        <img src="../assets/img/casual_cooking-unsplash.jpg" alt="Casual Cooking" class="img-fluid rounded mb-3" style="max-height: 200px; object-fit: cover;">
+                        <img src="../assets/img/casual_cooking-unsplash.jpg" alt="Casual Cooking"
+                            class="img-fluid rounded mb-3" style="max-height: 200px; object-fit: cover;">
                         <h4>Find a Casual Cooking Partner</h4>
                         <p>Select your preferences below and we'll find you a cooking buddy with similar interests!</p>
                     </div>
-                    
+
                     <form id="casualCookingForm">
                         <div class="mb-3">
                             <label for="cookingStyle" class="form-label">What are you cooking today?</label>
@@ -470,7 +493,7 @@
                                 <option value="any">Any style - I'm flexible!</option>
                             </select>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="experienceLevel" class="form-label">Your cooking experience level</label>
                             <select class="form-select" id="experienceLevel">
@@ -481,7 +504,7 @@
                                 <option value="any">Any level - I enjoy cooking with everyone!</option>
                             </select>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="sessionLength" class="form-label">Preferred session length</label>
                             <select class="form-select" id="sessionLength">
@@ -492,7 +515,7 @@
                                 <option value="any">Any length - I'm flexible!</option>
                             </select>
                         </div>
-                        
+
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" id="shareRecipeCheck">
                             <label class="form-check-label" for="shareRecipeCheck">
@@ -503,14 +526,16 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-info text-white" id="findPartnerBtn">Find Cooking Partner</button>
+                    <button type="button" class="btn btn-info text-white" id="findPartnerBtn">Find Cooking
+                        Partner</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Finding Partner Modal -->
-    <div class="modal fade" id="findingPartnerModal" tabindex="-1" aria-labelledby="findingPartnerModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal fade" id="findingPartnerModal" tabindex="-1" aria-labelledby="findingPartnerModalLabel"
+        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-body text-center p-5">
@@ -518,31 +543,37 @@
                         <span class="visually-hidden">Loading...</span>
                     </div>
                     <h4 id="findingPartnerModalLabel">Finding your cooking partner...</h4>
-                    <p class="mb-4">We're looking for someone who matches your preferences. This usually takes less than a minute.</p>
+                    <p class="mb-4">We're looking for someone who matches your preferences. This usually takes less than
+                        a minute.</p>
                     <div class="progress mb-3">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                            aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
                     </div>
-                    <button type="button" class="btn btn-outline-secondary mt-3" id="cancelSearchBtn">Cancel Search</button>
+                    <button type="button" class="btn btn-outline-secondary mt-3" id="cancelSearchBtn">Cancel
+                        Search</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Competitive Mode Modal -->
-    <div class="modal fade" id="competitiveModeModal" tabindex="-1" aria-labelledby="competitiveModeModalLabel" aria-hidden="true">
+    <div class="modal fade" id="competitiveModeModal" tabindex="-1" aria-labelledby="competitiveModeModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title" id="competitiveModeModalLabel">Competitive Cooking Challenge</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="text-center mb-4">
-                        <img src="../assets/img/competitiv_cooking-unsplash.jpg" alt="Competitive Cooking" class="img-fluid rounded mb-3" style="max-height: 200px; object-fit: cover;">
+                        <img src="../assets/img/competitiv_cooking-unsplash.jpg" alt="Competitive Cooking"
+                            class="img-fluid rounded mb-3" style="max-height: 200px; object-fit: cover;">
                         <h4>Select Your Challenge</h4>
                         <p>Choose a cooking challenge that matches your skills and available ingredients!</p>
                     </div>
-                    
+
                     <form id="competitiveCookingForm">
                         <div class="mb-3">
                             <label for="challengeType" class="form-label">Challenge Type</label>
@@ -558,7 +589,7 @@
                                 <option value="mystery-box">Mystery Box Challenge</option>
                             </select>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="difficultyLevel" class="form-label">Difficulty Level</label>
                             <select class="form-select" id="difficultyLevel">
@@ -568,7 +599,7 @@
                                 <option value="professional">Professional</option>
                             </select>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="timeLimit" class="form-label">Time Limit</label>
                             <select class="form-select" id="timeLimit">
@@ -578,7 +609,7 @@
                                 <option value="60">60 Minutes</option>
                             </select>
                         </div>
-                        
+
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" id="ingredientsCheck" checked>
                             <label class="form-check-label" for="ingredientsCheck">
@@ -596,7 +627,8 @@
     </div>
 
     <!-- Looking for Opponent Modal -->
-    <div class="modal fade" id="findingOpponentModal" tabindex="-1" aria-labelledby="findingOpponentModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal fade" id="findingOpponentModal" tabindex="-1" aria-labelledby="findingOpponentModalLabel"
+        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-body text-center p-5">
@@ -604,11 +636,15 @@
                         <span class="visually-hidden">Loading...</span>
                     </div>
                     <h4 id="findingOpponentModalLabel">Finding your opponent...</h4>
-                    <p class="mb-4">We're looking for a chef who matches your skill level for this challenge. This usually takes less than a minute.</p>
+                    <p class="mb-4">We're looking for a chef who matches your skill level for this challenge. This
+                        usually takes less than a minute.</p>
                     <div class="progress mb-3">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger"
+                            role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"
+                            style="width: 75%"></div>
                     </div>
-                    <button type="button" class="btn btn-outline-secondary mt-3" id="cancelCompetitionBtn">Cancel Search</button>
+                    <button type="button" class="btn btn-outline-secondary mt-3" id="cancelCompetitionBtn">Cancel
+                        Search</button>
                 </div>
             </div>
         </div>

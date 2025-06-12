@@ -75,6 +75,12 @@
                             class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4"
                             data-bs-toggle="modal" data-bs-target="#searchModal"><i
                                 class="fas fa-search text-primary"></i></button>
+                        <a href="shopping_cart.html" class="position-relative me-4 my-auto cart-icon">
+                            <i class="fa fa-shopping-bag fa-2x"></i>
+                            <span
+                                class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
+                                style="top: -5px; left: 15px; height: 20px; min-width: 20px;" id="cart-count">0</span>
+                        </a>
                         <a href="login.html" class="my-auto">
                             <i class="fas fa-user fa-2x"></i>
                         </a>
@@ -249,82 +255,82 @@
     <script src="../assets/js/auth-nav.js"></script>
 
     <!-- Add before the closing body tag -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Modify the ingredients section to add a button
-        const addButtonToIngredientsSection = () => {
-            const ingredientsSection = document.querySelector('#ingredients-section');
-            if (ingredientsSection) {
-                const heading = ingredientsSection.querySelector('h4');
-                if (heading) {
-                    // Convert to flex container to put button on the right
-                    heading.style.display = 'flex';
-                    heading.style.justifyContent = 'space-between';
-                    heading.style.alignItems = 'center';
-                    
-                    // Create the button
-                    const addToCartBtn = document.createElement('button');
-                    addToCartBtn.className = 'btn btn-sm btn-outline-primary';
-                    addToCartBtn.innerHTML = '<i class="fa fa-shopping-bag me-1"></i> Add all to shopping list';
-                    
-                    // Add click handler
-                    addToCartBtn.addEventListener('click', function() {
-                        const recipeId = new URLSearchParams(window.location.search).get('id');
-                        if (recipeId) {
-                            addRecipeToShoppingList(recipeId);
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Modify the ingredients section to add a button
+            const addButtonToIngredientsSection = () => {
+                const ingredientsSection = document.querySelector('#ingredients-section');
+                if (ingredientsSection) {
+                    const heading = ingredientsSection.querySelector('h4');
+                    if (heading) {
+                        // Convert to flex container to put button on the right
+                        heading.style.display = 'flex';
+                        heading.style.justifyContent = 'space-between';
+                        heading.style.alignItems = 'center';
+
+                        // Create the button
+                        const addToCartBtn = document.createElement('button');
+                        addToCartBtn.className = 'btn btn-sm btn-outline-primary';
+                        addToCartBtn.innerHTML = '<i class="fa fa-shopping-bag me-1"></i> Add all to shopping list';
+
+                        // Add click handler
+                        addToCartBtn.addEventListener('click', function () {
+                            const recipeId = new URLSearchParams(window.location.search).get('id');
+                            if (recipeId) {
+                                addRecipeToShoppingList(recipeId);
+                            }
+                        });
+
+                        heading.appendChild(addToCartBtn);
+                    }
+                }
+            };
+
+            // Function to add all ingredients to shopping list
+            function addRecipeToShoppingList(recipeId) {
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    showToast('Please log in to add items to your shopping list', true);
+                    return;
+                }
+
+                fetch(`http://localhost:3000/cart/recipe/${recipeId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Failed to add ingredients (${response.status})`);
                         }
+                        return response.text();
+                    })
+                    .then(() => {
+                        showToast('All ingredients added to shopping list!');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('Error adding ingredients to shopping list', true);
                     });
-                    
-                    heading.appendChild(addToCartBtn);
-                }
             }
-        };
-        
-        // Function to add all ingredients to shopping list
-        function addRecipeToShoppingList(recipeId) {
-            const token = localStorage.getItem('accessToken');
-            if (!token) {
-                showToast('Please log in to add items to your shopping list', true);
-                return;
-            }
-            
-            fetch(`http://localhost:3000/cart/recipe/${recipeId}`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
+
+            // Helper function to show toast notifications
+            function showToast(message, isError = false) {
+                // Create toast container if it doesn't exist
+                let toastContainer = document.querySelector('.toast-container');
+                if (!toastContainer) {
+                    toastContainer = document.createElement('div');
+                    toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+                    document.body.appendChild(toastContainer);
                 }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Failed to add ingredients (${response.status})`);
-                }
-                return response.text();
-            })
-            .then(() => {
-                showToast('All ingredients added to shopping list!');
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showToast('Error adding ingredients to shopping list', true);
-            });
-        }
-        
-        // Helper function to show toast notifications
-        function showToast(message, isError = false) {
-            // Create toast container if it doesn't exist
-            let toastContainer = document.querySelector('.toast-container');
-            if (!toastContainer) {
-                toastContainer = document.createElement('div');
-                toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
-                document.body.appendChild(toastContainer);
-            }
-            
-            // Create toast element
-            const toastEl = document.createElement('div');
-            toastEl.className = `toast ${isError ? 'bg-danger' : 'bg-success'} text-white`;
-            toastEl.setAttribute('role', 'alert');
-            
-            toastEl.innerHTML = `
+
+                // Create toast element
+                const toastEl = document.createElement('div');
+                toastEl.className = `toast ${isError ? 'bg-danger' : 'bg-success'} text-white`;
+                toastEl.setAttribute('role', 'alert');
+
+                toastEl.innerHTML = `
                 <div class="toast-header ${isError ? 'bg-danger' : 'bg-success'} text-white">
                     <strong class="me-auto">${isError ? 'Error' : 'Success'}</strong>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -333,32 +339,32 @@
                     ${message}
                 </div>
             `;
-            
-            // Add to container
-            toastContainer.appendChild(toastEl);
-            
-            // Initialize and show using Bootstrap's toast
-            const toast = new bootstrap.Toast(toastEl, { autohide: true, delay: 5000 });
-            toast.show();
-            
-            // Remove from DOM after hiding
-            toastEl.addEventListener('hidden.bs.toast', function() {
-                toastContainer.removeChild(toastEl);
-            });
-        }
-        
-        // Wait for recipe to load, then add button
-        const checkForIngredientsAndAddButton = () => {
-            if (document.querySelector('#ingredients-section')) {
-                addButtonToIngredientsSection();
-            } else {
-                setTimeout(checkForIngredientsAndAddButton, 300);
+
+                // Add to container
+                toastContainer.appendChild(toastEl);
+
+                // Initialize and show using Bootstrap's toast
+                const toast = new bootstrap.Toast(toastEl, { autohide: true, delay: 5000 });
+                toast.show();
+
+                // Remove from DOM after hiding
+                toastEl.addEventListener('hidden.bs.toast', function () {
+                    toastContainer.removeChild(toastEl);
+                });
             }
-        };
-        
-        checkForIngredientsAndAddButton();
-    });
-</script>
+
+            // Wait for recipe to load, then add button
+            const checkForIngredientsAndAddButton = () => {
+                if (document.querySelector('#ingredients-section')) {
+                    addButtonToIngredientsSection();
+                } else {
+                    setTimeout(checkForIngredientsAndAddButton, 300);
+                }
+            };
+
+            checkForIngredientsAndAddButton();
+        });
+    </script>
 </body>
 
 </html>

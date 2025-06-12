@@ -75,6 +75,12 @@
                             class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4"
                             data-bs-toggle="modal" data-bs-target="#searchModal"><i
                                 class="fas fa-search text-primary"></i></button>
+                        <a href="shopping_cart.html" class="position-relative me-4 my-auto cart-icon">
+                            <i class="fa fa-shopping-bag fa-2x"></i>
+                            <span
+                                class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
+                                style="top: -5px; left: 15px; height: 20px; min-width: 20px;" id="cart-count">0</span>
+                        </a>
                         <a href="login.html" class="my-auto">
                             <i class="fas fa-user fa-2x"></i>
                         </a>
@@ -128,22 +134,27 @@
                     <div class="row g-4">
                         <div class="col-xl-3">
                             <div class="input-group w-100 mx-auto d-flex">
-                                <input type="search" class="form-control p-3" placeholder="Search recipes" id="recipe-search-input" aria-describedby="recipe-search-icon">
-                                <span id="recipe-search-icon" class="input-group-text p-3"><i class="fa fa-search"></i></span>
+                                <input type="search" class="form-control p-3" placeholder="Search recipes"
+                                    id="recipe-search-input" aria-describedby="recipe-search-icon">
+                                <span id="recipe-search-icon" class="input-group-text p-3"><i
+                                        class="fa fa-search"></i></span>
                             </div>
                         </div>
                         <div class="col-6"></div>
                         <div class="col-xl-3">
-                            <div class="bg-light ps-3 py-2 pe-3 rounded d-flex align-items-center justify-content-start gap-3 flex-wrap" style="box-shadow:0 2px 8px rgba(0,0,0,0.04); width: fit-content; min-width: 0; margin-top: -12px; overflow: visible; position: relative; z-index: 2;">
+                            <div class="bg-light ps-3 py-2 pe-3 rounded d-flex align-items-center justify-content-start gap-3 flex-wrap"
+                                style="box-shadow:0 2px 8px rgba(0,0,0,0.04); width: fit-content; min-width: 0; margin-top: -12px; overflow: visible; position: relative; z-index: 2;">
                                 <label for="recipe-sorting" class="me-2 mb-0">Sort By:</label>
-                                <select id="recipe-sorting" name="recipe-sorting" class="border-0 form-select-sm bg-light me-3">
+                                <select id="recipe-sorting" name="recipe-sorting"
+                                    class="border-0 form-select-sm bg-light me-3">
                                     <option value="none">No Sorting</option>
                                     <option value="alpha">Alphabetically</option>
                                     <!--<option value="popularity">Popularity</option>-->
                                     <option value="rating">Ratings</option>
                                 </select>
                                 <label for="recipes-per-page" class="me-2 mb-0">Recipes per page:</label>
-                                <select id="recipes-per-page" name="recipes-per-page" class="border-0 form-select-sm bg-light">
+                                <select id="recipes-per-page" name="recipes-per-page"
+                                    class="border-0 form-select-sm bg-light">
                                     <option value="6">6</option>
                                     <option value="9" selected>9</option>
                                     <option value="12">12</option>
@@ -482,7 +493,8 @@
                                         <!-- Apply/Clear Buttons -->
                                         <div class="d-flex justify-content-between mt-4">
                                             <button class="btn btn-outline-secondary px-4">Clear All</button>
-                                            <button id="applyFiltersBtn" class="btn btn-primary px-4">Apply Filters</button>
+                                            <button id="applyFiltersBtn" class="btn btn-primary px-4">Apply
+                                                Filters</button>
                                         </div>
                                     </div>
                                 </div>
@@ -577,7 +589,8 @@
                             <!-- Dynamic Recipe List -->
                             <div id="recipe-list" class="row g-4 justify-content-center"></div>
                             <!-- Pagination Controls -->
-                            <nav id="recipe-pagination-nav" aria-label="Recipe pagination" class="mt-4 d-flex justify-content-center">
+                            <nav id="recipe-pagination-nav" aria-label="Recipe pagination"
+                                class="mt-4 d-flex justify-content-center">
                                 <ul id="recipe-pagination" class="pagination flex-wrap"></ul>
                             </nav>
                             <!-- End Dynamic Recipe List -->

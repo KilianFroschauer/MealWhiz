@@ -16,7 +16,9 @@
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap"
+        rel="stylesheet">
     <!-- K2D Google Font import -->
     <link href="https://fonts.googleapis.com/css2?family=K2D:wght@500;600;700;1000&display=swap" rel="stylesheet">
 
@@ -39,7 +41,7 @@
         .battle-container {
             min-height: 600px;
         }
-        
+
         .video-container {
             background-color: #000;
             height: 400px;
@@ -50,11 +52,11 @@
             border-radius: 8px;
             overflow: hidden;
         }
-        
+
         .video-placeholder {
             text-align: center;
         }
-        
+
         .chat-container {
             height: 400px;
             overflow-y: auto;
@@ -63,11 +65,11 @@
             padding: 15px;
             background-color: #f8f9fa;
         }
-        
+
         .message {
             margin-bottom: 15px;
         }
-        
+
         .user-message .message-content {
             background-color: #007bff;
             color: white;
@@ -77,7 +79,7 @@
             max-width: 80%;
             margin-left: auto;
         }
-        
+
         .partner-message .message-content {
             background-color: #6c757d;
             color: white;
@@ -86,7 +88,7 @@
             display: inline-block;
             max-width: 80%;
         }
-        
+
         .spectator-message .message-content {
             background-color: #f8f9fa;
             border: 1px solid #dee2e6;
@@ -95,7 +97,7 @@
             display: inline-block;
             max-width: 80%;
         }
-        
+
         .system-message .message-content {
             background-color: #ffc107;
             border-radius: 18px;
@@ -104,36 +106,37 @@
             max-width: 100%;
             margin: 0 auto;
         }
-        
+
         .user-message {
             text-align: right;
         }
-        
-        .partner-message, .spectator-message {
+
+        .partner-message,
+        .spectator-message {
             text-align: left;
         }
-        
+
         .system-message {
             text-align: center;
         }
-        
+
         .username {
             font-weight: bold;
             display: block;
             font-size: 0.8rem;
         }
-        
+
         .message p {
             margin: 0;
         }
-        
+
         .suggestion-pills {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
             margin-bottom: 15px;
         }
-        
+
         .suggestion-pill {
             background-color: #e9ecef;
             border-radius: 20px;
@@ -142,29 +145,29 @@
             cursor: pointer;
             transition: background-color 0.2s;
         }
-        
+
         .suggestion-pill:hover {
             background-color: #dee2e6;
         }
-        
+
         .cooking-timer {
             font-size: 2.5rem;
             font-weight: bold;
         }
-        
+
         .chef-card {
             border: 3px solid transparent;
             transition: all 0.3s;
         }
-        
+
         .chef-card.selected {
             border-color: #28a745;
         }
-        
+
         .vote-button.active {
             transform: scale(1.05);
         }
-        
+
         .competition-info {
             background-color: #f8f9fa;
             border-radius: 8px;
@@ -176,7 +179,8 @@
 
 <body>
     <!-- Spinner Start -->
-    <div id="spinner" class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center">
+    <div id="spinner"
+        class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center">
         <div class="spinner-grow text-primary" role="status"></div>
     </div>
     <!-- Spinner End -->
@@ -186,10 +190,14 @@
         <div class="container px-0">
             <nav class="navbar navbar-light bg-white navbar-expand-xl">
                 <a href="../index.html" class="navbar-brand d-flex align-items-center">
-                    <img src="../assets/img/Logo-Whizard-cropped-tranparent.png" alt="MealWhiz Logo" style="height: 65px; margin-right: 10px;">
-                    <h1 class="m-0" style="font-family: 'K2D', sans-serif; color: #000; font-weight: 1000; font-size: 3.5rem;">MealWhiz</h1>
+                    <img src="../assets/img/Logo-Whizard-cropped-tranparent.png" alt="MealWhiz Logo"
+                        style="height: 65px; margin-right: 10px;">
+                    <h1 class="m-0"
+                        style="font-family: 'K2D', sans-serif; color: #000; font-weight: 1000; font-size: 3.5rem;">
+                        MealWhiz</h1>
                 </a>
-                <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarCollapse">
                     <span class="fa fa-bars text-primary"></span>
                 </button>
                 <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
@@ -200,9 +208,17 @@
                         <a href="contact.html" class="nav-item nav-link">Contact</a>
                     </div>
                     <div class="d-flex m-3 me-0">
-                        <button class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4" data-bs-toggle="modal" data-bs-target="#searchModal">
+                        <button
+                            class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4"
+                            data-bs-toggle="modal" data-bs-target="#searchModal">
                             <i class="fas fa-search text-primary"></i>
                         </button>
+                        <a href="shopping_cart.html" class="position-relative me-4 my-auto cart-icon">
+                            <i class="fa fa-shopping-bag fa-2x"></i>
+                            <span
+                                class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
+                                style="top: -5px; left: 15px; height: 20px; min-width: 20px;" id="cart-count">0</span>
+                        </a>
                         <a href="login.html" class="my-auto">
                             <i class="fas fa-user fa-2x"></i>
                         </a>
@@ -223,7 +239,8 @@
                 </div>
                 <div class="modal-body d-flex align-items-center">
                     <div class="input-group w-75 mx-auto d-flex">
-                        <input type="search" class="form-control p-3" placeholder="keywords" aria-describedby="search-icon-1">
+                        <input type="search" class="form-control p-3" placeholder="keywords"
+                            aria-describedby="search-icon-1">
                         <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
                     </div>
                 </div>
@@ -261,8 +278,10 @@
                 <div class="row">
                     <!-- Main Video Conference Area (Jitsi) -->
                     <div class="col-lg-8 mb-4 mb-lg-0">
-                        <div id="jitsiMeetContainer" style="height: 65vh; background-color: #222; border-radius: 8px; position: relative;">
-                            <div id="jitsiMeetPlaceholder" class="d-flex flex-column align-items-center justify-content-center h-100 text-white">
+                        <div id="jitsiMeetContainer"
+                            style="height: 65vh; background-color: #222; border-radius: 8px; position: relative;">
+                            <div id="jitsiMeetPlaceholder"
+                                class="d-flex flex-column align-items-center justify-content-center h-100 text-white">
                                 <i class="fas fa-video fa-3x mb-3"></i>
                                 <h4>Video Conference</h4>
                                 <p>Loading or waiting for session to start...</p>
@@ -287,14 +306,17 @@
                                         (<span id="casualPartnerStatus" class="badge bg-secondary">Offline</span>)
                                     </div>
                                     <h6>My Cooking Station:</h6>
-                                    <input type="text" id="casualRecipeInput" class="form-control form-control-sm mb-2" placeholder="What are you making?">
-                                    <textarea id="casualRecipeNotes" class="form-control form-control-sm" rows="2" placeholder="Notes for your partner..."></textarea>
+                                    <input type="text" id="casualRecipeInput" class="form-control form-control-sm mb-2"
+                                        placeholder="What are you making?">
+                                    <textarea id="casualRecipeNotes" class="form-control form-control-sm" rows="2"
+                                        placeholder="Notes for your partner..."></textarea>
                                 </div>
                                 <!-- Competitive Mode Info -->
                                 <div id="competitiveContext" class="d-none">
                                     <p><strong>Mode:</strong> Competitive Challenge</p>
                                     <p><strong>Challenge:</strong> <span id="competitiveChallengeName">-</span></p>
-                                    <p><strong>Difficulty:</strong> <span id="competitiveDifficulty" class="badge bg-primary">-</span></p>
+                                    <p><strong>Difficulty:</strong> <span id="competitiveDifficulty"
+                                            class="badge bg-primary">-</span></p>
                                     <div class="d-flex justify-content-between align-items-center">
                                         <strong>Time Remaining:</strong>
                                         <span id="competitiveTimerDisplay" class="badge bg-danger fs-6">00:00</span>
@@ -313,29 +335,34 @@
                             <div class="card-header">
                                 <h5 class="mb-0">Live Chat</h5>
                             </div>
-                            <div id="chatMessages" class="card-body" style="height: 300px; overflow-y: auto; background-color: #f8f9fa;">
+                            <div id="chatMessages" class="card-body"
+                                style="height: 300px; overflow-y: auto; background-color: #f8f9fa;">
                                 <!-- Messages will be appended here by cookoff-battle.ts -->
                                 <div class="text-muted small p-2 text-center">Chat messages will appear here.</div>
                             </div>
                             <div class="card-footer">
                                 <div class="input-group">
-                                    <input type="text" id="chatInput" class="form-control" placeholder="Type your message...">
+                                    <input type="text" id="chatInput" class="form-control"
+                                        placeholder="Type your message...">
                                     <button id="sendChatBtn" class="btn btn-primary">
                                         <i class="fas fa-paper-plane"></i> Send
                                     </button>
                                 </div>
                                 <div id="chatSuggestionPills" class="mt-2 d-none">
                                     <!-- Suggestion pills for casual chat -->
-                                    <small class="suggestion-pill-btn badge bg-secondary me-1" style="cursor:pointer;">How's it going?</small>
-                                    <small class="suggestion-pill-btn badge bg-secondary me-1" style="cursor:pointer;">What are you making?</small>
-                                    <small class="suggestion-pill-btn badge bg-secondary" style="cursor:pointer;">Looks great!</small>
+                                    <small class="suggestion-pill-btn badge bg-secondary me-1"
+                                        style="cursor:pointer;">How's it going?</small>
+                                    <small class="suggestion-pill-btn badge bg-secondary me-1"
+                                        style="cursor:pointer;">What are you making?</small>
+                                    <small class="suggestion-pill-btn badge bg-secondary" style="cursor:pointer;">Looks
+                                        great!</small>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Hidden original mode content containers (can be removed if JS logic is fully adapted to new structure) -->
             <div id="casualModeContent" class="d-none"></div>
             <div id="competitiveModeContent" class="d-none"></div>
@@ -356,16 +383,23 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="position-relative mx-auto">
-                            <input class="form-control border-0 w-100 py-3 px-4 rounded-pill" type="number" placeholder="Your Email">
-                            <button type="submit" class="btn btn-primary border-0 border-secondary py-3 px-4 position-absolute rounded-pill text-white" style="top: 0; right: 0;">Subscribe Now</button>
+                            <input class="form-control border-0 w-100 py-3 px-4 rounded-pill" type="number"
+                                placeholder="Your Email">
+                            <button type="submit"
+                                class="btn btn-primary border-0 border-secondary py-3 px-4 position-absolute rounded-pill text-white"
+                                style="top: 0; right: 0;">Subscribe Now</button>
                         </div>
                     </div>
                     <div class="col-lg-3">
                         <div class="d-flex justify-content-end pt-3">
-                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i class="fab fa-youtube"></i></a>
-                            <a class="btn btn-outline-secondary btn-md-square rounded-circle" href=""><i class="fab fa-linkedin-in"></i></a>
+                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i
+                                    class="fab fa-twitter"></i></a>
+                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i
+                                    class="fab fa-youtube"></i></a>
+                            <a class="btn btn-outline-secondary btn-md-square rounded-circle" href=""><i
+                                    class="fab fa-linkedin-in"></i></a>
                         </div>
                     </div>
                 </div>
@@ -374,7 +408,8 @@
                 <div class="col-lg-3 col-md-6">
                     <div class="footer-item">
                         <h4 class="text-light mb-3">Why People Like us!</h4>
-                        <p class="mb-4">typesetting, remaining essentially unchanged. It was popularised in the 1960s with the like Aldus PageMaker including of Lorem Ipsum.</p>
+                        <p class="mb-4">typesetting, remaining essentially unchanged. It was popularised in the 1960s
+                            with the like Aldus PageMaker including of Lorem Ipsum.</p>
                         <a href="" class="btn border-secondary py-2 px-4 rounded-pill text-primary">Read More</a>
                     </div>
                 </div>
@@ -418,10 +453,12 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <span class="text-light"><a href="#"><i class="fas fa-copyright text-light me-2"></i>MealWhiz</a>, All right reserved.</span>
+                    <span class="text-light"><a href="#"><i class="fas fa-copyright text-light me-2"></i>MealWhiz</a>,
+                        All right reserved.</span>
                 </div>
                 <div class="col-md-6 my-auto text-center text-md-end text-white">
-                    Designed By <a class="border-bottom" href="https://htmlcodex.com">HTML Codex</a> Distributed By <a class="border-bottom" href="https://themewagon.com">ThemeWagon</a>
+                    Designed By <a class="border-bottom" href="https://htmlcodex.com">HTML Codex</a> Distributed By <a
+                        class="border-bottom" href="https://themewagon.com">ThemeWagon</a>
                 </div>
             </div>
         </div>
@@ -429,7 +466,8 @@
     <!-- Copyright End -->
 
     <!-- Back to Top -->
-    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i class="fa fa-arrow-up"></i></a>
+    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+            class="fa fa-arrow-up"></i></a>
 
     <!-- JavaScript Libraries -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
