@@ -11,7 +11,6 @@ const BASE_RECIPE_SELECT_QUERY = `
   SELECT 
     r.recipe_id, 
     r.title, 
-    r.ingredients, 
     r.instructions,
     r.total_time,
     r.rating,
@@ -25,7 +24,20 @@ const BASE_RECIPE_SELECT_QUERY = `
       JOIN allergens a ON ra.allergen_id = a.allergens_id 
       WHERE ra.recipe_id = r.recipe_id
     ) as allergen_list,
-    r.meal_times -- Assuming meal_times is a column in the recipe table
+    ARRAY(
+      SELECT fp.product_name
+      FROM recipe_ingredient ri
+      JOIN food_products fp ON ri.ingredient_code = fp.code
+      WHERE ri.recipe_id = r.recipe_id
+      ORDER BY fp.product_name
+    ) as ingredients,
+    ARRAY(
+      SELECT CONCAT(ri.quantity::text, ' ', ri.unit)
+      FROM recipe_ingredient ri
+      WHERE ri.recipe_id = r.recipe_id
+      ORDER BY ri.ingredient_code
+    ) as ingredients_amount,
+    r.meal_times
   FROM recipe r
   LEFT JOIN difficulty d ON r.difficulty = d.difficulty_id
   LEFT JOIN diary_pref dp ON r.diary_pref_id = dp.diary_pref_id
@@ -40,26 +52,39 @@ export async function getAllRecipes(): Promise<Recipe[]> {
   try {
     const query = `
       SELECT 
-        r.recipe_id, 
-        r.title, 
-        r.ingredients, 
-        r.total_time,
-        r.rating,
-        r.description,
-        d.difficulty,
-        dp.diary_pref,
-        c.cuisine,
-        ARRAY(
-          SELECT a.allergen 
-          FROM recipe_allergen ra 
-          JOIN allergens a ON ra.allergen_id = a.allergens_id 
-          WHERE ra.recipe_id = r.recipe_id
-        ) as allergen_list,
-        r.meal_times
-      FROM recipe r
-      LEFT JOIN difficulty d ON r.difficulty = d.difficulty_id
-      LEFT JOIN diary_pref dp ON r.diary_pref_id = dp.diary_pref_id
-      LEFT JOIN cuisine c ON r.cuisine_id = c.cuisine_id
+    r.recipe_id, 
+    r.title, 
+    r.instructions,
+    r.total_time,
+    r.rating,
+    r.description,
+    d.difficulty,
+    dp.diary_pref,
+    c.cuisine,
+    ARRAY(
+      SELECT a.allergen 
+      FROM recipe_allergen ra 
+      JOIN allergens a ON ra.allergen_id = a.allergens_id 
+      WHERE ra.recipe_id = r.recipe_id
+    ) as allergen_list,
+    ARRAY(
+      SELECT fp.product_name
+      FROM recipe_ingredient ri
+      JOIN food_products fp ON ri.ingredient_code = fp.code
+      WHERE ri.recipe_id = r.recipe_id
+      ORDER BY fp.product_name
+    ) as ingredients,
+    ARRAY(
+      SELECT CONCAT(ri.quantity::text, ' ', ri.unit)
+      FROM recipe_ingredient ri
+      WHERE ri.recipe_id = r.recipe_id
+      ORDER BY ri.ingredient_code
+    ) as ingredients_amount,
+    r.meal_times
+  FROM recipe r
+  LEFT JOIN difficulty d ON r.difficulty = d.difficulty_id
+  LEFT JOIN diary_pref dp ON r.diary_pref_id = dp.diary_pref_id
+  LEFT JOIN cuisine c ON r.cuisine_id = c.cuisine_id
     `;
 
     const result = await pool.query(query);
@@ -107,9 +132,13 @@ export async function getFilteredRecipes(filters: RecipeFilterOptions): Promise<
 
     // General query filter (searches title, ingredients, cuisine)
     if (filters.query) {
+      // conditions.push(`
+      //   (r.title ILIKE $${paramIndex} OR 
+      //    r.ingredients ILIKE $${paramIndex} OR 
+      //    c.cuisine ILIKE $${paramIndex})
+      // `);
       conditions.push(`
         (r.title ILIKE $${paramIndex} OR 
-         r.ingredients ILIKE $${paramIndex} OR 
          c.cuisine ILIKE $${paramIndex})
       `);
       params.push(`%${filters.query}%`);
@@ -165,12 +194,25 @@ export async function getFilteredRecipes(filters: RecipeFilterOptions): Promise<
       paramIndex++;
     }
 
-    // Filter by ingredients string (e.g., "tomato, onion")
-    if (filters.ingredients) {
-      conditions.push(`r.ingredients ILIKE $${paramIndex}`);
-      params.push(`%${filters.ingredients}%`);
-      paramIndex++;
-    }
+    // Filter by ingredients (e.g., "tomato, onion")
+if (filters.ingredients) {
+  // Split the input string into an array of ingredient names
+  const ingredientList = filters.ingredients.split(',').map(i => i.trim().toLowerCase()).filter(Boolean);
+
+  if (ingredientList.length > 0) {
+    conditions.push(
+      `EXISTS (
+        SELECT 1
+        FROM recipe_ingredient ri
+        JOIN food_products fp ON ri.ingredient_code = fp.code
+        WHERE ri.recipe_id = r.recipe_id
+          AND (${ingredientList.map((_, i) => `LOWER(fp.product_name) LIKE $${paramIndex + i}`).join(' OR ')})
+      )`
+    );
+    ingredientList.forEach(ing => params.push(`%${ing}%`));
+    paramIndex += ingredientList.length;
+  }
+}
 
     if (filters.mealTimes?.length) {
   // Capitalize first letter of each meal time to match the enum values in the database
@@ -217,7 +259,9 @@ export async function getFilteredRecipes(filters: RecipeFilterOptions): Promise<
  */
 export async function mapDbRowsToRecipes(rows: any[]): Promise<Recipe[]> {
   const recipePromises = rows.map(async row => {
-    const basicIngredients = parseIngredients(row.ingredients);
+    // const basicIngredients = parseIngredients(row.ingredients);
+    const basicIngredients = row.ingredients;
+    
     const difficulty = mapDifficultyToEnum(row.difficulty);
     const nutrition = await calculateRecipeNutrition(row.recipe_id);
 
