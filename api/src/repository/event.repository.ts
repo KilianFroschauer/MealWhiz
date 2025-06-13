@@ -41,7 +41,7 @@ export function generateStreamUrl(): string {
   const roomName = `mealwhiz-${uuidv4()}`;
   
   // Use the new self-hosted Jitsi server URL
-  return `https://meet.mealwhiz.at/${roomName}#config.prejoinPageEnabled=false&config.requireDisplayName=false&config.enableLobbyChat=false`;
+  return `https://meet.localhost/${roomName}#config.prejoinPageEnabled=false&config.requireDisplayName=false&config.enableLobbyChat=false`;
   
   // For other platforms, use their API or URL structure
 }

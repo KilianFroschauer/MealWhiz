@@ -3,34 +3,32 @@
  * Authentication-aware navigation handler
  * Updates navigation elements based on login status
  */
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener("DOMContentLoaded", async () => {
     // Check if user is logged in with a valid token
     const isLoggedIn = await validateToken();
     // Determine if we're in the root directory or pages directory
-    const isRootDirectory = window.location.pathname.endsWith('index.html') ||
-        !window.location.pathname.includes('/pages/');
+    const isRootDirectory = window.location.pathname.endsWith("index.html") || !window.location.pathname.includes("/pages/");
     // Find all user icon links - handle both root and pages directory paths
-    const userIconLinks = document.querySelectorAll('a[href="login.html"], a[href="profile.html"], ' +
-        'a[href="pages/login.html"], a[href="pages/profile.html"]');
+    const userIconLinks = document.querySelectorAll('a[href="login.html"], a[href="profile.html"], ' + 'a[href="pages/login.html"], a[href="pages/profile.html"]');
     // Update each user icon link
     userIconLinks.forEach((link) => {
         // If logged in, point to profile; otherwise, point to login
         if (isRootDirectory) {
             // In root directory (index.html)
-            link.href = isLoggedIn ? 'pages/profile.html' : 'pages/login.html';
+            link.href = isLoggedIn ? "pages/profile.html" : "pages/login.html";
         }
         else {
             // In pages directory
-            link.href = isLoggedIn ? 'profile.html' : 'login.html';
+            link.href = isLoggedIn ? "profile.html" : "login.html";
         }
     });
     // Handle shopping cart link - should go to login if not logged in
-    const cartLinks = document.querySelectorAll('.cart-icon');
+    const cartLinks = document.querySelectorAll(".cart-icon");
     cartLinks.forEach((link) => {
-        link.addEventListener('click', (e) => {
+        link.addEventListener("click", (e) => {
             if (!isLoggedIn) {
                 e.preventDefault();
-                window.location.href = isRootDirectory ? 'pages/login.html' : 'login.html';
+                window.location.href = isRootDirectory ? "pages/login.html" : "login.html";
             }
         });
     });
@@ -44,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  * @returns Promise resolving to boolean indicating if token is valid
  */
 async function validateToken() {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem("accessToken");
     // No token means not logged in
     if (!token) {
         return false;
@@ -53,10 +51,10 @@ async function validateToken() {
     try {
         const apiBase = "http://localhost:3000";
         const response = await fetch(`${apiBase}/validate-token`, {
-            method: 'GET',
+            method: "GET",
             headers: {
-                'Authorization': `Bearer ${token}`
-            }
+                Authorization: `Bearer ${token}`,
+            },
         });
         // If response is OK, token is valid
         if (response.ok) {
@@ -64,7 +62,7 @@ async function validateToken() {
         }
         // If unauthorized response, token is expired or invalid
         if (response.status === 401) {
-            console.log('Token expired or invalid. Logging out...');
+            console.log("Token expired or invalid. Logging out...");
             logout();
             return false;
         }
@@ -72,7 +70,7 @@ async function validateToken() {
         return true;
     }
     catch (error) {
-        console.error('Error validating token:', error);
+        console.error("Error validating token:", error);
         // If network error, assume token is valid (to prevent logout when offline)
         return true;
     }
@@ -81,18 +79,13 @@ async function validateToken() {
  * Logs the user out by removing the token and redirecting
  */
 function logout() {
-    localStorage.removeItem('accessToken');
+    localStorage.removeItem("accessToken");
     // If we're on a protected page like profile, redirect to login
-    const protectedPages = [
-        '/profile.html',
-        '/shopping_cart.html',
-        '/pages/profile.html',
-        '/pages/shopping_cart.html'
-    ];
+    const protectedPages = ["/profile.html", "/shopping_cart.html", "/pages/profile.html", "/pages/shopping_cart.html"];
     const currentPath = window.location.pathname;
-    if (protectedPages.some(page => currentPath.endsWith(page))) {
-        const isRootDirectory = !currentPath.includes('/pages/');
-        window.location.href = isRootDirectory ? 'pages/login.html' : 'login.html';
+    if (protectedPages.some((page) => currentPath.endsWith(page))) {
+        const isRootDirectory = !currentPath.includes("/pages/");
+        window.location.href = isRootDirectory ? "pages/login.html" : "login.html";
     }
 }
 /**
@@ -101,15 +94,15 @@ function logout() {
  */
 function updateHeaderUI(isLoggedIn) {
     // Elements to update based on login status
-    const loginButton = document.querySelector('.login-button');
-    const profileLink = document.querySelector('.profile-link');
-    const cartCount = document.getElementById('cart-count');
+    const loginButton = document.querySelector(".login-button");
+    const profileLink = document.querySelector(".profile-link");
+    const cartCount = document.getElementById("cart-count");
     // Update UI elements if they exist
     if (loginButton) {
-        loginButton.style.display = isLoggedIn ? 'none' : 'inline-block';
+        loginButton.style.display = isLoggedIn ? "none" : "inline-block";
     }
     if (profileLink) {
-        profileLink.style.display = isLoggedIn ? 'inline-block' : 'none';
+        profileLink.style.display = isLoggedIn ? "inline-block" : "none";
     }
     // Update cart count if logged in
     if (isLoggedIn && cartCount) {
@@ -120,20 +113,20 @@ function updateHeaderUI(isLoggedIn) {
  * Fetches and updates the cart count
  */
 async function updateCartCount() {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem("accessToken");
     if (!token)
         return;
     try {
         const apiBase = "http://localhost:3000";
         const res = await fetch(`${apiBase}/cart`, {
-            method: 'GET',
+            method: "GET",
             headers: {
-                'Authorization': `Bearer ${token}`
-            }
+                Authorization: `Bearer ${token}`,
+            },
         });
         if (res.ok) {
             const items = await res.json();
-            const cartCount = document.getElementById('cart-count');
+            const cartCount = document.getElementById("cart-count");
             if (cartCount) {
                 cartCount.textContent = items.length.toString();
             }
@@ -144,6 +137,6 @@ async function updateCartCount() {
         }
     }
     catch (error) {
-        console.error('Error updating cart count:', error);
+        console.error("Error updating cart count:", error);
     }
 }

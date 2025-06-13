@@ -37,7 +37,7 @@ function createRecipeCard(recipe) {
             <div class="d-flex justify-content-end">
               <div class="d-flex align-items-center">
                 <i class="fas fa-star text-warning me-2"></i>
-                <span class="fw-bold text-dark">${ratingValue !== undefined && !isNaN(ratingValue) ? ratingValue.toFixed(1) : '-'}</span>
+                <span class="fw-bold text-dark">${ratingValue !== undefined && !isNaN(ratingValue) ? ratingValue.toFixed(1) : "-"}</span>
               </div>
             </div>
           </div>
@@ -51,40 +51,41 @@ function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 // --- SORTING ---
-const sortingDropdown = document.getElementById('recipe-sorting');
+const sortingDropdown = document.getElementById("recipe-sorting");
 let lastFetchedRecipes = []; // Stores the most recently fetched set of recipes (unpaginated, unsorted by user).
 // Renders a list of recipes into the designated HTML container.
 // This function is later patched by pagination logic.
 let renderRecipes = function (recipes) {
     lastFetchedRecipes = recipes.slice(); // Store a copy of the fetched recipes for sorting/filtering.
-    const list = document.getElementById('recipe-list');
+    const list = document.getElementById("recipe-list");
     if (!list)
         return;
     if (recipes.length === 0) {
-        list.innerHTML = '<div class="alert alert-warning text-center col-12">No recipes found matching your criteria.</div>';
+        list.innerHTML =
+            '<div class="alert alert-warning text-center col-12">No recipes found matching your criteria.</div>';
     }
     else {
-        list.innerHTML = recipes.map(createRecipeCard).join('');
+        list.innerHTML = recipes.map(createRecipeCard).join("");
     }
 };
 // Sorts the `lastFetchedRecipes` array based on `sortType` and re-renders them.
 function sortAndRenderRecipes(sortType) {
-    if (!lastFetchedRecipes.length && sortType !== 'none')
+    if (!lastFetchedRecipes.length && sortType !== "none")
         return; // Don't sort if no recipes or if "none" is selected initially.
     let sortedRecipes;
     // If sortType is 'none', we want to display the recipes as they were originally fetched by the current filters/search.
     // This means `lastFetchedRecipes` (which is updated by fetch functions) already holds the correct "unsorted" state.
-    if (sortType === 'none') {
+    if (sortType === "none") {
         sortedRecipes = lastFetchedRecipes.slice(); // Use the current state from last fetch
     }
     else {
         // For other sort types, we sort a copy of `lastFetchedRecipes`.
         sortedRecipes = lastFetchedRecipes.slice(); // Create a copy to sort
-        if (sortType === 'rating') {
+        if (sortType === "rating") {
             // Sort by ratings, descending (higher ratings first).
             sortedRecipes.sort((a, b) => (b.ratings ?? 0) - (a.ratings ?? 0));
         }
-        else if (sortType === 'alpha') {
+        else if (sortType === "alpha") {
             // Sort alphabetically by name.
             sortedRecipes.sort((a, b) => a.name.localeCompare(b.name));
         }
@@ -97,12 +98,14 @@ function sortAndRenderRecipes(sortType) {
 // --- LOADING STATE ---
 // Displays skeleton loader cards while recipes are being fetched.
 function setLoadingState(isLoading) {
-    const list = document.getElementById('recipe-list');
+    const list = document.getElementById("recipe-list");
     if (!list)
         return;
     if (isLoading) {
         // Generate HTML for 6 skeleton cards.
-        list.innerHTML = Array(6).fill('').map(() => `
+        list.innerHTML = Array(6)
+            .fill("")
+            .map(() => `
         <div class="col-md-6 col-lg-6 col-xl-4">
           <div class="rounded position-relative food-item skeleton-card">
             <div class="food-img skeleton-img"></div>
@@ -118,78 +121,92 @@ function setLoadingState(isLoading) {
             </div>
           </div>
         </div>
-        `).join('');
+        `)
+            .join("");
     }
     // If !isLoading, the actual recipe cards will replace this.
 }
 // --- FILTERING ---
 // Maps HTML checkbox IDs to backend allergen IDs.
 const allergenIdMap = {
-    "allergy-eggs": 1, "allergy-milk": 2, "allergy-gluten": 3, "allergy-crustaceans": 4,
-    "allergy-fish": 5, "allergy-peanut": 6, "allergy-soy": 7, "allergy-nuts": 8,
-    "allergy-celery": 9, "allergy-mustard": 10, "allergy-sesame": 11, "allergy-sulphites": 12,
-    "allergy-lupines": 13, "allergy-molluscs": 14
+    "allergy-eggs": 1,
+    "allergy-milk": 2,
+    "allergy-gluten": 3,
+    "allergy-crustaceans": 4,
+    "allergy-fish": 5,
+    "allergy-peanut": 6,
+    "allergy-soy": 7,
+    "allergy-nuts": 8,
+    "allergy-celery": 9,
+    "allergy-mustard": 10,
+    "allergy-sesame": 11,
+    "allergy-sulphites": 12,
+    "allergy-lupines": 13,
+    "allergy-molluscs": 14,
 };
 // Collects all active filter values from the sidebar UI elements.
 function collectRecipeFilters() {
     const filters = {};
     // Name (from the main search bar, usually at the top of the filter sidebar).
     const nameInput = document.querySelector('.col-xl-3 .input-group input[type="search"]');
-    if (nameInput && nameInput.value.trim() !== '') {
+    if (nameInput && nameInput.value.trim() !== "") {
         filters.name = nameInput.value.trim();
     }
     // Dietary Preferences (checkboxes with IDs starting "dp-").
     const dpChecked = Array.from(document.querySelectorAll('input[id^="dp-"]:checked'));
     if (dpChecked.length) {
-        filters.dp = dpChecked.map(cb => cb.id.replace('dp-', '')); // e.g., "vegan", "vegetarian".
+        filters.dp = dpChecked.map((cb) => cb.id.replace("dp-", "")); // e.g., "vegan", "vegetarian".
     }
     // Allergens (checkboxes with IDs starting "allergy-").
     const aChecked = Array.from(document.querySelectorAll('input[id^="allergy-"]:checked'));
     if (aChecked.length) {
-        filters.a = aChecked.map(cb => allergenIdMap[cb.id]).filter(id => id !== undefined); // Map to numeric IDs.
+        filters.a = aChecked.map((cb) => allergenIdMap[cb.id]).filter((id) => id !== undefined); // Map to numeric IDs.
     }
     // Meal Times (checkboxes with IDs starting "meal-").
     const mtChecked = Array.from(document.querySelectorAll('input[id^="meal-"]:checked'));
     if (mtChecked.length) {
-        filters.mt = mtChecked.map(cb => cb.id.replace('meal-', '')); // e.g., "breakfast", "dinner".
+        filters.mt = mtChecked.map((cb) => cb.id.replace("meal-", "")); // e.g., "breakfast", "dinner".
     }
     // Difficulty (radio buttons named "difficulty").
     const diffRadio = document.querySelector('input[name="difficulty"]:checked');
-    if (diffRadio && diffRadio.value !== 'any') { // "any" means no difficulty filter.
+    if (diffRadio && diffRadio.value !== "any") {
+        // "any" means no difficulty filter.
         filters.diff = diffRadio.value; // e.g., "easy", "medium", "hard".
     }
     // Minimum Rating (range slider).
-    const ratingRange = document.getElementById('ratingRange');
-    if (ratingRange && ratingRange.value && parseFloat(ratingRange.value) > parseFloat(ratingRange.min || "1")) { // Only apply if not min value
+    const ratingRange = document.getElementById("ratingRange");
+    if (ratingRange && ratingRange.value && parseFloat(ratingRange.value) > parseFloat(ratingRange.min || "1")) {
+        // Only apply if not min value
         filters.minRating = ratingRange.value;
     }
     // Max Preparation Time (range slider).
-    const timeRange = document.getElementById('timeRange');
-    if (timeRange && timeRange.value && timeRange.value !== timeRange.max) { // Only apply if not max value.
+    const timeRange = document.getElementById("timeRange");
+    if (timeRange && timeRange.value && timeRange.value !== timeRange.max) {
+        // Only apply if not max value.
         filters.maxTime = timeRange.value;
     }
     // Calories (min/max input fields).
-    const minCal = document.getElementById('minCalories')?.value;
-    const maxCal = document.getElementById('maxCalories')?.value;
-    if (minCal && minCal.trim() !== '')
+    const minCal = document.getElementById("minCalories")?.value;
+    const maxCal = document.getElementById("maxCalories")?.value;
+    if (minCal && minCal.trim() !== "")
         filters.minCal = minCal;
-    if (maxCal && maxCal.trim() !== '')
+    if (maxCal && maxCal.trim() !== "")
         filters.maxCal = maxCal;
     // Ingredients (from a tag-based input or a single input field).
-    const ingredientTags = Array.from(document.querySelectorAll('#ingredientTags .ingredient-tag'));
+    const ingredientTags = Array.from(document.querySelectorAll("#ingredientTags .ingredient-tag"));
     if (ingredientTags.length) {
-        filters.ing = ingredientTags.map(tag => tag.textContent?.trim() || '').filter(Boolean);
+        filters.ing = ingredientTags.map((tag) => tag.textContent?.trim() || "").filter(Boolean);
     }
     else {
-        const ingInput = document.getElementById('ingredientInput');
-        if (ingInput && ingInput.value.trim() !== '') {
+        const ingInput = document.getElementById("ingredientInput");
+        if (ingInput && ingInput.value.trim() !== "") {
             filters.ing = [ingInput.value.trim()]; // Send as an array even if single input.
         }
     }
     // Tags (from selectable badges in #tagsCollapse).
-    const tagBadges = Array.from(document.querySelectorAll('#tagsCollapse .badge.bg-secondary.selected'));
+    const tagBadges = Array.from(document.querySelectorAll("#tagsCollapse .badge.bg-secondary.selected"));
     if (tagBadges.length) {
-        filters.tags = tagBadges.map(b => b.textContent?.trim().toLowerCase() || '').filter(Boolean);
+        filters.tags = tagBadges.map((b) => b.textContent?.trim().toLowerCase() || "").filter(Boolean);
     }
     return filters;
 }
@@ -200,9 +217,9 @@ function buildRecipeQueryString(filters) {
         if (Array.isArray(filters[key])) {
             // For array values (like ingredients, tags), join with comma for backend.
             if (filters[key].length > 0)
-                params.append(key, filters[key].join(','));
+                params.append(key, filters[key].join(","));
         }
-        else if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
+        else if (filters[key] !== undefined && filters[key] !== null && filters[key] !== "") {
             params.append(key, filters[key]);
         }
     }
@@ -210,17 +227,17 @@ function buildRecipeQueryString(filters) {
 }
 // Fetches recipes from the API based on the provided filter object and renders them.
 let fetchAndRenderRecipesWithFilters = async function (filters) {
-    const list = document.getElementById('recipe-list');
+    const list = document.getElementById("recipe-list");
     if (!list)
         return;
     setLoadingState(true); // Show skeleton loaders.
     currentPage = 1; // Reset to first page when filters change.
     try {
-        let url = 'http://localhost:3000/recipes';
+        let url = "http://localhost:3000/recipes";
         if (filters && Object.keys(filters).length > 0) {
             const queryString = buildRecipeQueryString(filters);
             if (queryString)
-                url += '?' + queryString;
+                url += "?" + queryString;
         }
         const res = await fetch(url);
         if (!res.ok)
@@ -236,15 +253,15 @@ let fetchAndRenderRecipesWithFilters = async function (filters) {
 // Fetches recipes based on a search query string and renders them.
 // This is typically used by the main search bar.
 let fetchAndRenderRecipes = async function (query) {
-    const list = document.getElementById('recipe-list');
+    const list = document.getElementById("recipe-list");
     if (!list)
         return;
     setLoadingState(true);
     currentPage = 1; // Reset to first page on new search.
     try {
-        let url = (query && query.trim() !== '')
+        let url = query && query.trim() !== ""
             ? `http://localhost:3000/recipes/search?query=${encodeURIComponent(query)}`
-            : 'http://localhost:3000/recipes'; // Default to all recipes if no query.
+            : "http://localhost:3000/recipes"; // Default to all recipes if no query.
         const res = await fetch(url);
         if (!res.ok)
             throw new Error(`Failed to fetch recipes: ${res.statusText}`);
@@ -259,17 +276,18 @@ let fetchAndRenderRecipes = async function (query) {
 // --- PAGINATION LOGIC ---
 let currentPage = 1;
 let recipesPerPage = 9; // Default number of recipes per page.
-const paginationDropdown = document.getElementById('recipes-per-page');
-const paginationContainer = document.getElementById('recipe-pagination');
+const paginationDropdown = document.getElementById("recipes-per-page");
+const paginationContainer = document.getElementById("recipe-pagination");
 // This function replaces the original `renderRecipes` to add pagination.
 // It stores all fetched recipes and then calls `updatePagination` to render the current page.
 function renderRecipesPaged(recipes) {
     lastFetchedRecipes = recipes.slice(); // Store all fetched recipes for pagination.
-    const list = document.getElementById('recipe-list');
+    const list = document.getElementById("recipe-list");
     if (list && recipes.length === 0) {
-        list.innerHTML = '<div class="alert alert-warning text-center col-12">No recipes found matching your filters.</div>';
+        list.innerHTML =
+            '<div class="alert alert-warning text-center col-12">No recipes found matching your filters.</div>';
         if (paginationContainer)
-            paginationContainer.innerHTML = ''; // Clear pagination if no results.
+            paginationContainer.innerHTML = ""; // Clear pagination if no results.
         return;
     }
     // `updatePagination` will handle rendering the correct slice of recipes and the pagination controls.
@@ -290,20 +308,22 @@ function updatePagination() {
     const startIdx = (currentPage - 1) * recipesPerPage;
     const endIdx = startIdx + recipesPerPage;
     const pagedRecipes = lastFetchedRecipes.slice(startIdx, endIdx);
-    const list = document.getElementById('recipe-list');
+    const list = document.getElementById("recipe-list");
     if (list) {
         if (pagedRecipes.length > 0) {
-            list.innerHTML = pagedRecipes.map(createRecipeCard).join('');
+            list.innerHTML = pagedRecipes.map(createRecipeCard).join("");
         }
-        else if (totalRecipes > 0) { // Recipes exist, but this page is empty (should not happen with correct currentPage adjustment)
+        else if (totalRecipes > 0) {
+            // Recipes exist, but this page is empty (should not happen with correct currentPage adjustment)
             list.innerHTML = '<div class="alert alert-info text-center col-12">No recipes on this page.</div>';
         }
         // If totalRecipes is 0, renderRecipesPaged handles the "no recipes found" message.
     }
     // Render pagination controls (Previous, page numbers, Next).
-    let html = '';
-    if (totalPages > 1) { // Only show pagination if more than one page.
-        html += `<li class="page-item${currentPage === 1 ? ' disabled' : ''}"><a class="page-link" href="#" data-page="${currentPage - 1}">Previous</a></li>`;
+    let html = "";
+    if (totalPages > 1) {
+        // Only show pagination if more than one page.
+        html += `<li class="page-item${currentPage === 1 ? " disabled" : ""}"><a class="page-link" href="#" data-page="${currentPage - 1}">Previous</a></li>`;
         // Logic for displaying page numbers (e.g., with ellipses for many pages)
         let startPage = Math.max(1, currentPage - 2);
         let endPage = Math.min(totalPages, currentPage + 2);
@@ -317,34 +337,34 @@ function updatePagination() {
                 html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
         }
         for (let i = startPage; i <= endPage; i++) {
-            html += `<li class="page-item${i === currentPage ? ' active' : ''}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+            html += `<li class="page-item${i === currentPage ? " active" : ""}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
         }
         if (endPage < totalPages) {
             if (endPage < totalPages - 1)
                 html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
             html += `<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">${totalPages}</a></li>`;
         }
-        html += `<li class="page-item${currentPage === totalPages ? ' disabled' : ''}"><a class="page-link" href="#" data-page="${currentPage + 1}">Next</a></li>`;
+        html += `<li class="page-item${currentPage === totalPages ? " disabled" : ""}"><a class="page-link" href="#" data-page="${currentPage + 1}">Next</a></li>`;
     }
     paginationContainer.innerHTML = html;
 }
 // Event listener for pagination controls.
 if (paginationContainer) {
-    paginationContainer.addEventListener('click', function (e) {
+    paginationContainer.addEventListener("click", function (e) {
         e.preventDefault(); // Prevent default link behavior.
         const target = e.target;
         // Check if a page link was clicked.
-        if (target.tagName === 'A' && target.hasAttribute('data-page')) {
-            const page = parseInt(target.getAttribute('data-page'));
+        if (target.tagName === "A" && target.hasAttribute("data-page")) {
+            const page = parseInt(target.getAttribute("data-page"));
             const totalPages = Math.ceil(lastFetchedRecipes.length / recipesPerPage) || 1;
             // Ensure the requested page is valid.
             if (!isNaN(page) && page >= 1 && page <= totalPages) {
                 currentPage = page;
                 updatePagination(); // Re-render for the new page.
                 // Scroll to the top of the recipe list after pagination
-                const recipeListElement = document.getElementById('recipe-list-section'); // Assuming you have a section/div wrapping the list
+                const recipeListElement = document.getElementById("recipe-list-section"); // Assuming you have a section/div wrapping the list
                 if (recipeListElement) {
-                    recipeListElement.scrollIntoView({ behavior: 'smooth' });
+                    recipeListElement.scrollIntoView({ behavior: "smooth" });
                 }
             }
         }
@@ -352,7 +372,7 @@ if (paginationContainer) {
 }
 // Event listener for the "recipes per page" dropdown.
 if (paginationDropdown) {
-    paginationDropdown.addEventListener('change', function () {
+    paginationDropdown.addEventListener("change", function () {
         recipesPerPage = parseInt(this.value);
         currentPage = 1; // Reset to first page.
         updatePagination(); // Update display with new items per page.
@@ -363,7 +383,7 @@ renderRecipes = renderRecipesPaged;
 // --- FEATURED RECIPES LOGIC (Typically for sidebars or special sections) ---
 // Renders a list of featured recipes.
 function renderFeaturedRecipes(recipes) {
-    const container = document.getElementById('featured-recipes');
+    const container = document.getElementById("featured-recipes");
     if (!container)
         return;
     if (!recipes.length) {
@@ -371,7 +391,8 @@ function renderFeaturedRecipes(recipes) {
         return;
     }
     // HTML for each featured recipe item.
-    container.innerHTML = recipes.map(r => `
+    container.innerHTML = recipes
+        .map((r) => `
         <a href="recipe-view.html?id=${r.id}" class="text-decoration-none text-dark">
             <div class="d-flex align-items-center justify-content-start mb-3 featured-recipe-card" style="cursor:pointer;">
                 <div class="rounded me-3" style="width: 80px; height: 80px; overflow: hidden;">
@@ -390,20 +411,21 @@ function renderFeaturedRecipes(recipes) {
                 </div>
             </div>
         </a>
-    `).join('');
+    `)
+        .join("");
 }
 // Fetches and renders featured recipes (e.g., top 3 by rating).
 async function fetchAndRenderFeaturedRecipes() {
-    const container = document.getElementById('featured-recipes');
+    const container = document.getElementById("featured-recipes");
     if (!container)
         return;
     // Show a simple loading text or small spinner for featured recipes.
     container.innerHTML = '<div class="text-muted small p-2">Loading featured...</div>';
     try {
         // Example: Fetch recipes with a minimum rating of 4.5.
-        const res = await fetch('http://localhost:3000/recipes?minRating=4.5'); // Add limit
+        const res = await fetch("http://localhost:3000/recipes?minRating=4.5"); // Add limit
         if (!res.ok)
-            throw new Error('Failed to fetch featured recipes');
+            throw new Error("Failed to fetch featured recipes");
         let recipes = await res.json();
         // Sort by rating (descending) and take the top 3.
         recipes = recipes.sort((a, b) => (b.ratings ?? 0) - (a.ratings ?? 0)).slice(0, 3);
@@ -415,19 +437,19 @@ async function fetchAndRenderFeaturedRecipes() {
     }
 }
 // --- INITIALIZATION AND EVENT LISTENERS ---
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
     // Check for a 'query' parameter in the URL on page load.
     const url = new URL(window.location.href);
-    const queryFromUrl = url.searchParams.get('query');
+    const queryFromUrl = url.searchParams.get("query");
     const filterSidebarSearchInput = document.querySelector('.col-xl-3 .input-group input[type="search"]');
-    if (queryFromUrl && queryFromUrl.trim() !== '') {
+    if (queryFromUrl && queryFromUrl.trim() !== "") {
         // If there's a query in the URL, fetch and render recipes based on it.
         // Also, populate the search input field in the filter sidebar.
         if (filterSidebarSearchInput) {
             filterSidebarSearchInput.value = queryFromUrl;
         }
         // And populate other search inputs on the page if they exist
-        document.querySelectorAll('input[type="search"]').forEach(input => {
+        document.querySelectorAll('input[type="search"]').forEach((input) => {
             if (input !== filterSidebarSearchInput)
                 input.value = queryFromUrl;
         });
@@ -439,102 +461,110 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // Event listener for the main search input in the filter sidebar.
     if (filterSidebarSearchInput) {
-        const filterSidebarSearchButton = filterSidebarSearchInput.closest('.input-group')?.querySelector('.input-group-text');
+        const filterSidebarSearchButton = filterSidebarSearchInput
+            .closest(".input-group")
+            ?.querySelector(".input-group-text");
         const triggerSearch = () => {
             const query = filterSidebarSearchInput.value.trim();
             // Update other search bars on the page to match this one.
-            document.querySelectorAll('input[type="search"]').forEach(input => {
+            document.querySelectorAll('input[type="search"]').forEach((input) => {
                 if (input !== filterSidebarSearchInput)
                     input.value = query;
             });
             fetchAndRenderRecipes(query); // Fetch based on this search input.
         };
-        filterSidebarSearchInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
+        filterSidebarSearchInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
                 e.preventDefault();
                 triggerSearch();
             }
         });
         if (filterSidebarSearchButton) {
-            filterSidebarSearchButton.addEventListener('click', triggerSearch);
+            filterSidebarSearchButton.addEventListener("click", triggerSearch);
         }
     }
     // Event listener for the search button in the global search modal.
-    const modalSearchBtn = document.querySelector('#searchModal .input-group-text');
+    const modalSearchBtn = document.querySelector("#searchModal .input-group-text");
     const modalSearchInput = document.querySelector('#searchModal input[type="search"]');
     if (modalSearchBtn && modalSearchInput) {
-        modalSearchBtn.addEventListener('click', () => {
+        modalSearchBtn.addEventListener("click", () => {
             const query = modalSearchInput.value.trim();
             if (filterSidebarSearchInput)
                 filterSidebarSearchInput.value = query; // Sync sidebar search
-            document.querySelectorAll('input[type="search"]').forEach(input => {
+            document.querySelectorAll('input[type="search"]').forEach((input) => {
                 input.value = query;
             });
             fetchAndRenderRecipes(query);
             // Close the modal after search if you have a Bootstrap modal instance
             // Example: bootstrap.Modal.getInstance(document.getElementById('searchModal'))?.hide();
         });
-        modalSearchInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
+        modalSearchInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
                 e.preventDefault();
-                modalSearchBtn.dispatchEvent(new Event('click')); // Trigger click on button
+                modalSearchBtn.dispatchEvent(new Event("click")); // Trigger click on button
             }
         });
     }
     // Event listener for "Apply Filters" button.
-    const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+    const applyFiltersBtn = document.getElementById("applyFiltersBtn");
     if (applyFiltersBtn) {
-        applyFiltersBtn.addEventListener('click', (e) => {
+        applyFiltersBtn.addEventListener("click", (e) => {
             e.preventDefault();
             const filters = collectRecipeFilters();
             fetchAndRenderRecipesWithFilters(filters);
         });
     }
     // Event listener for "Clear All" filters button.
-    const clearFiltersBtn = document.getElementById('clearFiltersBtn'); // Assuming ID for clear button
+    const clearFiltersBtn = document.getElementById("clearFiltersBtn"); // Assuming ID for clear button
     if (clearFiltersBtn) {
-        clearFiltersBtn.addEventListener('click', (e) => {
+        clearFiltersBtn.addEventListener("click", (e) => {
             e.preventDefault();
             // Uncheck all filter checkboxes.
-            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            document
+                .querySelectorAll('input[type="checkbox"]')
+                .forEach((cb) => (cb.checked = false));
             // Reset difficulty radio to 'any'.
-            const diffAny = document.getElementById('diff-any');
+            const diffAny = document.getElementById("diff-any");
             if (diffAny)
                 diffAny.checked = true;
             // Reset rating range slider and its display.
-            const ratingRange = document.getElementById('ratingRange');
-            const ratingValueDisplay = document.getElementById('ratingValue');
+            const ratingRange = document.getElementById("ratingRange");
+            const ratingValueDisplay = document.getElementById("ratingValue");
             if (ratingRange) {
-                ratingRange.value = ratingRange.min || '1';
+                ratingRange.value = ratingRange.min || "1";
                 if (ratingValueDisplay)
                     ratingValueDisplay.textContent = `${ratingRange.value} ★`;
             }
             // Reset time range slider and its display.
-            const timeRange = document.getElementById('timeRange');
-            const timeValueDisplay = document.getElementById('timeValue');
+            const timeRange = document.getElementById("timeRange");
+            const timeValueDisplay = document.getElementById("timeValue");
             if (timeRange) {
-                timeRange.value = timeRange.defaultValue || timeRange.max || '120'; // Reset to default or max
+                timeRange.value = timeRange.defaultValue || timeRange.max || "120"; // Reset to default or max
                 if (timeValueDisplay)
                     timeValueDisplay.textContent = `${timeRange.value} min`;
             }
             // Clear min/max calorie inputs.
-            const minCalInput = document.getElementById('minCalories');
+            const minCalInput = document.getElementById("minCalories");
             if (minCalInput)
-                minCalInput.value = '';
-            const maxCalInput = document.getElementById('maxCalories');
+                minCalInput.value = "";
+            const maxCalInput = document.getElementById("maxCalories");
             if (maxCalInput)
-                maxCalInput.value = '';
+                maxCalInput.value = "";
             // Clear ingredient input and tags.
-            const ingInput = document.getElementById('ingredientInput');
+            const ingInput = document.getElementById("ingredientInput");
             if (ingInput)
-                ingInput.value = '';
-            const ingredientTagsContainer = document.getElementById('ingredientTags');
+                ingInput.value = "";
+            const ingredientTagsContainer = document.getElementById("ingredientTags");
             if (ingredientTagsContainer)
-                ingredientTagsContainer.innerHTML = '';
+                ingredientTagsContainer.innerHTML = "";
             // Deselect all tag badges.
-            document.querySelectorAll('#tagsCollapse .badge.bg-secondary.selected').forEach(badge => badge.classList.remove('selected'));
+            document
+                .querySelectorAll("#tagsCollapse .badge.bg-secondary.selected")
+                .forEach((badge) => badge.classList.remove("selected"));
             // Clear search input field(s).
-            document.querySelectorAll('input[type="search"]').forEach(input => input.value = '');
+            document
+                .querySelectorAll('input[type="search"]')
+                .forEach((input) => (input.value = ""));
             // Reset sorting dropdown to "none" or default
             if (sortingDropdown)
                 sortingDropdown.value = "none";
@@ -543,18 +573,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     // Event listener for tag selection in the filter sidebar.
-    const tagBadgesContainer = document.getElementById('tagsCollapse');
+    const tagBadgesContainer = document.getElementById("tagsCollapse");
     if (tagBadgesContainer) {
-        tagBadgesContainer.addEventListener('click', function (e) {
+        tagBadgesContainer.addEventListener("click", function (e) {
             const target = e.target;
-            if (target.classList.contains('badge')) { // Check if a badge was clicked
-                target.classList.toggle('selected'); // Toggle 'selected' class for styling.
+            if (target.classList.contains("badge")) {
+                // Check if a badge was clicked
+                target.classList.toggle("selected"); // Toggle 'selected' class for styling.
             }
         });
     }
     // Event listener for the sorting dropdown.
     if (sortingDropdown) {
-        sortingDropdown.addEventListener('change', (e) => {
+        sortingDropdown.addEventListener("change", (e) => {
             const value = e.target.value;
             sortAndRenderRecipes(value); // Sort and re-render based on new selection.
         });
@@ -564,7 +595,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const originalFetchAndRenderRecipes = fetchAndRenderRecipes;
     fetchAndRenderRecipes = async function (query) {
         await originalFetchAndRenderRecipes(query); // Call original fetch logic.
-        if (sortingDropdown && sortingDropdown.value !== "none") { // Re-apply sort if not "none"
+        if (sortingDropdown && sortingDropdown.value !== "none") {
+            // Re-apply sort if not "none"
             sortAndRenderRecipes(sortingDropdown.value);
         }
         else if (sortingDropdown && sortingDropdown.value === "none") {
@@ -575,7 +607,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const originalFetchAndRenderRecipesWithFilters = fetchAndRenderRecipesWithFilters;
     fetchAndRenderRecipesWithFilters = async function (filters) {
         await originalFetchAndRenderRecipesWithFilters(filters); // Call original fetch logic.
-        if (sortingDropdown && sortingDropdown.value !== "none") { // Re-apply sort if not "none"
+        if (sortingDropdown && sortingDropdown.value !== "none") {
+            // Re-apply sort if not "none"
             sortAndRenderRecipes(sortingDropdown.value);
         }
         else if (sortingDropdown && sortingDropdown.value === "none") {
@@ -585,19 +618,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fetch and render featured recipes for the sidebar.
     fetchAndRenderFeaturedRecipes();
     // Initialize range slider value displays
-    const ratingRangeInput = document.getElementById('ratingRange');
-    const ratingValueSpan = document.getElementById('ratingValue');
+    const ratingRangeInput = document.getElementById("ratingRange");
+    const ratingValueSpan = document.getElementById("ratingValue");
     if (ratingRangeInput && ratingValueSpan) {
         ratingValueSpan.textContent = `${ratingRangeInput.value} ★`;
-        ratingRangeInput.addEventListener('input', () => {
+        ratingRangeInput.addEventListener("input", () => {
             ratingValueSpan.textContent = `${ratingRangeInput.value} ★`;
         });
     }
-    const timeRangeInput = document.getElementById('timeRange');
-    const timeValueSpan = document.getElementById('timeValue');
+    const timeRangeInput = document.getElementById("timeRange");
+    const timeValueSpan = document.getElementById("timeValue");
     if (timeRangeInput && timeValueSpan) {
         timeValueSpan.textContent = `${timeRangeInput.value} min`;
-        timeRangeInput.addEventListener('input', () => {
+        timeRangeInput.addEventListener("input", () => {
             timeValueSpan.textContent = `${timeRangeInput.value} min`;
         });
     }
