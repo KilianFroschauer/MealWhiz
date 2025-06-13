@@ -297,32 +297,20 @@
                             <div class="card-header">
                                 <h5 id="contextualInfoHeader">Session Details</h5>
                             </div>
-                            <div class="card-body" id="contextualInfoBody">
-                                <!-- Casual Mode Info -->
+                            <div class="card-body" id="contextualInfoBody">                                <!-- Casual Mode Info -->
                                 <div id="casualContext" class="d-none">
                                     <p><strong>Mode:</strong> Casual Cooking</p>
                                     <div class="partner-status mb-2">
-                                        <strong>Partner:</strong> <span id="casualPartnerName">Waiting...</span>
+                                        <strong>Host:</strong> <span id="casualPartnerName">Waiting...</span>
                                         (<span id="casualPartnerStatus" class="badge bg-secondary">Offline</span>)
                                     </div>
-                                    <h6>My Cooking Station:</h6>
-                                    <input type="text" id="casualRecipeInput" class="form-control form-control-sm mb-2"
-                                        placeholder="What are you making?">
-                                    <textarea id="casualRecipeNotes" class="form-control form-control-sm" rows="2"
-                                        placeholder="Notes for your partner..."></textarea>
-                                </div>
-                                <!-- Competitive Mode Info -->
+                                </div>                                <!-- Competitive Mode Info -->
                                 <div id="competitiveContext" class="d-none">
-                                    <p><strong>Mode:</strong> Competitive Challenge</p>
-                                    <p><strong>Challenge:</strong> <span id="competitiveChallengeName">-</span></p>
-                                    <p><strong>Difficulty:</strong> <span id="competitiveDifficulty"
-                                            class="badge bg-primary">-</span></p>
-                                    <div class="d-flex justify-content-between align-items-center">
+                                    <p><strong>Mode:</strong> Competitive Challenge</p>                                    <div class="d-flex justify-content-between align-items-center">
                                         <strong>Time Remaining:</strong>
                                         <span id="competitiveTimerDisplay" class="badge bg-danger fs-6">00:00</span>
                                     </div>
                                     <hr>
-                                    <h6>Opponent: <span id="competitiveOpponentName">Waiting...</span></h6>
                                     <div id="competitivePhases">
                                         <!-- Phase specific content like submission/voting can be shown here -->
                                     </div>

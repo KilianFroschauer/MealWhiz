@@ -28,6 +28,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Retrieve battle settings from URL parameters.
     const settings = getBattleSettings();
     console.log("Battle Page Loaded. Settings:", settings);
+    // Update currentUser name if username is provided in URL
+    if (settings.username) {
+        currentUser.name = settings.username;
+    }
     // Initialize basic page UI elements based on settings.
     initializePageUI(settings);
     // Check if essential parameters for Jitsi are present.
@@ -39,9 +43,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Fetch details of the current event.
         currentEventDetails = await fetchEventDetails(settings.eventId);
         // Set up the battle-specific UI elements (casual vs. competitive).
-        setupBattleUI(settings, currentEventDetails);
-        // Initialize and join the Jitsi video conference.
-        initializeJitsi(settings, currentUser.name);
+        setupBattleUI(settings, currentEventDetails); // Initialize and join the Jitsi video conference.
+        // Use username from URL if available, otherwise fallback to currentUser.name
+        const displayName = settings.username || currentUser.name;
+        initializeJitsi(settings, displayName);
     }
     catch (error) {
         console.error("Error during page setup:", error);
@@ -60,6 +65,8 @@ function getBattleSettings() {
         mode: mode,
         eventId: urlParams.get('eventId'),
         streamUrl: urlParams.get('streamUrl'),
+        username: urlParams.get('username') ? decodeURIComponent(urlParams.get('username')) : undefined,
+        role: urlParams.get('role'),
         // Decode URI components for challenge type and difficulty as they might contain special characters.
         challengeType: urlParams.get('challengeType') ? decodeURIComponent(urlParams.get('challengeType')) : undefined,
         difficulty: urlParams.get('difficulty') ? decodeURIComponent(urlParams.get('difficulty')) : undefined,
@@ -175,15 +182,15 @@ function initializeJitsi(settings, userName) {
         jitsiApi.dispose();
         jitsiApi = null;
     }
-    console.log(`Initializing Jitsi Meet with room: "${roomNameForJitsi}", user: "${userName}"`);
+    console.log(`Initializing Jitsi Meet with room: "${roomNameForJitsi}", user: "${userName}", role: "${settings.role || 'competitor'}"`);
     // Call the function to create and configure the Jitsi Meet External API instance.
-    jitsiApi = initJitsiMeetExternalAPI(roomNameForJitsi, userName, 'jitsiMeetContainer');
+    jitsiApi = initJitsiMeetExternalAPI(roomNameForJitsi, userName, 'jitsiMeetContainer', settings);
     if (!jitsiApi) {
         showErrorInPlaceholder("Error initializing video conference. Please try again later.");
     }
 }
 // Creates and configures the Jitsi Meet External API.
-function initJitsiMeetExternalAPI(roomName, displayName, parentElementId) {
+function initJitsiMeetExternalAPI(roomName, displayName, parentElementId, settings) {
     const parentElement = document.getElementById(parentElementId); // The HTML element to host Jitsi.
     const placeholderElement = document.getElementById('jitsiMeetPlaceholder');
     if (!parentElement) {
@@ -198,21 +205,112 @@ function initJitsiMeetExternalAPI(roomName, displayName, parentElementId) {
     configureJitsiPlaceholder(placeholderElement, true);
     parentElement.style.display = 'block'; // Make the Jitsi container visible.
     const jitsiDomain = new URL(JITSI_SERVER_URL).hostname; // Extract domain from Jitsi server URL.
+    // Check if user is a viewer in competitive mode
+    const isViewer = settings?.mode === 'competitive' && settings?.role === 'viewer'; // Base configuration for all users - optimized for cooking competitions
+    let configOverwrite = {
+        prejoinPageEnabled: false,
+        requireDisplayName: true,
+        disableDeepLinking: true,
+        // Optimize for cooking competition environment
+        enableNoisyMicDetection: true,
+        enableTalkWhileMuted: false,
+        disableThirdPartyRequests: true,
+        // Disable unnecessary features
+        disableProfile: false,
+        enableWelcomePage: false
+    };
+    // Base interface configuration - cleaner for cooking focus
+    let interfaceConfigOverwrite = {
+        SHOW_CHROME_EXTENSION_BANNER: false,
+        TOOLBAR_ALWAYS_VISIBLE: true,
+        SETTINGS_SECTIONS: ['devices', 'language'],
+        // Hide promotional elements
+        SHOW_BRAND_WATERMARK: false,
+        SHOW_JITSI_WATERMARK: false,
+        SHOW_POWERED_BY: false,
+        HIDE_DEEP_LINKING_LOGO: true,
+        INITIAL_TOOLBAR_TIMEOUT: 5000,
+        TOOLBAR_TIMEOUT: 8000
+    };
+    if (isViewer) {
+        // Viewers in competitive mode: invisible spectator configuration
+        configOverwrite = {
+            ...configOverwrite,
+            startWithAudioMuted: true,
+            startWithVideoMuted: true,
+            disableProfile: true,
+            readOnlyName: true,
+            // Make viewers truly invisible/silent
+            startSilent: true,
+            disableInitialGUM: true,
+            disableAudioLevels: true,
+            enableLayerSuspension: true,
+            // Additional invisible participant settings
+            defaultRemoteDisplayName: 'Competitor',
+            hideDisplayName: true,
+            // Disable chat for viewers
+            disableChat: true
+        };
+        interfaceConfigOverwrite = {
+            ...interfaceConfigOverwrite,
+            // Ultra-minimal interface for invisible spectators - only essential viewer controls
+            TOOLBAR_BUTTONS: [
+                'settings', 'fullscreen'
+            ],
+            // Hide as much UI as possible for spectators
+            DISABLE_VIDEO_BACKGROUND: true,
+            DISABLE_FOCUS_INDICATOR: true,
+            FILM_STRIP_MAX_HEIGHT: 0,
+            DISABLE_PRESENCE_STATUS: true,
+            DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
+            // Minimal toolbar for viewers
+            TOOLBAR_ALWAYS_VISIBLE: false,
+            INITIAL_TOOLBAR_TIMEOUT: 2000,
+            // Disable chat interface
+            DISABLE_CHAT: true
+        };
+    }
+    else {
+        // Competitors or casual mode users: essential cooking competition functionality
+        interfaceConfigOverwrite = {
+            ...interfaceConfigOverwrite,
+            // Only essential buttons for cooking competitions
+            TOOLBAR_BUTTONS: [
+                'microphone', 'camera', 'chat', 'fullscreen', 'hangup', 'settings'
+            ],
+            // Hide unnecessary branding and promotional elements
+            SHOW_BRAND_WATERMARK: false,
+            SHOW_JITSI_WATERMARK: false,
+            SHOW_POWERED_BY: false,
+            SHOW_PROMOTIONAL_CLOSE_PAGE: false,
+            HIDE_DEEP_LINKING_LOGO: true,
+            // Disable less relevant features for cooking competitions
+            DISABLE_VIDEO_BACKGROUND: false,
+            DISABLE_FOCUS_INDICATOR: true,
+            HIDE_INVITE_MORE_HEADER: true
+        };
+    }
     // Jitsi Meet API options.
     const options = {
         roomName: roomName,
         width: '100%',
         height: '100%',
         parentNode: parentElement,
-        userInfo: { displayName },
-        configOverwrite: { prejoinPageEnabled: false, requireDisplayName: true },
-        interfaceConfigOverwrite: { SHOW_CHROME_EXTENSION_BANNER: false }, // Hide Chrome extension banner.
+        userInfo: {
+            displayName: displayName // Keep original name, viewers will be hidden anyway
+        },
+        configOverwrite,
+        interfaceConfigOverwrite
         // jwt: 'YOUR_JWT_TOKEN_IF_USING_SECURE_DOMAIN' // Add JWT if using a secured Jitsi setup.
     };
     try {
         // Instantiate the Jitsi Meet External API.
         const api = new JitsiMeetExternalAPI(jitsiDomain, options);
         isVideoConferenceJoined = false; // Reset joined flag.
+        // Apply additional restrictions for viewers after API initialization
+        if (isViewer) {
+            setupViewerRestrictions(api);
+        }
         attachJitsiEventListeners(api); // Attach event listeners to the Jitsi API instance.
         return api;
     }
@@ -557,57 +655,125 @@ function setupCommonEventListeners() {
     const exitButton = document.getElementById('exitBattleButton');
     if (exitButton) {
         exitButton.addEventListener('click', () => {
-            // If Jitsi API is active, dispose of it before leaving.
-            if (jitsiApi) {
-                console.log("Disposing Jitsi API on exit.");
-                jitsiApi.dispose();
-                jitsiApi = null;
+            // Get current user role
+            const settings = getBattleSettings();
+            const isViewer = settings.mode === 'competitive' && settings.role === 'viewer';
+            if (isViewer) {
+                // For viewers: just leave without affecting the meeting
+                console.log("Viewer leaving session - meeting continues for competitors");
+                if (jitsiApi) {
+                    jitsiApi.dispose(); // Only dispose for this viewer
+                    jitsiApi = null;
+                }
+                // Redirect to the main CookOff page
+                window.location.href = 'CookOff.html';
             }
-            // Redirect to the main CookOff page.
-            window.location.href = 'CookOff.html';
+            else {
+                // For competitors: normal exit that ends the meeting
+                console.log("Competitor/casual user exiting - disposing Jitsi API");
+                if (jitsiApi) {
+                    jitsiApi.dispose();
+                    jitsiApi = null;
+                }
+                // Redirect to the main CookOff page
+                window.location.href = 'CookOff.html';
+            }
         });
     }
 }
 // Updates the UI to display opponent/partner information.
 function updateOpponentDisplayInUI(opponent, mode) {
-    // Determine element IDs based on the mode.
-    const nameElId = mode === 'casual' ? 'casualPartnerName' : 'competitiveOpponentName';
-    const avatarElId = mode === 'casual' ? 'casualPartnerAvatar' : 'competitiveOpponentAvatar';
-    const statusElId = 'casualPartnerStatus'; // Status is typically shown only in casual mode.
+    // Only update UI for casual mode - competitive mode doesn't show opponent info
+    if (mode === 'competitive') {
+        return; // No opponent display in competitive mode
+    }
+    // Casual mode partner display logic
+    const nameElId = 'casualPartnerName';
+    const avatarElId = 'casualPartnerAvatar';
+    const statusElId = 'casualPartnerStatus';
     const nameEl = document.getElementById(nameElId);
     const avatarEl = document.getElementById(avatarElId);
+    const statusEl = document.getElementById(statusElId);
     if (opponent) {
-        // If opponent/partner exists, display their name and avatar.
+        // If partner exists, display their name and avatar.
         if (nameEl)
             nameEl.textContent = opponent.name;
         if (avatarEl)
             avatarEl.src = opponent.avatar || '../assets/img/avatar.jpg'; // Default avatar.
-        if (mode === 'casual') {
-            // Update status for casual mode (e.g., "Online").
-            const statusEl = document.getElementById(statusElId);
-            if (statusEl) {
-                statusEl.textContent = 'Online';
-                statusEl.className = 'badge bg-success';
-            }
+        // Update status for casual mode (e.g., "Online").
+        if (statusEl) {
+            statusEl.textContent = 'Online';
+            statusEl.className = 'badge bg-success';
         }
     }
     else {
-        // If no opponent/partner, display a waiting message.
-        const waitingMsg = mode === 'casual' ? 'Waiting for partner...' : 'Waiting for opponent...';
+        // If no partner, display a waiting message.
         if (nameEl)
-            nameEl.textContent = waitingMsg;
+            nameEl.textContent = 'Waiting for partner...';
         if (avatarEl)
             avatarEl.src = '../assets/img/avatar.jpg'; // Default placeholder avatar.
-        if (mode === 'casual') {
-            // Update status for casual mode (e.g., "Offline").
-            const statusEl = document.getElementById(statusElId);
-            if (statusEl) {
-                statusEl.textContent = 'Offline';
-                statusEl.className = 'badge bg-secondary';
-            }
+        // Update status for casual mode (e.g., "Offline").
+        if (statusEl) {
+            statusEl.textContent = 'Offline';
+            statusEl.className = 'badge bg-secondary';
         }
     }
 }
 // Removed mock opponent joining and WebSocket placeholders as they are not functional without a backend.
 // Simplified Jitsi initialization and event handling.
 // Consolidated UI updates.
+// Sets up additional restrictions for viewers in competitive mode (invisible spectators)
+function setupViewerRestrictions(api) {
+    // Wait for the API to be ready before applying restrictions
+    api.addEventListener('videoConferenceJoined', () => {
+        console.log('[Jitsi] Applying invisible spectator mode for viewer');
+        try {
+            // Ensure viewers are completely muted and hidden
+            api.executeCommand('toggleAudio'); // Ensure muted
+            api.executeCommand('toggleVideo'); // Ensure video off
+            // Hide the local video tile for viewers
+            api.executeCommand('setTileView', false);
+            console.log('[Jitsi] Invisible spectator mode applied successfully');
+        }
+        catch (error) {
+            console.warn('[Jitsi] Could not apply all spectator restrictions:', error);
+        }
+    });
+    // Completely prevent any audio/video interaction for viewers
+    api.addEventListener('audioMuteStatusChanged', (event) => {
+        if (!event.muted) {
+            console.log('[Jitsi] Spectator attempted audio interaction - blocking');
+            api.executeCommand('toggleAudio'); // Force mute
+        }
+    });
+    api.addEventListener('videoMuteStatusChanged', (event) => {
+        if (!event.muted) {
+            console.log('[Jitsi] Spectator attempted video interaction - blocking');
+            api.executeCommand('toggleVideo'); // Force video off
+        }
+    });
+    // Block screen sharing for viewers
+    api.addEventListener('screenSharingStatusChanged', (event) => {
+        if (event.on) {
+            console.log('[Jitsi] Spectator attempted screen sharing - blocking');
+            api.executeCommand('toggleShareScreen'); // Turn off screen sharing
+        }
+    }); // Block any chat attempts (additional layer of protection)
+    api.addEventListener('outgoingMessage', (event) => {
+        console.log('[Jitsi] Spectator attempted to send chat message - blocking');
+        // Note: This event might not exist in all Jitsi versions, but added for completeness
+        return false;
+    });
+    // Handle viewer exit differently - they leave without ending meeting for others
+    api.addEventListener('readyToClose', () => {
+        console.log('[Jitsi] Viewer is leaving session - meeting continues for competitors');
+        // Custom leave logic for viewers - only they leave, meeting continues
+        isVideoConferenceJoined = false;
+        if (jitsiApi) {
+            jitsiApi.dispose(); // Only dispose for this viewer
+            jitsiApi = null;
+        }
+        // Redirect viewer back to lobby or main page
+        window.location.href = 'CookOff.html';
+    });
+}

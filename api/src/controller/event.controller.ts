@@ -28,11 +28,24 @@ export class EventController {
      * @param {Response} res - Express response object.
      * @param {NextFunction} next - Express next middleware function.
      * @returns {Promise<void>}
-     */
-    async createNewEvent(req: Request, res: Response, next: NextFunction): Promise<void> {
+     */    async createNewEvent(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { mode, challengeType, difficulty } = req.body as CreateEventRequestBody;
-            const hostUserId = (req as any).payload?.user?.userId;
+            
+            // Get hostUserId from authentication token
+            const authReq = req as any; // AuthRequest interface
+            let hostUserId: number | undefined;
+            
+            if (authReq.payload && authReq.payload.user && typeof authReq.payload.user.userId === 'number') {
+                hostUserId = authReq.payload.user.userId;
+            } else if (authReq.payload && typeof authReq.payload.userId === 'number') {
+                hostUserId = authReq.payload.userId;
+            }
+
+            if (!hostUserId) {
+                res.status(StatusCodes.UNAUTHORIZED).json({ error: "Invalid user identification in token" });
+                return;
+            }
 
             if (!mode || !challengeType || !difficulty) {
                 res.status(StatusCodes.BAD_REQUEST).json({ error: "Missing required fields: mode, challengeType, difficulty" });
@@ -43,7 +56,9 @@ export class EventController {
                 return;
             }
 
+            // Generate stream URL
             const streamUrl = generateStreamUrl();
+
             const eventData: EventCreationData = {
                 mode,
                 challengeType,

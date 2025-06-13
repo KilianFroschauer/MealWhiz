@@ -1,5 +1,6 @@
 import express, { Router } from "express";
 import { EventController } from '../controller/event.controller';
+import { isAuthenticated } from '../middlewares/auth.middlware';
 
 export const eventRouter: Router = express.Router();
 const eventController = new EventController();
@@ -56,7 +57,7 @@ const eventController = new EventController();
  *                   type: string
  *                   description: URL for the streaming session
  */
-eventRouter.post("/", eventController.createNewEvent);
+eventRouter.post("/", isAuthenticated, eventController.createNewEvent);
 
 /**
  * @swagger

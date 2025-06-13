@@ -64,13 +64,11 @@ export class AuthController {
                 console.log("Login failed: Password mismatch for username:", usernameToLogin);
                 res.status(StatusCodes.UNAUTHORIZED).json({ error: "Wrong password" });
                 return;
-            }
-
-            const userClaims = {
+            }            const userClaims = {
                 userId: user.user_id,
                 username: user.user_name,
             };
-            const minutes = 15; // Token expiration time
+            const minutes = 30; // Token expiration time
             const expiresAt = new Date(Date.now() + minutes * 60000);
 
             const secret = process.env.JWT_SECRET;
@@ -315,9 +313,7 @@ export class AuthController {
             console.error("Error updating user:", error);
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Failed to update user profile");
         }
-    }
-
-    /**
+    }    /**
      * Validates if the current JWT token is still valid.
      * @param {Request} req - Express request object.
      * @param {Response} res - Express response object.
@@ -325,6 +321,20 @@ export class AuthController {
      */
     async validateToken(req: Request, res: Response): Promise<void> {
         // If this route is reached with isAuthenticated middleware, token is valid
-        res.status(StatusCodes.OK).json({ valid: true });
+        const authReq = req as AuthRequest;
+        const payload = authReq.payload;
+        
+        // Return validation status along with user info from token
+        if (payload && payload.user) {
+            res.status(StatusCodes.OK).json({ 
+                valid: true,
+                userId: payload.user.userId,
+                username: payload.user.username,
+                user_id: payload.user.userId,  // Alternative field name
+                user_name: payload.user.username  // Alternative field name
+            });
+        } else {
+            res.status(StatusCodes.OK).json({ valid: true });
+        }
     }
 }
