@@ -155,13 +155,13 @@ async function submitRating(recipeId, rating, stars, messageElement) {
             ratingDisplay.textContent = result.newRating.toFixed(1);
         }
         // Show toast notification
-        alert('Rating submitted successfully!');
+        showToast(`You rated this recipe ${rating} star${rating !== 1 ? 's' : ''}`, false);
     }
     catch (error) {
         console.error('Error submitting rating:', error);
         messageElement.textContent = 'Failed to submit rating. Please try again.';
         messageElement.className = 'ms-3 rating-message text-danger';
-        alert('Error submitting rating');
+        showToast('Error submitting rating', true);
     }
 }
 // Asynchronously loads the recipe data.
