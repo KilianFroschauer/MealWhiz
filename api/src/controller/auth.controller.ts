@@ -5,8 +5,8 @@ import jwt from 'jsonwebtoken';
 import { pool } from '../config';
 import { UserCredentials } from '../models/auth.models';
 import { AuthRequest } from '../middlewares/auth.middlware';
-import {Recipe} from '../models/recipe.models';
-import {mapDbRowsToRecipes} from '../repository/recipe.repository';
+import { Recipe } from '../models/recipe.models';
+import { mapDbRowsToRecipes } from '../repository/recipe.repository';
 
 // TODO: move db operations in an auth repository
 
@@ -66,7 +66,7 @@ export class AuthController {
                 console.log("Login failed: Password mismatch for username:", usernameToLogin);
                 res.status(StatusCodes.UNAUTHORIZED).json({ error: "Wrong password" });
                 return;
-            }            const userClaims = {
+            } const userClaims = {
                 userId: user.user_id,
                 username: user.user_name,
             };
@@ -325,10 +325,10 @@ export class AuthController {
         // If this route is reached with isAuthenticated middleware, token is valid
         const authReq = req as AuthRequest;
         const payload = authReq.payload;
-        
+
         // Return validation status along with user info from token
         if (payload && payload.user) {
-            res.status(StatusCodes.OK).json({ 
+            res.status(StatusCodes.OK).json({
                 valid: true,
                 userId: payload.user.userId,
                 username: payload.user.username,
@@ -361,44 +361,50 @@ export class AuthController {
  * @returns Array of Recipe objects that the user has favorited
  */
 export async function getUserFavoriteRecipes(userId: number): Promise<Recipe[]> {
-  const client = await pool.connect();
-  
-  try {
-    const query = `
+    const client = await pool.connect();
+
+    try {
+        const query = `
       SELECT 
-        r.recipe_id, 
-        r.title, 
-        r.ingredients, 
-        r.instructions,
-        r.total_time,
-        r.rating,
-        r.description,
-        d.difficulty,
-        dp.diary_pref,
-        c.cuisine,
-        ARRAY(
-          SELECT a.allergen 
-          FROM recipe_allergen ra 
-          JOIN allergens a ON ra.allergen_id = a.allergens_id 
-          WHERE ra.recipe_id = r.recipe_id
-        ) as allergen_list,
-        r.meal_times,
-        uf.created_at as favorited_at
-      FROM recipe r
-      JOIN user_favorites uf ON r.recipe_id = uf.recipe_id
-      LEFT JOIN difficulty d ON r.difficulty = d.difficulty_id
-      LEFT JOIN diary_pref dp ON r.diary_pref_id = dp.diary_pref_id
-      LEFT JOIN cuisine c ON r.cuisine_id = c.cuisine_id
-      WHERE uf.user_id = $1
-      ORDER BY uf.created_at DESC
+    r.recipe_id, 
+    r.title, 
+    ARRAY(
+      SELECT fp.product_name
+      FROM recipe_ingredient ri
+      JOIN food_products fp ON ri.ingredient_code = fp.code
+      WHERE ri.recipe_id = r.recipe_id
+      ORDER BY ri.ingredient_code
+    ) as ingredients,
+    r.instructions,
+    r.total_time,
+    r.rating,
+    r.description,
+    d.difficulty,
+    dp.diary_pref,
+    c.cuisine,
+    ARRAY(
+      SELECT a.allergen 
+      FROM recipe_allergen ra 
+      JOIN allergens a ON ra.allergen_id = a.allergens_id 
+      WHERE ra.recipe_id = r.recipe_id
+    ) as allergen_list,
+    r.meal_times,
+    uf.created_at as favorited_at
+FROM recipe r
+JOIN user_favorites uf ON r.recipe_id = uf.recipe_id
+LEFT JOIN difficulty d ON r.difficulty = d.difficulty_id
+LEFT JOIN diary_pref dp ON r.diary_pref_id = dp.diary_pref_id
+LEFT JOIN cuisine c ON r.cuisine_id = c.cuisine_id
+WHERE uf.user_id = $1
+ORDER BY uf.created_at DESC
     `;
-    
-    const result = await client.query(query, [userId]);
-    return await mapDbRowsToRecipes(result.rows);
-  } catch (error) {
-    console.error('Error fetching user favorite recipes:', error);
-    throw error;
-  } finally {
-    client.release();
-  }
+
+        const result = await client.query(query, [userId]);
+        return await mapDbRowsToRecipes(result.rows);
+    } catch (error) {
+        console.error('Error fetching user favorite recipes:', error);
+        throw error;
+    } finally {
+        client.release();
+    }
 }

@@ -276,17 +276,24 @@ cartRouter.post("/recipe/:recipeId", isAuthenticated, async (req: Request, res: 
     // Get recipe ingredients using the junction table
     // This approach doesn't rely on array_length with a text column
     const recipeResult = await pool.query(
-        `SELECT r.ingredients,
-                ARRAY(
-                    SELECT ri.quantity::text 
-                    FROM recipe_ingredient ri 
-                    WHERE ri.recipe_id = r.recipe_id
-                    ORDER BY ri.ingredient_code
-                ) as quantities
-         FROM recipe r
-         WHERE r.recipe_id = $1`,
-        [recipeId]
-    );
+    `SELECT 
+        ARRAY(
+            SELECT fp.product_name
+            FROM recipe_ingredient ri
+            JOIN food_products fp ON ri.ingredient_code = fp.code
+            WHERE ri.recipe_id = r.recipe_id
+            ORDER BY ri.ingredient_code
+        ) as ingredients,
+        ARRAY(
+            SELECT ri.quantity::text 
+            FROM recipe_ingredient ri 
+            WHERE ri.recipe_id = r.recipe_id
+            ORDER BY ri.ingredient_code
+        ) as quantities
+     FROM recipe r
+     WHERE r.recipe_id = $1`,
+    [recipeId]
+);
 
     if (recipeResult.rows.length === 0) {
         res.status(404).send("Rezept nicht gefunden");
