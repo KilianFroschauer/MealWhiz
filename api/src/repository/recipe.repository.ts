@@ -194,25 +194,21 @@ export async function getFilteredRecipes(filters: RecipeFilterOptions): Promise<
       paramIndex++;
     }
 
-    // Filter by ingredients (e.g., "tomato, onion")
-if (filters.ingredients) {
-  // Split the input string into an array of ingredient names
-  const ingredientList = filters.ingredients.split(',').map(i => i.trim().toLowerCase()).filter(Boolean);
-
-  if (ingredientList.length > 0) {
-    conditions.push(
-      `EXISTS (
-        SELECT 1
-        FROM recipe_ingredient ri
-        JOIN food_products fp ON ri.ingredient_code = fp.code
-        WHERE ri.recipe_id = r.recipe_id
-          AND (${ingredientList.map((_, i) => `LOWER(fp.product_name) LIKE $${paramIndex + i}`).join(' OR ')})
-      )`
-    );
-    ingredientList.forEach(ing => params.push(`%${ing}%`));
-    paramIndex += ingredientList.length;
-  }
-}
+    // Filter by ingredients (e.g., ["tomato", "onion"])
+    if (filters.ingredients && Array.isArray(filters.ingredients) && filters.ingredients.length > 0) {
+      const ingredientConditions = filters.ingredients.map((ingredient, index) => {
+        const subParamIndex = paramIndex + index;
+        params.push(`%${ingredient.toLowerCase()}%`); // Store parameter for this ingredient
+        return `EXISTS (
+          SELECT 1
+          FROM recipe_ingredient ri_sub
+          JOIN food_products fp_sub ON ri_sub.ingredient_code = fp_sub.code
+          WHERE ri_sub.recipe_id = r.recipe_id AND LOWER(fp_sub.product_name) ILIKE $${subParamIndex}
+        )`;
+      });
+      conditions.push(`(${ingredientConditions.join(' AND ')})`);
+      paramIndex += filters.ingredients.length; // Increment paramIndex by the number of ingredients
+    }
 
     if (filters.mealTimes?.length) {
   // Capitalize first letter of each meal time to match the enum values in the database

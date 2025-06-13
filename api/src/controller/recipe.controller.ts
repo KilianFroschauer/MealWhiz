@@ -98,7 +98,7 @@ export class RecipeController {
                     allergens: allergens as string[],
                     mealTimes: mealTimes as string[],
                     tags: tags as string[],
-                    ingredients: ingredients.join(",")
+                    ingredients: ingredients // Pass the array directly
                 });
                 res.status(200).json(convertToSimpleRecipe(filteredRecipes));
             }
