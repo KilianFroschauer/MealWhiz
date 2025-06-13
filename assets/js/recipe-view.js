@@ -135,7 +135,7 @@ function updateStarsDisplay(stars, rating, mode) {
 async function submitRating(recipeId, rating, stars, messageElement) {
     try {
         const token = localStorage.getItem("accessToken");
-        const response = await fetch(`http://localhost/recipes/${recipeId}/rate`, {
+        const response = await fetch(`http://localhost:3000/recipes/${recipeId}/rate`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -176,7 +176,7 @@ async function loadRecipe() {
     }
     try {
         // Fetch recipe data from the API.
-        const res = await fetch(`http://localhost/recipes/${id}`);
+        const res = await fetch(`http://localhost:3000/recipes/${id}`);
         if (!res.ok) {
             // Handle cases where the recipe is not found (e.g., 404 error).
             showError("Recipe not found.");
@@ -203,7 +203,7 @@ async function checkFavoriteStatus(recipeId) {
         const token = localStorage.getItem("accessToken");
         if (!token)
             return false;
-        const response = await fetch(`http://localhost/recipes/${recipeId}/favorite`, {
+        const response = await fetch(`http://localhost:3000/recipes/${recipeId}/favorite`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -228,7 +228,7 @@ async function toggleFavorite(recipeId, button) {
         }
         // Disable button during API call
         button.setAttribute("disabled", "true");
-        const response = await fetch(`http://localhost/recipes/${recipeId}/favorite`, {
+        const response = await fetch(`http://localhost:3000/recipes/${recipeId}/favorite`, {
             method: "POST",
             headers: {
                 Authorization: `Bearer ${token}`,
