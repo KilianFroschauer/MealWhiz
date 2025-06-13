@@ -1,3 +1,4 @@
+"use strict";
 // filepath: c:\Users\Samuel\Documents\HTL\SYP\MealWhiz\assets\ts\cookoff.ts
 // TypeScript for the CookOff page
 // This script handles the main CookOff landing page, allowing users to
@@ -547,8 +548,7 @@ async function fetchCompetitiveLobbies(container) {
         const div = document.createElement('div');
         div.className = 'list-group';
         lobbies.forEach(lobby => {
-            var _a;
-            const competitors = ((_a = lobby.participants) === null || _a === void 0 ? void 0 : _a.filter(p => p.role === 'host' || p.role === 'opponent')) || [];
+            const competitors = lobby.participants?.filter(p => p.role === 'host' || p.role === 'opponent') || [];
             const isOpen = competitors.length < 2;
             const item = document.createElement('div');
             item.className = `list-group-item ${isOpen ? 'list-group-item-action' : 'list-group-item-secondary'}`;
