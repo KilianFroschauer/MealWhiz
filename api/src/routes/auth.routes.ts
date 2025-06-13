@@ -297,7 +297,7 @@ authRouter.get("/validate-token", isAuthenticated, authController.validateToken)
  * /users/favorites:
  *   get:
  *     tags:
- *       - user
+ *       [Authentication]
  *     summary: Get user's favorite recipes
  *     description: Get all recipes that the current user has favorited
  *     security:

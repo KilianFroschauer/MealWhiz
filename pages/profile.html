@@ -191,7 +191,7 @@
 
                             <!-- Favorites Card -->
                             <div class="col-md-4">
-                                <div class="card h-100 profile-card" onclick="window.location.href='#'">
+                                <div class="card h-100 profile-card" onclick="scrollToFavorites()">
                                     <div class="card-body text-center p-4">
                                         <div class="mb-4">
                                             <i class="fas fa-heart fa-4x text-danger"></i>
@@ -265,7 +265,7 @@
     <!-- My Favorite Recipes Section Start -->
     <div class="container-fluid py-3">
         <div class="container">
-            <h2 class="mb-4">My Favorite Recipes</h2>
+            <h2 id="my-favorites-section" class="mb-4">My Favorite Recipes</h2>
             <div id="favorite-recipes" class="row g-4">
                 <!-- Favorites will be loaded here -->
                 <div class="text-center py-5">
@@ -474,6 +474,11 @@
             document.getElementById('settings-section').style.display = 'block';
             // Smooth scroll to settings section
             document.getElementById('settings-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function scrollToFavorites() {
+            // Smooth scroll to favorites section
+            document.getElementById('my-favorites-section').scrollIntoView({ behavior: 'smooth' });
         }
 
         function closeSettings() {
