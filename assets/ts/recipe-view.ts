@@ -66,7 +66,7 @@ async function isUserLoggedIn(): Promise<boolean> {
 
     // Check if token is valid by making a lightweight API call
     try {
-        const apiBase: string = "http://mealwhiz.at:3000";
+        const apiBase: string = "http://localhost:3000";
         const response = await fetch(`${apiBase}/validate-token`, {
             method: "GET",
             headers: {
@@ -172,7 +172,7 @@ async function submitRating(recipeId: number, rating: number, stars: NodeListOf<
     try {
         const token = localStorage.getItem("accessToken");
 
-        const response = await fetch(`http://mealwhiz.at/recipes/${recipeId}/rate`, {
+        const response = await fetch(`http://localhost/recipes/${recipeId}/rate`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -218,7 +218,7 @@ async function loadRecipe() {
     }
     try {
         // Fetch recipe data from the API.
-        const res = await fetch(`http://mealwhiz.at/recipes/${id}`);
+        const res = await fetch(`http://localhost/recipes/${id}`);
         if (!res.ok) {
             // Handle cases where the recipe is not found (e.g., 404 error).
             showError("Recipe not found.");
@@ -248,7 +248,7 @@ async function checkFavoriteStatus(recipeId: number): Promise<boolean> {
         const token = localStorage.getItem("accessToken");
         if (!token) return false;
 
-        const response = await fetch(`http://mealwhiz.at/recipes/${recipeId}/favorite`, {
+        const response = await fetch(`http://localhost/recipes/${recipeId}/favorite`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -275,7 +275,7 @@ async function toggleFavorite(recipeId: number, button: HTMLElement): Promise<vo
         // Disable button during API call
         button.setAttribute("disabled", "true");
 
-        const response = await fetch(`http://mealwhiz.at/recipes/${recipeId}/favorite`, {
+        const response = await fetch(`http://localhost/recipes/${recipeId}/favorite`, {
             method: "POST",
             headers: {
                 Authorization: `Bearer ${token}`,

@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     try {
         // Fetch recipes from the API. Here, it's fetching recipes with a minimum rating of 4.5.
         // The API might also support parameters like `?featured=true`.
-        const res = await fetch("http://mealwhiz.at:3000/recipes?minRating=4.5"); // Fetch a bit more to ensure variety if some images fail
+        const res = await fetch("http://localhost:3000/recipes?minRating=4.5"); // Fetch a bit more to ensure variety if some images fail
         if (!res.ok) {
             throw new Error(`Failed to fetch recipes: ${res.statusText}`);
         }

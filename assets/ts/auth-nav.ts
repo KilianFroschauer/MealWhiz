@@ -58,7 +58,7 @@ async function validateToken(): Promise<boolean> {
 
     // Check if token is valid by making a lightweight API call
     try {
-        const apiBase: string = "http://mealwhiz.at:3000";
+        const apiBase: string = "http://localhost:3000";
         const response = await fetch(`${apiBase}/validate-token`, {
             method: "GET",
             headers: {
@@ -136,7 +136,7 @@ async function updateCartCount(): Promise<void> {
     if (!token) return;
 
     try {
-        const apiBase: string = "http://mealwhiz.at:3000";
+        const apiBase: string = "http://localhost:3000";
         const res: Response = await fetch(`${apiBase}/cart`, {
             method: "GET",
             headers: {

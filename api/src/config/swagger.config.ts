@@ -12,7 +12,7 @@ const swaggerOptions = {
         },
         servers: [
             {
-                url: process.env.API_URL || "http://mealwhiz.at:3000",
+                url: process.env.API_URL || "http://localhost:3000",
             },
         ],
         tags: [

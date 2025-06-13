@@ -13,7 +13,8 @@ function getRecipeIdFromUrl() {
 // Shows or hides a loading spinner element.
 function setLoading(loading) {
     const spinner = document.getElementById("spinner");
-    if (spinner) spinner.style.display = loading ? "flex" : "none"; // 'flex' for centered spinner.
+    if (spinner)
+        spinner.style.display = loading ? "flex" : "none"; // 'flex' for centered spinner.
 }
 // Displays an error message within the main content area.
 function showError(message) {
@@ -38,7 +39,7 @@ async function isUserLoggedIn() {
     }
     // Check if token is valid by making a lightweight API call
     try {
-        const apiBase = "http://mealwhiz.at:3000";
+        const apiBase = "http://localhost:3000";
         const response = await fetch(`${apiBase}/validate-token`, {
             method: "GET",
             headers: {
@@ -57,7 +58,8 @@ async function isUserLoggedIn() {
         }
         // For other errors, assume token might be valid
         return true;
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Error validating token:", error);
         // If network error, assume token is valid (to prevent logout when offline)
         return true;
@@ -69,9 +71,8 @@ async function renderRatingComponent(recipe, container) {
     ratingContainer.className = "my-4 border-top pt-4";
     ratingContainer.innerHTML = `
         <h5 class="fw-bold mb-3">Rate this recipe</h5>
-        ${
-            (await isUserLoggedIn())
-                ? `
+        ${(await isUserLoggedIn())
+        ? `
             <div class="d-flex align-items-center recipe-rating-component">
                 <div class="star-rating">
                     <i class="far fa-star" data-rating="1"></i>
@@ -83,13 +84,12 @@ async function renderRatingComponent(recipe, container) {
                 <span class="ms-3 rating-message">Click to rate</span>
             </div>
         `
-                : `
+        : `
             <div class="alert alert-info">
                 <i class="fas fa-info-circle me-2"></i>
                 <a href="login.html" class="alert-link">Log in</a> to rate this recipe
             </div>
-        `
-        }
+        `}
     `;
     container.appendChild(ratingContainer);
     // Only add event listeners if user is logged in
@@ -101,13 +101,15 @@ async function renderRatingComponent(recipe, container) {
             star.addEventListener("mouseover", () => {
                 const rating = parseInt(star.getAttribute("data-rating") || "0");
                 updateStarsDisplay(stars, rating, "hover");
-                if (ratingMessage) ratingMessage.textContent = `${rating} star${rating !== 1 ? "s" : ""}`;
+                if (ratingMessage)
+                    ratingMessage.textContent = `${rating} star${rating !== 1 ? "s" : ""}`;
             });
         });
         // Reset stars when not hovering
         ratingContainer.querySelector(".star-rating")?.addEventListener("mouseleave", () => {
             updateStarsDisplay(stars, 0, "reset");
-            if (ratingMessage) ratingMessage.textContent = "Click to rate";
+            if (ratingMessage)
+                ratingMessage.textContent = "Click to rate";
         });
         // Handle click to submit rating
         stars.forEach((star) => {
@@ -123,7 +125,8 @@ function updateStarsDisplay(stars, rating, mode) {
     stars.forEach((star, index) => {
         if (mode === "reset") {
             star.className = "far fa-star";
-        } else {
+        }
+        else {
             star.className = index < rating ? "fas fa-star text-warning" : "far fa-star";
         }
     });
@@ -132,7 +135,7 @@ function updateStarsDisplay(stars, rating, mode) {
 async function submitRating(recipeId, rating, stars, messageElement) {
     try {
         const token = localStorage.getItem("accessToken");
-        const response = await fetch(`http://mealwhiz.at:3000/recipes/${recipeId}/rate`, {
+        const response = await fetch(`http://localhost/recipes/${recipeId}/rate`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -155,7 +158,8 @@ async function submitRating(recipeId, rating, stars, messageElement) {
         }
         // Show toast notification
         showToast(`You rated this recipe ${rating} star${rating !== 1 ? "s" : ""}`, false);
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Error submitting rating:", error);
         messageElement.textContent = "Failed to submit rating. Please try again.";
         messageElement.className = "ms-3 rating-message text-danger";
@@ -172,7 +176,7 @@ async function loadRecipe() {
     }
     try {
         // Fetch recipe data from the API.
-        const res = await fetch(`http://mealwhiz.at:3000/recipes/${id}`);
+        const res = await fetch(`http://localhost/recipes/${id}`);
         if (!res.ok) {
             // Handle cases where the recipe is not found (e.g., 404 error).
             showError("Recipe not found.");
@@ -184,7 +188,8 @@ async function loadRecipe() {
             recipe.isFavorite = await checkFavoriteStatus(id);
         }
         renderRecipe(recipe); // Render the fetched recipe.
-    } catch (e) {
+    }
+    catch (e) {
         // Handle generic fetch errors (e.g., network issues).
         showError("Failed to load recipe.");
         console.error("Error loading recipe:", e);
@@ -196,17 +201,20 @@ document.addEventListener("DOMContentLoaded", loadRecipe);
 async function checkFavoriteStatus(recipeId) {
     try {
         const token = localStorage.getItem("accessToken");
-        if (!token) return false;
-        const response = await fetch(`http://mealwhiz.at:3000/recipes/${recipeId}/favorite`, {
+        if (!token)
+            return false;
+        const response = await fetch(`http://localhost/recipes/${recipeId}/favorite`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
             },
         });
-        if (!response.ok) return false;
+        if (!response.ok)
+            return false;
         const data = await response.json();
         return data.isFavorite === true;
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Error checking favorite status:", error);
         return false;
     }
@@ -220,7 +228,7 @@ async function toggleFavorite(recipeId, button) {
         }
         // Disable button during API call
         button.setAttribute("disabled", "true");
-        const response = await fetch(`http://mealwhiz.at:3000/recipes/${recipeId}/favorite`, {
+        const response = await fetch(`http://localhost/recipes/${recipeId}/favorite`, {
             method: "POST",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -232,21 +240,25 @@ async function toggleFavorite(recipeId, button) {
         const result = await response.json();
         // Update button appearance based on the new status
         updateFavoriteButton(button, result.isFavorite);
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Error toggling favorite:", error);
         showToast("Error updating favorite status", true);
-    } finally {
+    }
+    finally {
         // Re-enable button
         button.removeAttribute("disabled");
     }
 }
 function updateFavoriteButton(button, isFavorite) {
     const icon = button.querySelector("i");
-    if (!icon) return;
+    if (!icon)
+        return;
     if (isFavorite) {
         icon.className = "fas fa-heart";
         button.setAttribute("title", "Remove from favorites");
-    } else {
+    }
+    else {
         icon.className = "far fa-heart";
         button.setAttribute("title", "Add to favorites");
     }
@@ -303,28 +315,22 @@ function showToast(message, isError = false) {
 function renderRecipe(recipe) {
     setLoading(false); // Hide loader.
     const container = document.getElementById("recipe-dynamic-content");
-    if (!container) return; // Exit if the main container isn't found.
+    if (!container)
+        return; // Exit if the main container isn't found.
     // Prepare the list of ingredients with their amounts.
     let ingredientsList = "";
-    if (
-        recipe.ingredients &&
+    if (recipe.ingredients &&
         recipe.ingredientsAmount &&
-        recipe.ingredients.length === recipe.ingredientsAmount.length
-    ) {
+        recipe.ingredients.length === recipe.ingredientsAmount.length) {
         // If amounts are available and match the number of ingredients.
         ingredientsList = recipe.ingredients
-            .map(
-                (ing, i) =>
-                    `<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">${ing}<span class="badge bg-light text-dark">${recipe.ingredientsAmount[i]}</span></li>`
-            )
+            .map((ing, i) => `<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">${ing}<span class="badge bg-light text-dark">${recipe.ingredientsAmount[i]}</span></li>`)
             .join("");
-    } else {
+    }
+    else {
         // Fallback if amounts are missing or mismatched.
         ingredientsList = recipe.ingredients
-            .map(
-                (ing) =>
-                    `<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">${ing}</li>`
-            )
+            .map((ing) => `<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">${ing}</li>`)
             .join("");
     }
     // Process recipe instructions: convert basic markdown to HTML.
@@ -333,7 +339,8 @@ function renderRecipe(recipe) {
         instructionsHtml = recipe.instructions
             .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>") // Replace **bold** with <b>bold</b>.
             .replace(/\r?\n/g, "<br>"); // Replace newlines with <br> tags.
-    } else {
+    }
+    else {
         instructionsHtml = '<div class="alert alert-info">Instructions not available.</div>';
     }
     // Construct the path for the recipe-specific image.
@@ -347,21 +354,15 @@ function renderRecipe(recipe) {
                 <div class="row g-4">
                     <div class="col-lg-6">
                         <div class="border rounded">
-                            <img src="${recipeImgPath}" class="img-fluid rounded" alt="${
-        recipe.name
-    }" onerror="this.onerror=null; this.src='../assets/img/Food_Example_01-unsplash.jpg';"> <!-- Fallback image -->
+                            <img src="${recipeImgPath}" class="img-fluid rounded" alt="${recipe.name}" onerror="this.onerror=null; this.src='../assets/img/Food_Example_01-unsplash.jpg';"> <!-- Fallback image -->
                         </div>
                     </div>
                     <div class="col-lg-6">
                         <div class="recipe-header mb-4">
                         <h4 class="recipe-title fw-bold mb-3">${recipe.name}</h4>
-                        <p class="mb-3">Category: <span class="badge bg-secondary">${
-                            recipe.mealTimes.join(", ") || "N/A"
-                        }</span></p>
+                        <p class="mb-3">Category: <span class="badge bg-secondary">${recipe.mealTimes.join(", ") || "N/A"}</span></p>
                         <div class="d-flex mb-3">
-                            <span class="badge badge-difficulty-${recipe.difficulty.toLowerCase()} me-2">${
-        recipe.difficulty.charAt(0).toUpperCase() + recipe.difficulty.slice(1)
-    }</span>
+                            <span class="badge badge-difficulty-${recipe.difficulty.toLowerCase()} me-2">${recipe.difficulty.charAt(0).toUpperCase() + recipe.difficulty.slice(1)}</span>
                             <span class="text-dark ms-2"><i class="far fa-clock me-1"></i>${recipe.time} min</span>
                         </div>
                         <div class="d-flex mb-4">
@@ -371,23 +372,19 @@ function renderRecipe(recipe) {
                         <p class="mb-4">${recipe.description || ""}</p> 
                         <div class="mb-4">
                             <h5 class="fw-bold mb-2">Dietary Information:</h5>
-                            ${
-                                recipe.dietaryPreferences.length > 0
-                                    ? recipe.dietaryPreferences
-                                          .map((dp) => `<span class="badge bg-success me-2">${dp}</span>`)
-                                          .join("")
-                                    : '<span class="text-muted">None</span>'
-                            }
+                            ${recipe.dietaryPreferences.length > 0
+        ? recipe.dietaryPreferences
+            .map((dp) => `<span class="badge bg-success me-2">${dp}</span>`)
+            .join("")
+        : '<span class="text-muted">None</span>'}
                         </div>
                         <div class="mb-4">
                             <h5 class="fw-bold mb-2">Contains:</h5>
-                            ${
-                                recipe.allergens.length > 0
-                                    ? recipe.allergens
-                                          .map((a) => `<span class="badge bg-danger me-2">${a}</span>`)
-                                          .join("")
-                                    : '<span class="text-muted">None</span>'
-                            }
+                            ${recipe.allergens.length > 0
+        ? recipe.allergens
+            .map((a) => `<span class="badge bg-danger me-2">${a}</span>`)
+            .join("")
+        : '<span class="text-muted">None</span>'}
                         </div>
                         <div class="mb-4">
                             <h5 class="fw-bold mb-2">Nutrition (per serving):</h5>
@@ -396,22 +393,18 @@ function renderRecipe(recipe) {
                             </div>
                             <div class="d-flex flex-wrap">
                                 <span class="me-4"><i class="fas fa-fire me-1"></i> ${recipe.calories} calories</span>
-                                <span class="me-4"><i class="fas fa-drumstick-bite me-1"></i> ${
-                                    recipe.proteins
-                                }g protein</span>
+                                <span class="me-4"><i class="fas fa-drumstick-bite me-1"></i> ${recipe.proteins}g protein</span>
                                 <span class="me-4"><i class="fas fa-bread-slice me-1"></i> ${recipe.carbs}g carbs</span>
                                 <span><i class="fas fa-cheese me-1"></i> ${recipe.fat}g fat</span>
                             </div>
                         </div>
                         <div class="mb-4">
                             <h5 class="fw-bold mb-2">Tags:</h5>
-                            ${
-                                recipe.tags && recipe.tags.length > 0
-                                    ? recipe.tags
-                                          .map((tag) => `<span class="badge bg-info me-2">${tag}</span>`)
-                                          .join("")
-                                    : '<span class="text-muted">None</span>'
-                            }
+                            ${recipe.tags && recipe.tags.length > 0
+        ? recipe.tags
+            .map((tag) => `<span class="badge bg-info me-2">${tag}</span>`)
+            .join("")
+        : '<span class="text-muted">None</span>'}
                         </div>
                         </div>
 

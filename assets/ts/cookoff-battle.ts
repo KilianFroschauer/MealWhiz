@@ -57,7 +57,7 @@ let isVideoConferenceJoined = false;
 let currentEventDetails: any = null;
 
 // Base URL for the backend API. Should be configurable in a real application.
-const API_BASE_URL = "http://mealwhiz.at:3000";
+const API_BASE_URL = "http://localhost:3000";
 // URL of the Jitsi server.
 const JITSI_SERVER_URL = "https://meet.mealwhiz.at";
 

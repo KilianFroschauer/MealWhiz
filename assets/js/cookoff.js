@@ -8,7 +8,7 @@
 // --- AUTH HELPER FUNCTIONS ---
 async function getUserInfoFromToken(token) {
     try {
-        const response = await fetch("http://mealwhiz.at:3000/validate-token", {
+        const response = await fetch("http://localhost:3000/validate-token", {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -22,7 +22,8 @@ async function getUserInfoFromToken(token) {
             };
         }
         return null;
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Error validating token:", error);
         return null;
     }
@@ -39,7 +40,8 @@ function showBootstrapModal(modalElement) {
             modalInstance = new bootstrap.Modal(modalElement);
         }
         modalInstance.show();
-    } catch (e) {
+    }
+    catch (e) {
         console.warn("Error showing Bootstrap modal:", e, modalElement.id);
     }
 }
@@ -53,7 +55,8 @@ function hideBootstrapModal(modalElement) {
         if (modalInstance) {
             modalInstance.hide();
         }
-    } catch (e) {
+    }
+    catch (e) {
         console.warn("Error hiding Bootstrap modal:", e, modalElement.id);
     }
 }
@@ -95,9 +98,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             // Hide the create modal
             const createCasualModal = document.getElementById("createCasualLobbyModal");
-            if (createCasualModal) hideBootstrapModal(createCasualModal);
+            if (createCasualModal)
+                hideBootstrapModal(createCasualModal);
             // Stream-URL wird jetzt vom Backend generiert
-            const response = await fetch("http://mealwhiz.at:3000/events", {
+            const response = await fetch("http://localhost:3000/events", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -116,10 +120,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const eventDetails = await response.json();
             const { id: eventId, streamUrl } = eventDetails;
             hideBootstrapModal(findingModalElement); // Pass username to Battle page for Jitsi
-            window.location.href = `CookOff-Battle.html?mode=casual&eventId=${eventId}&streamUrl=${encodeURIComponent(
-                streamUrl
-            )}&username=${encodeURIComponent(userInfo.username)}`;
-        } catch (error) {
+            window.location.href = `CookOff-Battle.html?mode=casual&eventId=${eventId}&streamUrl=${encodeURIComponent(streamUrl)}&username=${encodeURIComponent(userInfo.username)}`;
+        }
+        catch (error) {
             console.error("Error creating casual lobby:", error);
             hideBootstrapModal(findingModalElement);
             alert("Could not create lobby. Please try again.");
@@ -144,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.location.href = "login.html";
                 return;
             } // Stream-URL wird jetzt vom Backend generiert
-            const response = await fetch("http://mealwhiz.at:3000/events", {
+            const response = await fetch("http://localhost:3000/events", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -163,10 +166,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const { id: eventId, streamUrl } = eventDetails;
             hideBootstrapModal(findingModalElement);
             // Pass username to Battle page for Jitsi
-            window.location.href = `CookOff-Battle.html?mode=casual&eventId=${eventId}&streamUrl=${encodeURIComponent(
-                streamUrl
-            )}&username=${encodeURIComponent(userInfo.username)}`;
-        } catch (error) {
+            window.location.href = `CookOff-Battle.html?mode=casual&eventId=${eventId}&streamUrl=${encodeURIComponent(streamUrl)}&username=${encodeURIComponent(userInfo.username)}`;
+        }
+        catch (error) {
             console.error("Error creating lobby:", error);
             hideBootstrapModal(findingModalElement);
             alert("Could not create lobby. Please try again.");
@@ -204,10 +206,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
                 hideBootstrapModal(findingModalElement);
                 // Pass username to Battle page for Jitsi
-                window.location.href = `CookOff-Battle.html?mode=casual&eventId=${lobbyId}&streamUrl=${encodeURIComponent(
-                    streamUrl
-                )}&username=${encodeURIComponent(userInfo.username)}`;
-            } catch (error) {
+                window.location.href = `CookOff-Battle.html?mode=casual&eventId=${lobbyId}&streamUrl=${encodeURIComponent(streamUrl)}&username=${encodeURIComponent(userInfo.username)}`;
+            }
+            catch (error) {
                 console.error("Error joining lobby:", error);
                 hideBootstrapModal(findingModalElement);
                 alert(`Could not join lobby "${lobbyName}". Please try again.`);
@@ -229,7 +230,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     bsModal._config.backdrop = false; // Temporarily disable backdrop for the casual modal
                     bsModal.hide();
                 }
-            } catch (e) {
+            }
+            catch (e) {
                 console.warn("Error accessing casualModal instance:", e);
                 // Fallback to hideBootstrapModal
                 hideBootstrapModal(casualModal);
@@ -254,7 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             // Add a cache-busting parameter (timestamp) to the URL
             const timestamp = new Date().getTime();
-            const response = await fetch(`http://mealwhiz.at:3000/events?mode=casual&status=open&t=${timestamp}`); // Adjust API endpoint if needed
+            const response = await fetch(`http://localhost:3000/events?mode=casual&status=open&t=${timestamp}`); // Adjust API endpoint if needed
             if (!response.ok) {
                 throw new Error(`Failed to fetch lobbies: ${response.statusText} (${response.status})`);
             }
@@ -284,7 +286,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 ul.appendChild(li);
             });
             container.appendChild(ul);
-        } catch (error) {
+        }
+        catch (error) {
             console.error("Error fetching public lobbies:", error);
             container.innerHTML =
                 '<p class="text-center text-danger">Could not load public lobbies. Please try again later.</p>';
@@ -328,11 +331,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (modalBody) {
                     setupLobbyInterface(modalBody);
                     showBootstrapModal(casualLobbyModalElement);
-                } else {
+                }
+                else {
                     console.error("Could not find modal body in #casualLobbyModal");
                     alert("Error setting up lobby interface: Modal body not found.");
                 }
-            } else {
+            }
+            else {
                 console.error("#casualLobbyModal not found.");
                 alert("Error accessing casual mode features: Modal element not found.");
             }
@@ -359,7 +364,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const challengeType = challengeTypeEl.value;
                 const difficultyLevel = difficultyLevelEl.value;
                 try {
-                    const response = await fetch("http://mealwhiz.at:3000/events", {
+                    const response = await fetch("http://localhost:3000/events", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -376,20 +381,24 @@ document.addEventListener("DOMContentLoaded", () => {
                     const eventDetails = await response.json();
                     const { id: eventId, streamUrl } = eventDetails;
                     hideBootstrapModal(findingOpponentElement);
-                    window.location.href = `CookOff-Battle.html?mode=competitive&eventId=${eventId}&streamUrl=${encodeURIComponent(
-                        streamUrl
-                    )}`;
-                } catch (error) {
+                    window.location.href = `CookOff-Battle.html?mode=competitive&eventId=${eventId}&streamUrl=${encodeURIComponent(streamUrl)}`;
+                }
+                catch (error) {
                     console.error("Error starting competitive cookoff:", error);
                     hideBootstrapModal(findingOpponentElement);
                     alert("Could not start competitive cookoff. Please try again.");
                 }
-            } else {
+            }
+            else {
                 let errorMsg = "Could not start competitive cookoff. Required elements are missing: ";
-                if (!competitiveModalElement) errorMsg += "Competitive Modal, ";
-                if (!findingOpponentElement) errorMsg += "Finding Opponent Modal, ";
-                if (!challengeTypeEl) errorMsg += "Challenge Type Select, ";
-                if (!difficultyLevelEl) errorMsg += "Difficulty Level Select, ";
+                if (!competitiveModalElement)
+                    errorMsg += "Competitive Modal, ";
+                if (!findingOpponentElement)
+                    errorMsg += "Finding Opponent Modal, ";
+                if (!challengeTypeEl)
+                    errorMsg += "Challenge Type Select, ";
+                if (!difficultyLevelEl)
+                    errorMsg += "Difficulty Level Select, ";
                 console.error(errorMsg.slice(0, -2));
                 alert(errorMsg.slice(0, -2) + ".");
                 if (findingOpponentElement && findingOpponentElement.classList.contains("show")) {
@@ -418,7 +427,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (createCompetitiveLobbyBtn) {
         createCompetitiveLobbyBtn.addEventListener("click", () => {
             const createModal = document.getElementById("createCompetitiveLobbyModal");
-            if (createModal) showBootstrapModal(createModal);
+            if (createModal)
+                showBootstrapModal(createModal);
         });
     }
     const competitiveLobbyForm = document.getElementById("competitiveLobbyForm");
@@ -484,7 +494,7 @@ async function handleCreateCompetitiveLobbyClick() {
             window.location.href = "login.html";
             return;
         } // Stream-URL wird jetzt vom Backend generiert
-        const response = await fetch("http://mealwhiz.at:3000/events", {
+        const response = await fetch("http://localhost:3000/events", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -504,22 +514,22 @@ async function handleCreateCompetitiveLobbyClick() {
         // Hide modals and redirect
         const createModal = document.getElementById("createCompetitiveLobbyModal");
         const competitiveModal = document.getElementById("competitiveModeModal");
-        if (createModal) hideBootstrapModal(createModal);
-        if (competitiveModal) hideBootstrapModal(competitiveModal);
+        if (createModal)
+            hideBootstrapModal(createModal);
+        if (competitiveModal)
+            hideBootstrapModal(competitiveModal);
         // Redirect to battle page with competitive mode and duration
-        window.location.href = `CookOff-Battle.html?mode=competitive&eventId=${eventId}&streamUrl=${encodeURIComponent(
-            streamUrl
-        )}&username=${encodeURIComponent(userInfo.username)}&duration=${duration}&description=${encodeURIComponent(
-            description
-        )}`;
-    } catch (error) {
+        window.location.href = `CookOff-Battle.html?mode=competitive&eventId=${eventId}&streamUrl=${encodeURIComponent(streamUrl)}&username=${encodeURIComponent(userInfo.username)}&duration=${duration}&description=${encodeURIComponent(description)}`;
+    }
+    catch (error) {
         console.error("Error creating competitive lobby:", error);
         alert("Could not create competitive lobby. Please try again.");
     }
 }
 function setupCompetitiveLobbies() {
     const competitiveLobbiesList = document.getElementById("competitiveLobbiesList");
-    if (!competitiveLobbiesList) return;
+    if (!competitiveLobbiesList)
+        return;
     // Fetch competitive lobbies
     fetchCompetitiveLobbies(competitiveLobbiesList);
 }
@@ -527,7 +537,7 @@ async function fetchCompetitiveLobbies(container) {
     container.innerHTML = '<p class="text-center">Loading competitive lobbies...</p>';
     try {
         const timestamp = new Date().getTime();
-        const response = await fetch(`http://mealwhiz.at:3000/events?mode=competitive&status=pending&t=${timestamp}`);
+        const response = await fetch(`http://localhost:3000/events?mode=competitive&status=pending&t=${timestamp}`);
         if (!response.ok) {
             throw new Error(`Failed to fetch competitive lobbies: ${response.statusText}`);
         }
@@ -550,31 +560,18 @@ async function fetchCompetitiveLobbies(container) {
                             <small>Host: ${lobby.hostName || "Unknown"}</small>
                         </div>
                         <div>
-                            ${
-                                isOpen
-                                    ? `<button class="btn btn-sm btn-danger me-2" onclick="joinCompetitiveLobby('${
-                                          lobby.id
-                                      }', '${lobby.challengeType || "CookOff"}', '${
-                                          lobby.streamUrl
-                                      }', 'competitor')">Join as Competitor</button>
-                                 <button class="btn btn-sm btn-outline-primary" onclick="joinCompetitiveLobby('${
-                                     lobby.id
-                                 }', '${lobby.challengeType || "CookOff"}', '${
-                                          lobby.streamUrl
-                                      }', 'viewer')">Join as Viewer</button>`
-                                    : `<button class="btn btn-sm btn-outline-primary" onclick="joinCompetitiveLobby('${
-                                          lobby.id
-                                      }', '${lobby.challengeType || "CookOff"}', '${
-                                          lobby.streamUrl
-                                      }', 'viewer')">Watch</button>`
-                            }
+                            ${isOpen
+                ? `<button class="btn btn-sm btn-danger me-2" onclick="joinCompetitiveLobby('${lobby.id}', '${lobby.challengeType || "CookOff"}', '${lobby.streamUrl}', 'competitor')">Join as Competitor</button>
+                                 <button class="btn btn-sm btn-outline-primary" onclick="joinCompetitiveLobby('${lobby.id}', '${lobby.challengeType || "CookOff"}', '${lobby.streamUrl}', 'viewer')">Join as Viewer</button>`
+                : `<button class="btn btn-sm btn-outline-primary" onclick="joinCompetitiveLobby('${lobby.id}', '${lobby.challengeType || "CookOff"}', '${lobby.streamUrl}', 'viewer')">Watch</button>`}
                         </div>
                     </div>
                 `;
             div.appendChild(item);
         });
         container.appendChild(div);
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Error fetching competitive lobbies:", error);
         container.innerHTML = '<p class="text-center text-danger">Could not load competitive lobbies.</p>';
     }
@@ -596,12 +593,12 @@ window.joinCompetitiveLobby = async function (lobbyId, lobbyName, streamUrl, rol
         }
         // Hide competitive modal
         const competitiveModal = document.getElementById("competitiveModeModal");
-        if (competitiveModal) hideBootstrapModal(competitiveModal);
+        if (competitiveModal)
+            hideBootstrapModal(competitiveModal);
         // Redirect with role information
-        window.location.href = `CookOff-Battle.html?mode=competitive&eventId=${lobbyId}&streamUrl=${encodeURIComponent(
-            streamUrl
-        )}&username=${encodeURIComponent(userInfo.username)}&role=${role}`;
-    } catch (error) {
+        window.location.href = `CookOff-Battle.html?mode=competitive&eventId=${lobbyId}&streamUrl=${encodeURIComponent(streamUrl)}&username=${encodeURIComponent(userInfo.username)}&role=${role}`;
+    }
+    catch (error) {
         console.error("Error joining competitive lobby:", error);
         alert("Could not join lobby. Please try again.");
     }

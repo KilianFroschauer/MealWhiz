@@ -19,7 +19,7 @@ declare var bootstrap: any;
 
 async function getUserInfoFromToken(token: string): Promise<{ userId: number; username: string } | null> {
     try {
-        const response = await fetch("http://mealwhiz.at:3000/validate-token", {
+        const response = await fetch("http://localhost:3000/validate-token", {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", (): void => {
             if (createCasualModal) hideBootstrapModal(createCasualModal);
 
             // Stream-URL wird jetzt vom Backend generiert
-            const response = await fetch("http://mealwhiz.at:3000/events", {
+            const response = await fetch("http://localhost:3000/events", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", (): void => {
                 window.location.href = "login.html";
                 return;
             } // Stream-URL wird jetzt vom Backend generiert
-            const response = await fetch("http://mealwhiz.at:3000/events", {
+            const response = await fetch("http://localhost:3000/events", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -299,7 +299,7 @@ document.addEventListener("DOMContentLoaded", (): void => {
         try {
             // Add a cache-busting parameter (timestamp) to the URL
             const timestamp = new Date().getTime();
-            const response = await fetch(`http://mealwhiz.at:3000/events?mode=casual&status=open&t=${timestamp}`); // Adjust API endpoint if needed
+            const response = await fetch(`http://localhost:3000/events?mode=casual&status=open&t=${timestamp}`); // Adjust API endpoint if needed
             if (!response.ok) {
                 throw new Error(`Failed to fetch lobbies: ${response.statusText} (${response.status})`);
             }
@@ -422,7 +422,7 @@ document.addEventListener("DOMContentLoaded", (): void => {
                 const difficultyLevel = difficultyLevelEl.value;
 
                 try {
-                    const response = await fetch("http://mealwhiz.at:3000/events", {
+                    const response = await fetch("http://localhost:3000/events", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -564,7 +564,7 @@ async function handleCreateCompetitiveLobbyClick(): Promise<void> {
             window.location.href = "login.html";
             return;
         } // Stream-URL wird jetzt vom Backend generiert
-        const response = await fetch("http://mealwhiz.at:3000/events", {
+        const response = await fetch("http://localhost:3000/events", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -613,7 +613,7 @@ async function fetchCompetitiveLobbies(container: HTMLElement): Promise<void> {
     container.innerHTML = '<p class="text-center">Loading competitive lobbies...</p>';
     try {
         const timestamp = new Date().getTime();
-        const response = await fetch(`http://mealwhiz.at:3000/events?mode=competitive&status=pending&t=${timestamp}`);
+        const response = await fetch(`http://localhost:3000/events?mode=competitive&status=pending&t=${timestamp}`);
         if (!response.ok) {
             throw new Error(`Failed to fetch competitive lobbies: ${response.statusText}`);
         }

@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     try {
         // Fetch recipes from the API. Here, it's fetching recipes with a minimum rating of 4.5.
         // The API might also support parameters like `?featured=true`.
-        const res = await fetch("http://mealwhiz.at:3000/recipes?minRating=4.5"); // Fetch a bit more to ensure variety if some images fail
+        const res = await fetch("http://localhost:3000/recipes?minRating=4.5"); // Fetch a bit more to ensure variety if some images fail
         if (!res.ok) {
             throw new Error(`Failed to fetch recipes: ${res.statusText}`);
         }
@@ -31,25 +31,19 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
         // Generate HTML for each carousel item.
         carouselInner.innerHTML = recipes
-            .map(
-                (r, i) => `
-            <div class="carousel-item${
-                i === 0 ? " active" : ""
-            } rounded" style="position:relative;height:350px;width:100%;background:#f0f0f0;overflow:hidden;">
+            .map((r, i) => `
+            <div class="carousel-item${i === 0 ? " active" : ""} rounded" style="position:relative;height:350px;width:100%;background:#f0f0f0;overflow:hidden;">
                 <img src="assets/img/recipe_imgs/${r.id}.jpg" 
                      class="img-fluid"
                      alt="${r.name}"
                      style="object-fit:cover;width:100%;height:100%;display:block;margin:auto;"
                      onerror="this.onerror=null; this.src='assets/img/Food-banner-unsplash.jpg'; this.alt='Fallback Recipe Image';"> {/* Fallback image on error */}
-                <a href="pages/recipe-view.html?id=${
-                    r.id
-                }" class="btn px-4 py-2 text-white rounded d-flex justify-content-center align-items-center text-center" 
+                <a href="pages/recipe-view.html?id=${r.id}" class="btn px-4 py-2 text-white rounded d-flex justify-content-center align-items-center text-center" 
                    style="background:rgba(0,0,0,0.6);position:absolute;bottom:20px;left:50%;transform:translateX(-50%);min-width:180px;max-width:90%;height:auto;min-height:50px;line-height:1.3;padding:10px 15px;font-weight:500;">
                     ${r.name}
                 </a>
             </div>
-        `
-            )
+        `)
             .join("");
         // Re-initialize the Bootstrap carousel if Bootstrap's JS is loaded.
         // This is necessary because we've dynamically added items.
@@ -63,7 +57,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
             new window.bootstrap.Carousel(carouselElement);
         }
-    } catch (e) {
+    }
+    catch (e) {
         console.error("Error loading recipes of the day:", e);
         // Display an error message in the carousel container.
         carouselInner.innerHTML =

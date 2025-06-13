@@ -260,7 +260,7 @@ let fetchAndRenderRecipesWithFilters = async function (filters?: Record<string, 
     setLoadingState(true); // Show skeleton loaders.
     currentPage = 1; // Reset to first page when filters change.
     try {
-        let url = "http://mealwhiz.at:3000/recipes";
+        let url = "http://localhost:3000/recipes";
         if (filters && Object.keys(filters).length > 0) {
             const queryString = buildRecipeQueryString(filters);
             if (queryString) url += "?" + queryString;
@@ -285,8 +285,8 @@ let fetchAndRenderRecipes = async function (query?: string): Promise<void> {
     try {
         let url =
             query && query.trim() !== ""
-                ? `http://mealwhiz.at:3000/recipes/search?query=${encodeURIComponent(query)}`
-                : "http://mealwhiz.at:3000/recipes"; // Default to all recipes if no query.
+                ? `http://localhost:3000/recipes/search?query=${encodeURIComponent(query)}`
+                : "http://localhost:3000/recipes"; // Default to all recipes if no query.
         const res = await fetch(url);
         if (!res.ok) throw new Error(`Failed to fetch recipes: ${res.statusText}`);
         const recipes: RecipeCardData[] = await res.json();
@@ -468,7 +468,7 @@ async function fetchAndRenderFeaturedRecipes(): Promise<void> {
     container.innerHTML = '<div class="text-muted small p-2">Loading featured...</div>';
     try {
         // Example: Fetch recipes with a minimum rating of 4.5.
-        const res = await fetch("http://mealwhiz.at:3000/recipes?minRating=4.5"); // Add limit
+        const res = await fetch("http://localhost:3000/recipes?minRating=4.5"); // Add limit
         if (!res.ok) throw new Error("Failed to fetch featured recipes");
         let recipes: RecipeCardData[] = await res.json();
         // Sort by rating (descending) and take the top 3.

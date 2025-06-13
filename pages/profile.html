@@ -398,7 +398,7 @@
 
         <!-- Profile Page Javascript -->
         <script>
-            const apiBase = "http://mealwhiz.at:3000";
+            const apiBase = "http://localhost:3000";
 
             // On page load, check if user is logged in and redirect if not
             document.addEventListener("DOMContentLoaded", function () {
@@ -580,7 +580,7 @@
                 if (!token) return;
 
                 try {
-                    const response = await fetch("http://mealwhiz.at/users/favorites", {
+                    const response = await fetch("http://localhost:3000/users/favorites", {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },

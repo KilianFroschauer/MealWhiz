@@ -20,7 +20,7 @@ let isVideoConferenceJoined = false;
 // Stores details of the current event fetched from the API.
 let currentEventDetails = null;
 // Base URL for the backend API. Should be configurable in a real application.
-const API_BASE_URL = "http://mealwhiz.at:3000";
+const API_BASE_URL = "http://localhost:3000";
 // URL of the Jitsi server.
 const JITSI_SERVER_URL = "https://meet.mealwhiz.at";
 // Main execution block after the DOM is fully loaded.
@@ -47,7 +47,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Use username from URL if available, otherwise fallback to currentUser.name
         const displayName = settings.username || currentUser.name;
         initializeJitsi(settings, displayName);
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Error during page setup:", error);
         showErrorInPlaceholder("Error loading session data. Video conference cannot be started.");
     }
@@ -59,7 +60,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 // Parses URL parameters to get battle settings.
 function getBattleSettings() {
     const urlParams = new URLSearchParams(window.location.search);
-    const mode = urlParams.get("mode") === "casual" ? "casual" : "competitive";
+    const mode = (urlParams.get("mode") === "casual" ? "casual" : "competitive");
     return {
         mode: mode,
         eventId: urlParams.get("eventId"),
@@ -101,7 +102,8 @@ function showErrorInPlaceholder(message) {
     }
     // Hide the actual Jitsi container if an error occurs.
     const jitsiMeetContainer = document.getElementById("jitsiMeetContainer");
-    if (jitsiMeetContainer) jitsiMeetContainer.style.display = "none";
+    if (jitsiMeetContainer)
+        jitsiMeetContainer.style.display = "none";
 }
 // Sets up UI elements specific to the battle mode (casual or competitive).
 function setupBattleUI(settings, eventDetails) {
@@ -113,13 +115,11 @@ function setupBattleUI(settings, eventDetails) {
     const competitiveContextDiv = document.getElementById("competitiveContext"); // UI for competitive mode.
     const chatSuggestionPills = document.getElementById("chatSuggestionPills"); // Quick chat suggestions.
     // Ensure all required UI elements are present.
-    if (
-        !battleModeTitle ||
+    if (!battleModeTitle ||
         !contextualInfoHeader ||
         !casualContextDiv ||
         !competitiveContextDiv ||
-        !chatSuggestionPills
-    ) {
+        !chatSuggestionPills) {
         console.error("One or more UI elements for battle setup are missing.");
         showErrorInPlaceholder("Important UI elements are missing, the meeting cannot be set up.");
         return;
@@ -133,7 +133,8 @@ function setupBattleUI(settings, eventDetails) {
         chatSuggestionPills.classList.remove("d-none"); // Show chat suggestions.
         setupSuggestionPills(); // Populate suggestion pills.
         updateOpponentDisplayInUI(opponentUser, "casual"); // Update partner display.
-    } else {
+    }
+    else {
         // Configure UI for competitive mode.
         battleModeTitle.textContent = "Competitive CookOff Challenge";
         contextualInfoHeader.textContent = "Challenge Details";
@@ -170,7 +171,8 @@ function initializeJitsi(settings, userName) {
         // Extract the room name from the provided stream URL.
         const url = new URL(settings.streamUrl);
         roomNameForJitsi = url.pathname.substring(1); // Remove leading slash.
-    } catch (e) {
+    }
+    catch (e) {
         console.error("Error parsing streamUrl to get room name:", settings.streamUrl, e);
         showErrorInPlaceholder("Error: Invalid video conference URL format.");
         return;
@@ -185,11 +187,7 @@ function initializeJitsi(settings, userName) {
         jitsiApi.dispose();
         jitsiApi = null;
     }
-    console.log(
-        `Initializing Jitsi Meet with room: "${roomNameForJitsi}", user: "${userName}", role: "${
-            settings.role || "competitor"
-        }"`
-    );
+    console.log(`Initializing Jitsi Meet with room: "${roomNameForJitsi}", user: "${userName}", role: "${settings.role || "competitor"}"`);
     // Call the function to create and configure the Jitsi Meet External API instance.
     jitsiApi = initJitsiMeetExternalAPI(roomNameForJitsi, userName, "jitsiMeetContainer", settings);
     if (!jitsiApi) {
@@ -275,7 +273,8 @@ function initJitsiMeetExternalAPI(roomName, displayName, parentElementId, settin
             // Disable chat interface
             DISABLE_CHAT: true,
         };
-    } else {
+    }
+    else {
         // Competitors or casual mode users: essential cooking competition functionality
         interfaceConfigOverwrite = {
             ...interfaceConfigOverwrite,
@@ -316,9 +315,11 @@ function initJitsiMeetExternalAPI(roomName, displayName, parentElementId, settin
         }
         attachJitsiEventListeners(api); // Attach event listeners to the Jitsi API instance.
         return api;
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Error initializing Jitsi Meet API:", error);
-        if (parentElement) parentElement.style.display = "none"; // Hide Jitsi container on error.
+        if (parentElement)
+            parentElement.style.display = "none"; // Hide Jitsi container on error.
         if (placeholderElement) {
             // Show critical error message.
             placeholderElement.innerHTML =
@@ -330,7 +331,8 @@ function initJitsiMeetExternalAPI(roomName, displayName, parentElementId, settin
 }
 // Configures the style and visibility of the Jitsi placeholder.
 function configureJitsiPlaceholder(placeholder, isLoading) {
-    if (!placeholder) return;
+    if (!placeholder)
+        return;
     // Style to overlay the placeholder on top of the Jitsi container.
     placeholder.style.position = "absolute";
     placeholder.style.top = "0";
@@ -347,7 +349,8 @@ function attachJitsiEventListeners(api) {
         console.log("[Jitsi Event] videoConferenceJoined: Local user joined.");
         isVideoConferenceJoined = true;
         const placeholder = document.getElementById("jitsiMeetPlaceholder");
-        if (placeholder) placeholder.remove(); // Remove loading placeholder.
+        if (placeholder)
+            placeholder.remove(); // Remove loading placeholder.
     });
     // Event: A remote participant has joined.
     api.addEventListener("participantJoined", (participant) => {
@@ -357,10 +360,7 @@ function attachJitsiEventListeners(api) {
             opponentUser = { id: 0, name: participant.displayName }; // Jitsi ID is not backend ID.
             const settings = getBattleSettings();
             setupBattleUI(settings, currentEventDetails); // Refresh UI with new opponent info.
-            displaySystemMessage(
-                `${participant.displayName} has joined the video call.`,
-                `system-jitsi-${participant.id}`
-            );
+            displaySystemMessage(`${participant.displayName} has joined the video call.`, `system-jitsi-${participant.id}`);
         }
     });
     // Event: A remote participant has left.
@@ -368,10 +368,7 @@ function attachJitsiEventListeners(api) {
         console.log("Participant left:", participant);
         // If the leaving participant was the opponent, clear opponent info.
         if (opponentUser && opponentUser.name === participant.displayName) {
-            displaySystemMessage(
-                `${participant.displayName} has left the video call.`,
-                `system-jitsi-left-${participant.id}`
-            );
+            displaySystemMessage(`${participant.displayName} has left the video call.`, `system-jitsi-left-${participant.id}`);
             opponentUser = null;
             const settings = getBattleSettings();
             setupBattleUI(settings, currentEventDetails); // Refresh UI.
@@ -392,7 +389,8 @@ function attachJitsiEventListeners(api) {
                     type: msgPayload.userName === currentUser.name ? "user" : "partner",
                 };
                 displayChatMessage(receivedMsg); // Display the received chat message.
-            } catch (e) {
+            }
+            catch (e) {
                 console.error("Error parsing received Jitsi message:", e, event.data.eventData.text);
             }
         }
@@ -413,7 +411,8 @@ function attachJitsiEventListeners(api) {
         iframe.onload = () => {
             console.log("[Jitsi Event] iframe.onload: Jitsi iframe content has loaded.");
             const placeholder = document.getElementById("jitsiMeetPlaceholder");
-            if (placeholder) placeholder.remove(); // Remove loading placeholder once iframe is loaded.
+            if (placeholder)
+                placeholder.remove(); // Remove loading placeholder once iframe is loaded.
         };
         iframe.onerror = (err) => {
             console.error("[Jitsi Event] iframe.onerror: Error loading Jitsi iframe content:", err);
@@ -422,7 +421,8 @@ function attachJitsiEventListeners(api) {
                 showErrorInPlaceholder("Error loading video conference. Check connection or reload.");
             }
         };
-    } else {
+    }
+    else {
         console.warn("[Jitsi Init] api.getIFrame() returned null.");
     }
 }
@@ -461,9 +461,7 @@ async function fetchEventDetails(eventId) {
         currentEventDetails = event; // Store globally for later use.
         // Try to identify the opponent from the event participants list.
         if (event.participants?.length > 0) {
-            const fetchedOpponent = event.participants.find(
-                (p) => p.userId !== currentUser.id && ["opponent", "participant", "host"].includes(p.role)
-            );
+            const fetchedOpponent = event.participants.find((p) => p.userId !== currentUser.id && ["opponent", "participant", "host"].includes(p.role));
             if (fetchedOpponent) {
                 opponentUser = {
                     id: fetchedOpponent.userId,
@@ -471,14 +469,12 @@ async function fetchEventDetails(eventId) {
                     avatar: fetchedOpponent.avatar || "../assets/img/avatar.jpg", // Default avatar if none provided.
                 };
                 console.log("Opponent identified:", opponentUser);
-                displaySystemMessage(
-                    `${opponentUser.name} is registered for this event.`,
-                    `system-api-opponent-${fetchedOpponent.userId}`
-                );
+                displaySystemMessage(`${opponentUser.name} is registered for this event.`, `system-api-opponent-${fetchedOpponent.userId}`);
             }
         }
         return event;
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Error in fetchEventDetails:", error);
         showErrorInPlaceholder("Could not load event data. Please check connection or try again.");
         throw error; // Re-throw to be caught by the caller.
@@ -492,17 +488,22 @@ function updateCompetitionDetailsInUI(eventDetails, timeLimit) {
     const challengeThemeEl = document.getElementById("challengeTheme");
     const challengeTimeEl = document.getElementById("challengeTime");
     // Populate elements with data from eventDetails or show 'N/A'.
-    if (challengeNameEl) challengeNameEl.textContent = eventDetails?.challenge?.name || "N/A";
-    if (challengeDifficultyEl) challengeDifficultyEl.textContent = eventDetails?.challenge?.difficulty || "N/A";
-    if (challengeThemeEl) challengeThemeEl.textContent = eventDetails?.challenge?.theme || "N/A";
+    if (challengeNameEl)
+        challengeNameEl.textContent = eventDetails?.challenge?.name || "N/A";
+    if (challengeDifficultyEl)
+        challengeDifficultyEl.textContent = eventDetails?.challenge?.difficulty || "N/A";
+    if (challengeThemeEl)
+        challengeThemeEl.textContent = eventDetails?.challenge?.theme || "N/A";
     // Use timeLimit from settings if available, otherwise from eventDetails.
     const displayTime = timeLimit || eventDetails?.challenge?.timeLimitMinutes;
-    if (challengeTimeEl) challengeTimeEl.textContent = displayTime ? `${displayTime} Minuten` : "N/A";
+    if (challengeTimeEl)
+        challengeTimeEl.textContent = displayTime ? `${displayTime} Minuten` : "N/A";
 }
 // Starts a countdown timer for competitive mode.
 function startCookingTimer(durationMinutes) {
     const timerDisplay = document.getElementById("competitiveTimerDisplay");
-    if (!timerDisplay) return; // Exit if timer display element not found.
+    if (!timerDisplay)
+        return; // Exit if timer display element not found.
     let timeLeft = durationMinutes * 60; // Convert minutes to seconds.
     const timerInterval = setInterval(() => {
         const minutes = Math.floor(timeLeft / 60);
@@ -527,16 +528,19 @@ function setupChatFunctionality(eventId) {
         const handler = () => sendChatMessage(chatInput, eventId);
         sendChatBtn.addEventListener("click", handler); // Send on button click.
         chatInput.addEventListener("keypress", (event) => {
-            if (event.key === "Enter") handler(); // Send on Enter key press.
+            if (event.key === "Enter")
+                handler(); // Send on Enter key press.
         });
-    } else {
+    }
+    else {
         console.warn("Chat input or send button not found.");
     }
 }
 // Sends a chat message.
 function sendChatMessage(chatInput, eventId) {
     const text = chatInput.value.trim();
-    if (text === "") return; // Don't send empty messages.
+    if (text === "")
+        return; // Don't send empty messages.
     // Create a message object.
     const message = {
         id: `msg-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
@@ -555,12 +559,14 @@ function sendChatMessage(chatInput, eventId) {
             // The second argument is 'to' (participantID), empty string sends to all.
             jitsiApi.executeCommand("sendEndpointTextMessage", "", JSON.stringify(message));
             console.log("Message sent via Jitsi: ", message);
-        } catch (e) {
+        }
+        catch (e) {
             console.error("Error sending message via Jitsi: ", e);
             // Display a system message if sending via Jitsi fails.
             displaySystemMessage("Error: Could not send message. It was displayed locally.", `err-${Date.now()}`);
         }
-    } else {
+    }
+    else {
         // Warn if Jitsi is not available or not connected.
         const warning = !jitsiApi ? "Video chat system not available." : "Video chat not fully connected.";
         displaySystemMessage(`Warning: ${warning} Message displayed locally only.`, `warn-${Date.now()}`);
@@ -590,7 +596,8 @@ function scrollToLastMessage() {
 // Appends a chat message to the chat display area.
 function displayChatMessage(message) {
     const chatMessagesDiv = document.getElementById("chatMessages");
-    if (!chatMessagesDiv) return; // Exit if chat display area not found.
+    if (!chatMessagesDiv)
+        return; // Exit if chat display area not found.
     const messageDiv = document.createElement("div");
     // Add base class and type-specific class for styling.
     messageDiv.classList.add("chat-message", `message-${message.type}`);
@@ -606,23 +613,17 @@ function displayChatMessage(message) {
     // Uses flexbox to align current user's messages to the right.
     messageDiv.innerHTML = `
         <div class="d-flex ${isCurrentUserMsg ? "flex-row-reverse" : "flex-row"} mb-2">
-            ${
-                message.type !== "system"
-                    ? `<img src="${avatarSrc}" class="rounded-circle me-2 ms-2" style="width: 30px; height: 30px;" alt="${message.userName}'s avatar">`
-                    : ""
-            }
-            <div class="message-content p-2 rounded shadow-sm ${
-                isCurrentUserMsg
-                    ? "bg-primary text-white"
-                    : message.type === "system"
-                    ? "bg-light text-muted w-100 text-center fst-italic"
-                    : "bg-light"
-            }">
+            ${message.type !== "system"
+        ? `<img src="${avatarSrc}" class="rounded-circle me-2 ms-2" style="width: 30px; height: 30px;" alt="${message.userName}'s avatar">`
+        : ""}
+            <div class="message-content p-2 rounded shadow-sm ${isCurrentUserMsg
+        ? "bg-primary text-white"
+        : message.type === "system"
+            ? "bg-light text-muted w-100 text-center fst-italic"
+            : "bg-light"}">
                 ${message.type !== "system" ? `<small class="fw-bold d-block">${message.userName}</small>` : ""}
                 <p class="mb-0">${escapeHTML(message.text)}</p> <!-- Escape HTML to prevent XSS -->
-                <small class="message-timestamp text-muted d-block ${
-                    isCurrentUserMsg ? "text-end" : "text-start"
-                } mt-1" style="font-size: 0.75em;">
+                <small class="message-timestamp text-muted d-block ${isCurrentUserMsg ? "text-end" : "text-start"} mt-1" style="font-size: 0.75em;">
                     ${timeFormatted}
                 </small>
             </div>
@@ -641,7 +642,8 @@ function escapeHTML(str) {
 function setupSuggestionPills() {
     const pillsContainer = document.getElementById("chatSuggestionPills");
     const chatInput = document.getElementById("chatInput");
-    if (!pillsContainer || !chatInput) return;
+    if (!pillsContainer || !chatInput)
+        return;
     const suggestions = [
         "What's your favorite ingredient?",
         "Any tips for this recipe?",
@@ -679,7 +681,8 @@ function setupCommonEventListeners() {
                 }
                 // Redirect to the main CookOff page
                 window.location.href = "CookOff.html";
-            } else {
+            }
+            else {
                 // For competitors: normal exit that ends the meeting
                 console.log("Competitor/casual user exiting - disposing Jitsi API");
                 if (jitsiApi) {
@@ -707,17 +710,22 @@ function updateOpponentDisplayInUI(opponent, mode) {
     const statusEl = document.getElementById(statusElId);
     if (opponent) {
         // If partner exists, display their name and avatar.
-        if (nameEl) nameEl.textContent = opponent.name;
-        if (avatarEl) avatarEl.src = opponent.avatar || "../assets/img/avatar.jpg"; // Default avatar.
+        if (nameEl)
+            nameEl.textContent = opponent.name;
+        if (avatarEl)
+            avatarEl.src = opponent.avatar || "../assets/img/avatar.jpg"; // Default avatar.
         // Update status for casual mode (e.g., "Online").
         if (statusEl) {
             statusEl.textContent = "Online";
             statusEl.className = "badge bg-success";
         }
-    } else {
+    }
+    else {
         // If no partner, display a waiting message.
-        if (nameEl) nameEl.textContent = "Waiting for partner...";
-        if (avatarEl) avatarEl.src = "../assets/img/avatar.jpg"; // Default placeholder avatar.
+        if (nameEl)
+            nameEl.textContent = "Waiting for partner...";
+        if (avatarEl)
+            avatarEl.src = "../assets/img/avatar.jpg"; // Default placeholder avatar.
         // Update status for casual mode (e.g., "Offline").
         if (statusEl) {
             statusEl.textContent = "Offline";
@@ -740,7 +748,8 @@ function setupViewerRestrictions(api) {
             // Hide the local video tile for viewers
             api.executeCommand("setTileView", false);
             console.log("[Jitsi] Invisible spectator mode applied successfully");
-        } catch (error) {
+        }
+        catch (error) {
             console.warn("[Jitsi] Could not apply all spectator restrictions:", error);
         }
     });

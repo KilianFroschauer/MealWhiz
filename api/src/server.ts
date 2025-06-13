@@ -11,8 +11,8 @@ const startServer = async () => {
         app.listen(PORT, () => {
             // Changed: server.listen to app.listen
             console.log(`🚀 Server is running on port ${PORT}`);
-            console.log(`📄 Swagger docs available at http://mealwhiz.at:${PORT}/api-docs`);
-            // console.log(`🔗 API available at http://mealwhiz.at:${PORT}/`); // Adjusted if no /api/v1 prefix
+            console.log(`📄 Swagger docs available at http://localhost:${PORT}/api-docs`);
+            // console.log(`🔗 API available at http://localhost:${PORT}/`); // Adjusted if no /api/v1 prefix
         });
     } catch (error) {
         console.error("❌ Failed to start server:", error);

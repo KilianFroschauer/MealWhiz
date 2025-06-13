@@ -7,7 +7,7 @@ const app = express();
 
 const allowedOrigins = [
     "http://127.0.0.1:5500", // Common for VS Code Live Server
-    "http://mealwhiz.at:5500", // Another common Live Server port
+    "http://localhost:5500", // Another common Live Server port
     // Add any other origins your frontend might be served from
 ];
 

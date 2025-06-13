@@ -7,19 +7,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Check if user is logged in with a valid token
     const isLoggedIn = await validateToken();
     // Determine if we're in the root directory or pages directory
-    const isRootDirectory =
-        window.location.pathname.endsWith("index.html") || !window.location.pathname.includes("/pages/");
+    const isRootDirectory = window.location.pathname.endsWith("index.html") || !window.location.pathname.includes("/pages/");
     // Find all user icon links - handle both root and pages directory paths
-    const userIconLinks = document.querySelectorAll(
-        'a[href="login.html"], a[href="profile.html"], ' + 'a[href="pages/login.html"], a[href="pages/profile.html"]'
-    );
+    const userIconLinks = document.querySelectorAll('a[href="login.html"], a[href="profile.html"], ' + 'a[href="pages/login.html"], a[href="pages/profile.html"]');
     // Update each user icon link
     userIconLinks.forEach((link) => {
         // If logged in, point to profile; otherwise, point to login
         if (isRootDirectory) {
             // In root directory (index.html)
             link.href = isLoggedIn ? "pages/profile.html" : "pages/login.html";
-        } else {
+        }
+        else {
             // In pages directory
             link.href = isLoggedIn ? "profile.html" : "login.html";
         }
@@ -51,7 +49,7 @@ async function validateToken() {
     }
     // Check if token is valid by making a lightweight API call
     try {
-        const apiBase = "http://mealwhiz.at:3000";
+        const apiBase = "http://localhost:3000";
         const response = await fetch(`${apiBase}/validate-token`, {
             method: "GET",
             headers: {
@@ -70,7 +68,8 @@ async function validateToken() {
         }
         // For other errors, assume token might be valid
         return true;
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Error validating token:", error);
         // If network error, assume token is valid (to prevent logout when offline)
         return true;
@@ -115,9 +114,10 @@ function updateHeaderUI(isLoggedIn) {
  */
 async function updateCartCount() {
     const token = localStorage.getItem("accessToken");
-    if (!token) return;
+    if (!token)
+        return;
     try {
-        const apiBase = "http://mealwhiz.at:3000";
+        const apiBase = "http://localhost:3000";
         const res = await fetch(`${apiBase}/cart`, {
             method: "GET",
             headers: {
@@ -130,11 +130,13 @@ async function updateCartCount() {
             if (cartCount) {
                 cartCount.textContent = items.length.toString();
             }
-        } else if (res.status === 401) {
+        }
+        else if (res.status === 401) {
             // Token expired
             logout();
         }
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Error updating cart count:", error);
     }
 }
