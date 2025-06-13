@@ -8,6 +8,8 @@
     <meta content="" name="keywords">
     <meta content="" name="description">
 
+    <link rel="icon" type="image/png" href="assets/img/Logo-Whizard-cropped.jpg" />
+
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -68,7 +70,8 @@
 
 <body>
     <!-- Spinner Start -->
-    <div id="spinner" class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center">
+    <div id="spinner"
+        class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center">
         <div class="spinner-grow text-primary" role="status"></div>
     </div>
     <!-- Spinner End -->
@@ -78,12 +81,15 @@
         <div class="container px-0">
             <nav class="navbar navbar-light bg-white navbar-expand-xl">
                 <a href="../index.html" class="navbar-brand d-flex align-items-center">
-                    <img src="../assets/img/Logo-Whizard-cropped-tranparent.png" alt="MealWhiz Logo" style="height: 65px; margin-right: 10px">
-                    <h1 class="m-0" style="font-family: 'K2D', sans-serif; color: #000; font-weight: 1000; font-size: 3.5rem">
+                    <img src="../assets/img/Logo-Whizard-cropped-tranparent.png" alt="MealWhiz Logo"
+                        style="height: 65px; margin-right: 10px">
+                    <h1 class="m-0"
+                        style="font-family: 'K2D', sans-serif; color: #000; font-weight: 1000; font-size: 3.5rem">
                         MealWhiz
                     </h1>
                 </a>
-                <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarCollapse">
                     <span class="fa fa-bars text-primary"></span>
                 </button>
                 <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
@@ -99,12 +105,16 @@
                         </div>
                     </div>
                     <div class="d-flex m-3 me-0">
-                        <button class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4" data-bs-toggle="modal" data-bs-target="#searchModal">
+                        <button
+                            class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4"
+                            data-bs-toggle="modal" data-bs-target="#searchModal">
                             <i class="fas fa-search text-primary"></i>
                         </button>
                         <a href="shopping_cart.html" class="position-relative me-4 my-auto cart-icon">
                             <i class="fa fa-shopping-bag fa-2x"></i>
-                            <span class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1" style="top: -5px; left: 15px; height: 20px; min-width: 20px;" id="cart-count">0</span>
+                            <span
+                                class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-white px-1"
+                                style="top: -5px; left: 15px; height: 20px; min-width: 20px;" id="cart-count">0</span>
                         </a>
                         <a href="profile.html" class="my-auto active">
                             <i class="fas fa-user fa-2x"></i>
@@ -126,7 +136,8 @@
                 </div>
                 <div class="modal-body d-flex align-items-center">
                     <div class="input-group w-75 mx-auto d-flex">
-                        <input type="search" class="form-control p-3" placeholder="Search recipes..." aria-describedby="search-icon-1">
+                        <input type="search" class="form-control p-3" placeholder="Search recipes..."
+                            aria-describedby="search-icon-1">
                         <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
                     </div>
                 </div>
@@ -166,7 +177,8 @@
                         <div class="row g-4">
                             <!-- Shopping List Card -->
                             <div class="col-md-4">
-                                <div class="card h-100 profile-card" onclick="window.location.href='shopping_cart.html'">
+                                <div class="card h-100 profile-card"
+                                    onclick="window.location.href='shopping_cart.html'">
                                     <div class="card-body text-center p-4">
                                         <div class="mb-4">
                                             <i class="fas fa-shopping-basket fa-4x text-primary"></i>
@@ -179,7 +191,7 @@
 
                             <!-- Favorites Card -->
                             <div class="col-md-4">
-                                <div class="card h-100 profile-card" onclick="window.location.href='#'">
+                                <div class="card h-100 profile-card" onclick="scrollToFavorites()">
                                     <div class="card-body text-center p-4">
                                         <div class="mb-4">
                                             <i class="fas fa-heart fa-4x text-danger"></i>
@@ -207,7 +219,7 @@
                         <!-- Settings Section (Hidden by Default) -->
                         <div id="settings-section" class="mt-4 pt-4 border-top" style="display: none;">
                             <h3 class="mb-4">Account Settings</h3>
-                            
+
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label for="display-name" class="form-label">Display Name</label>
@@ -231,7 +243,8 @@
                                 </div>
                                 <div class="col-12 mt-4">
                                     <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
-                                    <button class="btn btn-outline-secondary ms-2" onclick="closeSettings()">Cancel</button>
+                                    <button class="btn btn-outline-secondary ms-2"
+                                        onclick="closeSettings()">Cancel</button>
                                 </div>
                             </div>
                         </div>
@@ -249,6 +262,22 @@
     </div>
     <!-- Profile Content End -->
 
+    <!-- My Favorite Recipes Section Start -->
+    <div class="container-fluid py-3">
+        <div class="container">
+            <h2 id="my-favorites-section" class="mb-4">My Favorite Recipes</h2>
+            <div id="favorite-recipes" class="row g-4">
+                <!-- Favorites will be loaded here -->
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- My Favorite Recipes Section End -->
+
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
         <div class="container py-5">
@@ -262,16 +291,23 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="position-relative mx-auto">
-                            <input class="form-control border-0 w-100 py-3 px-4 rounded-pill" type="text" placeholder="Your Email">
-                            <button type="submit" class="btn btn-primary border-0 border-secondary py-3 px-4 position-absolute rounded-pill text-white" style="top: 0; right: 0;">Subscribe Now</button>
+                            <input class="form-control border-0 w-100 py-3 px-4 rounded-pill" type="text"
+                                placeholder="Your Email">
+                            <button type="submit"
+                                class="btn btn-primary border-0 border-secondary py-3 px-4 position-absolute rounded-pill text-white"
+                                style="top: 0; right: 0;">Subscribe Now</button>
                         </div>
                     </div>
                     <div class="col-lg-3">
                         <div class="d-flex justify-content-end pt-3">
-                            <a class="btn  btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i class="fab fa-youtube"></i></a>
-                            <a class="btn btn-outline-secondary btn-md-square rounded-circle" href=""><i class="fab fa-linkedin-in"></i></a>
+                            <a class="btn  btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i
+                                    class="fab fa-twitter"></i></a>
+                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i
+                                    class="fab fa-youtube"></i></a>
+                            <a class="btn btn-outline-secondary btn-md-square rounded-circle" href=""><i
+                                    class="fab fa-linkedin-in"></i></a>
                         </div>
                     </div>
                 </div>
@@ -280,7 +316,8 @@
                 <div class="col-lg-3 col-md-6">
                     <div class="footer-item">
                         <h4 class="text-light mb-3">Why People Like us!</h4>
-                        <p class="mb-4">typesetting, remaining essentially unchanged. It was popularised in the 1960s with the like Aldus PageMaker including of Lorem Ipsum.</p>
+                        <p class="mb-4">typesetting, remaining essentially unchanged. It was popularised in the 1960s
+                            with the like Aldus PageMaker including of Lorem Ipsum.</p>
                         <a href="" class="btn border-secondary py-2 px-4 rounded-pill text-primary">Read More</a>
                     </div>
                 </div>
@@ -326,10 +363,12 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <span class="text-light"><a href="#"><i class="fas fa-copyright text-light me-2"></i>MealWhiz</a>, All right reserved.</span>
+                    <span class="text-light"><a href="#"><i class="fas fa-copyright text-light me-2"></i>MealWhiz</a>,
+                        All right reserved.</span>
                 </div>
                 <div class="col-md-6 my-auto text-center text-md-end text-white">
-                    Designed By <a class="border-bottom" href="https://htmlcodex.com">HTML Codex</a> Distributed By <a class="border-bottom" href="https://themewagon.com">ThemeWagon</a>
+                    Designed By <a class="border-bottom" href="https://htmlcodex.com">HTML Codex</a> Distributed By <a
+                        class="border-bottom" href="https://themewagon.com">ThemeWagon</a>
                 </div>
             </div>
         </div>
@@ -337,7 +376,8 @@
     <!-- Copyright End -->
 
     <!-- Back to Top -->
-    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i class="fa fa-arrow-up"></i></a>
+    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+            class="fa fa-arrow-up"></i></a>
 
     <!-- JavaScript Libraries -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
@@ -356,20 +396,20 @@
         const apiBase = "http://localhost:3000";
 
         // On page load, check if user is logged in and redirect if not
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Hide spinner once page is loaded
             document.querySelector('#spinner').classList.remove('show');
-            
+
             // Check for login token
             const token = localStorage.getItem('accessToken');
             if (!token) {
                 window.location.href = 'login.html';
                 return;
             }
-            
+
             // Load user data
             loadUserData();
-            
+
             // Update cart count
             updateCartCount();
         });
@@ -389,13 +429,13 @@
                 if (res.ok) {
                     const user = await res.json();
                     document.getElementById('username-display').textContent = user.username || 'User';
-                    
+
                     // Set other user data if available
                     if (user.joinDate) {
                         const joinDate = new Date(user.joinDate);
                         document.getElementById('member-since').textContent = joinDate.getFullYear();
                     }
-                    
+
                     // Pre-fill settings form
                     document.getElementById('display-name').value = user.username || '';
                     document.getElementById('email').value = user.email || '';
@@ -434,6 +474,11 @@
             document.getElementById('settings-section').style.display = 'block';
             // Smooth scroll to settings section
             document.getElementById('settings-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function scrollToFavorites() {
+            // Smooth scroll to favorites section
+            document.getElementById('my-favorites-section').scrollIntoView({ behavior: 'smooth' });
         }
 
         function closeSettings() {
@@ -524,6 +569,80 @@
                 notification.style.opacity = '0';
             }, 3000);
         }
+
+        async function loadFavoriteRecipes() {
+            const token = localStorage.getItem('accessToken');
+            if (!token) return;
+
+            try {
+                const response = await fetch('http://localhost:3000/users/favorites', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load favorites');
+                }
+
+                const favorites = await response.json();
+                const container = document.getElementById('favorite-recipes');
+
+                if (!container) return;
+
+                if (favorites.length === 0) {
+                    container.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <p>You haven't saved any favorite recipes yet.</p>
+                    <a href="/pages/recipes.html" class="btn btn-primary">Browse Recipes</a>
+                </div>
+            `;
+                    return;
+                }
+
+                container.innerHTML = favorites.map(recipe => `
+            <div class="col-md-6 col-lg-4 col-xl-3">
+                <div class="rounded position-relative fruite-item">
+                    <div class="fruite-img">
+                        <img src="../assets/img/recipe_imgs/${recipe.id}.jpg" class="img-fluid w-100 rounded-top" alt="${recipe.name}" 
+                            onerror="this.onerror=null;this.src='../assets/img/recipe_placeholder.jpg';">
+                    </div>
+                    <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">${recipe.difficulty}</div>
+                    <div class="p-4 border border-secondary border-top-0 rounded-bottom">
+                        <h4>${recipe.name}</h4>
+                        <div class="d-flex justify-content-between flex-lg-wrap">
+                            <p class="text-dark fs-5 fw-bold mb-0">
+                                <i class="far fa-clock text-primary me-1"></i> ${recipe.time} min
+                            </p>
+                            <div class="d-flex align-items-center">
+                                <a href="/pages/recipe-view.html?id=${recipe.id}" class="btn border border-secondary rounded-pill px-3 text-primary">
+                                    <i class="fa fa-eye me-2"></i> View Recipe
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+            } catch (error) {
+                console.error('Error loading favorites:', error);
+                const container = document.getElementById('favorite-recipes');
+                if (container) {
+                    container.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <p class="text-danger">Error loading favorite recipes.</p>
+                </div>
+            `;
+                }
+            }
+        }
+
+        // Call this function when the page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add this to your other initial function calls
+            loadFavoriteRecipes();
+        });
     </script>
 </body>
 

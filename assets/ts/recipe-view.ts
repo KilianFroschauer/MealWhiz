@@ -18,11 +18,12 @@ interface Recipe {
     carbs: number;
     fat: number;
     time: number; // Preparation/cooking time in minutes.
-    difficulty: string; // e.g., "easy", "medium", "hard".
+    difficulty: "easy" | "medium" | "hard"; // e.g., "easy", "medium", "hard".
     mealTimes: string[]; // e.g., ["Breakfast", "Lunch"].
     tags: string[]; // e.g., ["Quick", "Healthy"].
     servings: number; // Number of servings the recipe makes.
-    instructions?: string; // Detailed cooking instructions, possibly with markdown.
+    instructions: string; // Detailed cooking instructions, possibly with markdown.
+    isFavorite?: boolean; // Add this property to track favorite status
 }
 
 // Retrieves the recipe ID from the 'id' query parameter in the URL.
@@ -49,8 +50,326 @@ function showError(message: string) {
     }
 }
 
-// Renders the fetched recipe details into the HTML structure.
-function renderRecipe(recipe: Recipe) {
+/**
+ * Validates the JWT token by checking:
+ * 1. If it exists
+ * 2. If it's not expired (by making a lightweight API call)
+ * @returns Promise resolving to boolean indicating if token is valid
+ */
+async function isUserLoggedIn(): Promise<boolean> {
+    const token = localStorage.getItem('accessToken');
+
+    // No token means not logged in
+    if (!token) {
+        return false;
+    }
+
+    // Check if token is valid by making a lightweight API call
+    try {
+        const apiBase: string = "http://localhost:3000";
+        const response = await fetch(`${apiBase}/validate-token`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        // If response is OK, token is valid
+        if (response.ok) {
+            return true;
+        }
+
+        // If unauthorized response, token is expired or invalid
+        if (response.status === 401) {
+            console.log('Token expired or invalid. Logging out...');
+            logout();
+            return false;
+        }
+
+        // For other errors, assume token might be valid
+        return true;
+
+    } catch (error) {
+        console.error('Error validating token:', error);
+        // If network error, assume token is valid (to prevent logout when offline)
+        return true;
+    }
+}
+
+// Render rating component for logged-in users
+async function renderRatingComponent(recipe: Recipe, container: HTMLElement) {
+    const ratingContainer = document.createElement('div');
+    ratingContainer.className = 'my-4 border-top pt-4';
+    ratingContainer.innerHTML = `
+        <h5 class="fw-bold mb-3">Rate this recipe</h5>
+        ${await isUserLoggedIn() ? `
+            <div class="d-flex align-items-center recipe-rating-component">
+                <div class="star-rating">
+                    <i class="far fa-star" data-rating="1"></i>
+                    <i class="far fa-star" data-rating="2"></i>
+                    <i class="far fa-star" data-rating="3"></i>
+                    <i class="far fa-star" data-rating="4"></i>
+                    <i class="far fa-star" data-rating="5"></i>
+                </div>
+                <span class="ms-3 rating-message">Click to rate</span>
+            </div>
+        ` : `
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <a href="login.html" class="alert-link">Log in</a> to rate this recipe
+            </div>
+        `}
+    `;
+
+    container.appendChild(ratingContainer);
+
+    // Only add event listeners if user is logged in
+    if (await isUserLoggedIn()) {
+        const stars = ratingContainer.querySelectorAll('.star-rating i');
+        const ratingMessage = ratingContainer.querySelector('.rating-message');
+
+        // Highlight stars on hover
+        stars.forEach(star => {
+            star.addEventListener('mouseover', () => {
+                const rating = parseInt(star.getAttribute('data-rating') || '0');
+                updateStarsDisplay(stars, rating, 'hover');
+                if (ratingMessage) ratingMessage.textContent = `${rating} star${rating !== 1 ? 's' : ''}`;
+            });
+        });
+
+        // Reset stars when not hovering
+        ratingContainer.querySelector('.star-rating')?.addEventListener('mouseleave', () => {
+            updateStarsDisplay(stars, 0, 'reset');
+            if (ratingMessage) ratingMessage.textContent = 'Click to rate';
+        });
+
+        // Handle click to submit rating
+        stars.forEach(star => {
+            star.addEventListener('click', async () => {
+                const rating = parseInt(star.getAttribute('data-rating') || '0');
+                await submitRating(recipe.id, rating, stars, ratingMessage as HTMLElement);
+            });
+        });
+    }
+}
+
+// Update the star display based on interaction
+function updateStarsDisplay(stars: NodeListOf<Element>, rating: number, mode: 'hover' | 'reset' | 'set') {
+    stars.forEach((star, index) => {
+        if (mode === 'reset') {
+            star.className = 'far fa-star';
+        } else {
+            star.className = (index < rating) ? 'fas fa-star text-warning' : 'far fa-star';
+        }
+    });
+}
+
+// Submit the rating to the API
+async function submitRating(recipeId: number, rating: number, stars: NodeListOf<Element>, messageElement: HTMLElement) {
+    try {
+        const token = localStorage.getItem('accessToken');
+
+        const response = await fetch(`http://localhost:3000/recipes/${recipeId}/rate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ rating })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to submit rating');
+        }
+
+        const result = await response.json();
+
+        // Update UI to show successful rating
+        updateStarsDisplay(stars, rating, 'set');
+        messageElement.textContent = `Thank you! You rated ${rating} star${rating !== 1 ? 's' : ''}`;
+        messageElement.className = 'ms-3 rating-message text-success';
+
+        // Update the displayed average rating
+        const ratingDisplay = document.querySelector('.recipe-rating-display');
+        if (ratingDisplay && result.newRating) {
+            ratingDisplay.textContent = result.newRating.toFixed(1);
+        }
+
+        // Show toast notification
+        alert('Rating submitted successfully!');
+    } catch (error) {
+        console.error('Error submitting rating:', error);
+        messageElement.textContent = 'Failed to submit rating. Please try again.';
+        messageElement.className = 'ms-3 rating-message text-danger';
+        alert('Error submitting rating');
+    }
+}
+
+// Asynchronously loads the recipe data.
+async function loadRecipe() {
+    setLoading(true); // Show loader.
+    const id = getRecipeIdFromUrl(); // Get recipe ID from URL.
+    if (!id) {
+        showError('No recipe ID provided in URL.');
+        return;
+    }
+    try {
+        // Fetch recipe data from the API.
+        const res = await fetch(`http://localhost:3000/recipes/${id}`);
+        if (!res.ok) {
+            // Handle cases where the recipe is not found (e.g., 404 error).
+            showError('Recipe not found.');
+            return;
+        }
+        const recipe: Recipe = await res.json(); // Parse JSON response.
+
+        // Check if the user has favorited this recipe
+        if (await isUserLoggedIn()) {
+            recipe.isFavorite = await checkFavoriteStatus(id);
+        }
+
+        renderRecipe(recipe); // Render the fetched recipe.
+    } catch (e) {
+        // Handle generic fetch errors (e.g., network issues).
+        showError('Failed to load recipe.');
+        console.error("Error loading recipe:", e);
+    }
+}
+
+// Add an event listener to call loadRecipe when the DOM is fully loaded.
+document.addEventListener('DOMContentLoaded', loadRecipe);
+
+// Add these functions for favorite management
+async function checkFavoriteStatus(recipeId: number): Promise<boolean> {
+    try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) return false;
+
+        const response = await fetch(`http://localhost:3000/recipes/${recipeId}/favorite`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) return false;
+        const data = await response.json();
+        return data.isFavorite === true;
+    } catch (error) {
+        console.error('Error checking favorite status:', error);
+        return false;
+    }
+}
+
+async function toggleFavorite(recipeId: number, button: HTMLElement): Promise<void> {
+    try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            showToast('Please log in to save favorites', true);
+            return;
+        }
+
+        // Disable button during API call
+        button.setAttribute('disabled', 'true');
+
+        const response = await fetch(`http://localhost:3000/recipes/${recipeId}/favorite`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to toggle favorite status');
+        }
+
+        const result = await response.json();
+
+        // Update button appearance based on the new status
+        updateFavoriteButton(button, result.isFavorite);
+
+    } catch (error) {
+        console.error('Error toggling favorite:', error);
+        showToast('Error updating favorite status', true);
+    } finally {
+        // Re-enable button
+        button.removeAttribute('disabled');
+    }
+}
+
+function updateFavoriteButton(button: HTMLElement, isFavorite: boolean): void {
+    const icon = button.querySelector('i');
+    if (!icon) return;
+
+    if (isFavorite) {
+        icon.className = 'fas fa-heart';
+        button.setAttribute('title', 'Remove from favorites');
+    } else {
+        icon.className = 'far fa-heart';
+        button.setAttribute('title', 'Add to favorites');
+    }
+}
+
+function renderFavoriteButton(recipe: Recipe, container: HTMLElement): void {
+    if (!isUserLoggedIn()) {
+        return;
+    }
+
+    const favoriteBtn = document.createElement('button');
+    favoriteBtn.className = 'favorite-btn ms-2';
+    favoriteBtn.innerHTML = `
+        <i class="${recipe.isFavorite ? 'fas' : 'far'} fa-heart me-1"></i>
+    `;
+    favoriteBtn.title = recipe.isFavorite ? 'Remove from favorites' : 'Add to favorites';
+
+    favoriteBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleFavorite(recipe.id, favoriteBtn);
+    });
+
+    container.appendChild(favoriteBtn);
+}
+
+// Add toast notification function
+function showToast(message: string, isError = false): void {
+    // Create toast container if it doesn't exist
+    let toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
+        toastContainer.style.position = 'fixed';
+        toastContainer.style.bottom = '20px';
+        toastContainer.style.right = '20px';
+        toastContainer.style.zIndex = '1050';
+        document.body.appendChild(toastContainer);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${isError ? 'bg-danger text-white' : 'bg-success text-white'}`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+
+    toast.innerHTML = `
+        <div class="toast-body">
+            ${message}
+        </div>
+    `;
+
+    toastContainer.appendChild(toast);
+
+    // Initialize toast using Bootstrap
+    const bsToast = new bootstrap.Toast(toast, { autohide: true, delay: 3000 });
+    bsToast.show();
+
+    // Remove toast from DOM after it's hidden
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
+}
+
+// Update the renderRecipe function to include the favorite button
+function renderRecipe(recipe: Recipe): void {
     setLoading(false); // Hide loader.
     const container = document.getElementById('recipe-dynamic-content');
     if (!container) return; // Exit if the main container isn't found.
@@ -93,7 +412,8 @@ function renderRecipe(recipe: Recipe) {
                         </div>
                     </div>
                     <div class="col-lg-6">
-                        <h4 class="fw-bold mb-3">${recipe.name}</h4>
+                        <div class="recipe-header mb-4">
+                        <h4 class="recipe-title fw-bold mb-3">${recipe.name}</h4>
                         <p class="mb-3">Category: <span class="badge bg-secondary">${recipe.mealTimes.join(', ') || 'N/A'}</span></p>
                         <div class="d-flex mb-3">
                             <span class="badge badge-difficulty-${recipe.difficulty.toLowerCase()} me-2">${recipe.difficulty.charAt(0).toUpperCase() + recipe.difficulty.slice(1)}</span>
@@ -128,6 +448,8 @@ function renderRecipe(recipe: Recipe) {
                             <h5 class="fw-bold mb-2">Tags:</h5>
                             ${recipe.tags && recipe.tags.length > 0 ? recipe.tags.map(tag => `<span class="badge bg-info me-2">${tag}</span>`).join('') : '<span class="text-muted">None</span>'}
                         </div>
+                        </div>
+
                     </div>
                     <div class="col-lg-12">
                         <div class="row">
@@ -171,32 +493,26 @@ function renderRecipe(recipe: Recipe) {
             
         </div>
     `;
-}
 
-// Asynchronously loads the recipe data.
-async function loadRecipe() {
-    setLoading(true); // Show loader.
-    const id = getRecipeIdFromUrl(); // Get recipe ID from URL.
-    if (!id) {
-        showError('No recipe ID provided in URL.');
-        return;
+    // Add favorite button next to the recipe title
+    const recipeTitle = container.querySelector('.recipe-title');
+    if (recipeTitle) {
+        const titleContainer = document.createElement('div');
+        titleContainer.className = 'd-flex align-items-center';
+
+        // Move the existing title into the container
+        titleContainer.appendChild(recipeTitle.cloneNode(true));
+
+        // Add the favorite button
+        renderFavoriteButton(recipe, titleContainer);
+
+        // Replace the original title with our new container
+        recipeTitle.parentNode!.replaceChild(titleContainer, recipeTitle);
     }
-    try {
-        // Fetch recipe data from the API.
-        const res = await fetch(`http://localhost:3000/recipes/${id}`);
-        if (!res.ok) {
-            // Handle cases where the recipe is not found (e.g., 404 error).
-            showError('Recipe not found.');
-            return;
-        }
-        const recipe: Recipe = await res.json(); // Parse JSON response.
-        renderRecipe(recipe); // Render the fetched recipe.
-    } catch (e) {
-        // Handle generic fetch errors (e.g., network issues).
-        showError('Failed to load recipe.');
-        console.error("Error loading recipe:", e);
+
+    // Add rating component
+    const recipeContent = document.getElementById('recipe-content');
+    if (recipeContent) {
+        renderRatingComponent(recipe, recipeContent);
     }
 }
-
-// Add an event listener to call loadRecipe when the DOM is fully loaded.
-document.addEventListener('DOMContentLoaded', loadRecipe);

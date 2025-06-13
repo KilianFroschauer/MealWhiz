@@ -5,6 +5,8 @@ import jwt from 'jsonwebtoken';
 import { pool } from '../config';
 import { UserCredentials } from '../models/auth.models';
 import { AuthRequest } from '../middlewares/auth.middlware';
+import {Recipe} from '../models/recipe.models';
+import {mapDbRowsToRecipes} from '../repository/recipe.repository';
 
 // TODO: move db operations in an auth repository
 
@@ -337,4 +339,66 @@ export class AuthController {
             res.status(StatusCodes.OK).json({ valid: true });
         }
     }
+
+    async getFavorites(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const authReq = req as AuthRequest;
+
+            const favorites = await getUserFavoriteRecipes(authReq.payload.user.userId);
+
+            res.status(200).json(favorites);
+        } catch (error) {
+            console.error(`Error fetching user favorites:`, error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
+}
+
+/**
+ * Get all favorite recipes for a specific user
+ * 
+ * @param userId The ID of the user
+ * @returns Array of Recipe objects that the user has favorited
+ */
+export async function getUserFavoriteRecipes(userId: number): Promise<Recipe[]> {
+  const client = await pool.connect();
+  
+  try {
+    const query = `
+      SELECT 
+        r.recipe_id, 
+        r.title, 
+        r.ingredients, 
+        r.instructions,
+        r.total_time,
+        r.rating,
+        r.description,
+        d.difficulty,
+        dp.diary_pref,
+        c.cuisine,
+        ARRAY(
+          SELECT a.allergen 
+          FROM recipe_allergen ra 
+          JOIN allergens a ON ra.allergen_id = a.allergens_id 
+          WHERE ra.recipe_id = r.recipe_id
+        ) as allergen_list,
+        r.meal_times,
+        uf.created_at as favorited_at
+      FROM recipe r
+      JOIN user_favorites uf ON r.recipe_id = uf.recipe_id
+      LEFT JOIN difficulty d ON r.difficulty = d.difficulty_id
+      LEFT JOIN diary_pref dp ON r.diary_pref_id = dp.diary_pref_id
+      LEFT JOIN cuisine c ON r.cuisine_id = c.cuisine_id
+      WHERE uf.user_id = $1
+      ORDER BY uf.created_at DESC
+    `;
+    
+    const result = await client.query(query, [userId]);
+    return await mapDbRowsToRecipes(result.rows);
+  } catch (error) {
+    console.error('Error fetching user favorite recipes:', error);
+    throw error;
+  } finally {
+    client.release();
+  }
 }

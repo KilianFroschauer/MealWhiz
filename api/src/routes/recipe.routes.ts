@@ -1,5 +1,6 @@
 import express from "express";
 import { RecipeController } from "../controller/recipe.controller";
+import { isAuthenticated } from "../middlewares/auth.middlware";
 
 export const recipeRouter = express.Router();
 const recipeController = new RecipeController();
@@ -277,3 +278,125 @@ recipeRouter.get("/", recipeController.getFilteredRecipes);
  *                   example: "Recipe not found"
  */
 recipeRouter.get("/:id", recipeController.getRecipeById);
+
+/**
+ * @swagger
+ * /recipes/{id}/rate:
+ *   post:
+ *     tags:
+ *       - recipe
+ *     summary: Rate a recipe
+ *     description: Submit a rating for a recipe (requires authentication)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the recipe to rate
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               rating:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 5
+ *                 description: Rating value from 1 to 5
+ *     responses:
+ *       200:
+ *         description: Rating submitted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 newRating:
+ *                   type: number
+ *                   example: 4.5
+ *       400:
+ *         description: Invalid input
+ *       401:
+ *         description: Unauthorized - user must be logged in
+ *       404:
+ *         description: Recipe not found
+ */
+recipeRouter.post("/:id/rate", isAuthenticated, recipeController.rateRecipe);
+
+/**
+ * @swagger
+ * /recipes/{id}/favorite:
+ *   post:
+ *     tags:
+ *       - recipe
+ *     summary: Toggle a recipe as favorite
+ *     description: Add or remove a recipe from the user's favorites
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the recipe to favorite/unfavorite
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 isFavorite:
+ *                   type: boolean
+ *                   description: Whether the recipe is now favorited
+ *                 count:
+ *                   type: integer
+ *                   description: Total number of users who favorited this recipe
+ *       401:
+ *         description: Unauthorized - user must be logged in
+ */
+recipeRouter.post("/:id/favorite", isAuthenticated, recipeController.toggleFavorite);
+
+/**
+ * @swagger
+ * /recipes/{id}/favorite:
+ *   get:
+ *     tags:
+ *       - recipe
+ *     summary: Check if a recipe is favorited
+ *     description: Check if the current user has favorited a specific recipe
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the recipe to check
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 isFavorite:
+ *                   type: boolean
+ *       401:
+ *         description: Unauthorized - user must be logged in
+ */
+recipeRouter.get("/:id/favorite", isAuthenticated, recipeController.checkFavorite);
