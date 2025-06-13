@@ -3,7 +3,7 @@ import { Recipe, RecipeFilterOptions } from "../models/recipe.models";
 import {
   parseIngredients,
   mapDifficultyToEnum,
-  determineMealTimes, 
+  determineMealTimes,
   calculateRecipeNutrition,
 } from "../utils/recipe.utils";
 
@@ -61,7 +61,7 @@ export async function getAllRecipes(): Promise<Recipe[]> {
       LEFT JOIN diary_pref dp ON r.diary_pref_id = dp.diary_pref_id
       LEFT JOIN cuisine c ON r.cuisine_id = c.cuisine_id
     `;
-    
+
     const result = await pool.query(query);
     return mapDbRowsToRecipes(result.rows);
   } catch (error) {
@@ -172,18 +172,27 @@ export async function getFilteredRecipes(filters: RecipeFilterOptions): Promise<
       paramIndex++;
     }
 
-    // Filter by meal times (assumes r.meal_times is an array in the DB)
     if (filters.mealTimes?.length) {
-      conditions.push(`r.meal_times && $${paramIndex}::text[]`); // Use array overlap operator
-      params.push(filters.mealTimes);
-      paramIndex++;
-    }
+  // Capitalize first letter of each meal time to match the enum values in the database
+  const capitalizedMealTimes = filters.mealTimes.map(
+    mt => mt.charAt(0).toUpperCase() + mt.slice(1).toLowerCase()
+  );
+  
+  // Use ANY to compare enum values directly
+  conditions.push(`EXISTS (
+    SELECT 1 FROM unnest(r.meal_times) mt 
+    WHERE mt::text = ANY($${paramIndex}::text[])
+  )`);
+  
+  params.push(capitalizedMealTimes);
+  paramIndex++;
+}
 
-     // Filter by tags (assuming tags are represented by cuisine in this context)
+    // Filter by tags (assuming tags are represented by cuisine in this context)
     if (filters.tags?.length) {
-        conditions.push(`c.cuisine = ANY($${paramIndex}::text[])`);
-        params.push(filters.tags);
-        paramIndex++;
+      conditions.push(`c.cuisine = ANY($${paramIndex}::text[])`);
+      params.push(filters.tags);
+      paramIndex++;
     }
 
     // Add WHERE clause if we have conditions
@@ -226,12 +235,12 @@ export async function mapDbRowsToRecipes(rows: any[]): Promise<Recipe[]> {
 
     let ingredients = basicIngredients;
     let ingredientsAmount: string[] = [];
-    
+
     try {
       const client = await pool.connect();
       const result = await client.query(ingredientQuery, [row.recipe_id]);
       client.release();
-      
+
       if (result.rows.length > 0) {
         ingredients = result.rows.map(r => r.ingredient_name);
         ingredientsAmount = result.rows.map(r => `${r.quantity} ${r.unit}`);
@@ -260,11 +269,11 @@ export async function mapDbRowsToRecipes(rows: any[]): Promise<Recipe[]> {
       difficulty: difficulty,
       mealTimes: determineMealTimes(row),
       tags: row.cuisine ? [row.cuisine] : [],
-      servings: row.servings || 4, 
-      instructions: row.instructions || '' 
+      servings: row.servings || 4,
+      instructions: row.instructions || ''
     };
   });
-  
+
   return Promise.all(recipePromises);
 }
 
@@ -277,22 +286,22 @@ export async function mapDbRowsToRecipes(rows: any[]): Promise<Recipe[]> {
  */
 export async function updateRecipeRating(recipeId: number, rating: number, userId: number): Promise<Recipe | undefined> {
   const client = await pool.connect();
-  
+
   try {
     await client.query('BEGIN');
-    
+
     // First check if recipe exists
     const recipeCheck = await client.query('SELECT recipe_id FROM recipe WHERE recipe_id = $1', [recipeId]);
     if (recipeCheck.rows.length === 0) {
       return undefined; // Recipe not found
     }
-    
+
     // Check if user has already rated this recipe
     const existingRating = await client.query(
       'SELECT * FROM user_recipe_ratings WHERE user_id = $1 AND recipe_id = $2',
       [userId, recipeId]
     );
-    
+
     if (existingRating.rows.length > 0) {
       // Update existing rating
       await client.query(
@@ -306,26 +315,26 @@ export async function updateRecipeRating(recipeId: number, rating: number, userI
         [userId, recipeId, rating]
       );
     }
-    
+
     // Calculate new average rating
     const avgResult = await client.query(
       'SELECT AVG(rating) as avg_rating FROM user_recipe_ratings WHERE recipe_id = $1',
       [recipeId]
     );
-    
+
     const avgRating = parseFloat(avgResult.rows[0].avg_rating);
-    
+
     // Update the recipe with new average rating
     await client.query(
       'UPDATE recipe SET rating = $1 WHERE recipe_id = $2',
       [avgRating, recipeId]
     );
-    
+
     await client.query('COMMIT');
-    
+
     // Fetch the updated recipe
     return await getRecipeById(recipeId);
-    
+
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('Error updating recipe rating:', error);
@@ -344,26 +353,26 @@ export async function updateRecipeRating(recipeId: number, rating: number, userI
  * @param userId The ID of the user
  * @returns Object with added property indicating whether recipe was added (true) or removed (false)
  */
-export async function toggleRecipeFavorite(recipeId: number, userId: number): Promise<{added: boolean}> {
+export async function toggleRecipeFavorite(recipeId: number, userId: number): Promise<{ added: boolean }> {
   const client = await pool.connect();
-  
+
   try {
     // First, check if the recipe exists
     const recipeCheck = await client.query(
       'SELECT recipe_id FROM recipe WHERE recipe_id = $1',
       [recipeId]
     );
-    
+
     if (recipeCheck.rows.length === 0) {
       throw new Error('Recipe not found');
     }
-    
+
     // Check if the recipe is already favorited by this user
     const favoriteCheck = await client.query(
       'SELECT * FROM user_favorites WHERE user_id = $1 AND recipe_id = $2',
       [userId, recipeId]
     );
-    
+
     // If already favorited, remove it
     if (favoriteCheck.rows.length > 0) {
       await client.query(
@@ -372,13 +381,13 @@ export async function toggleRecipeFavorite(recipeId: number, userId: number): Pr
       );
       return { added: false };
     }
-    
+
     // If not favorited, add it
     await client.query(
       'INSERT INTO user_favorites (user_id, recipe_id, created_at) VALUES ($1, $2, NOW())',
       [userId, recipeId]
     );
-    
+
     return { added: true };
   } catch (error) {
     console.error('Error toggling recipe favorite status:', error);
@@ -397,13 +406,13 @@ export async function toggleRecipeFavorite(recipeId: number, userId: number): Pr
  */
 export async function isRecipeFavorited(recipeId: number, userId: number): Promise<boolean> {
   const client = await pool.connect();
-  
+
   try {
     const result = await client.query(
       'SELECT * FROM user_favorites WHERE user_id = $2 AND recipe_id = $1',
       [userId, recipeId]
     );
-    
+
     return result.rows.length > 0;
   } catch (error) {
     console.error('Error checking favorite status:', error);
