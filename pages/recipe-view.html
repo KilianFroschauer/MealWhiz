@@ -1,199 +1,214 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>MealWhiz - Recipe Details</title>
+        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+        <meta content="" name="keywords" />
+        <meta content="" name="description" />
 
-<head>
-    <meta charset="utf-8">
-    <title>MealWhiz - Recipe Details</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="" name="keywords">
-    <meta content="" name="description">
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="../assets/img/Logo-Whizard-cropped.jpg" />
+        <link rel="shortcut icon" type="image/png" href="../assets/img/Logo-Whizard-cropped.jpg" />
+        <link rel="apple-touch-icon" href="../assets/img/Logo-Whizard-cropped.jpg" />
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="../assets/img/Logo-Whizard-cropped.jpg">
-    <link rel="shortcut icon" type="image/png" href="../assets/img/Logo-Whizard-cropped.jpg">
-    <link rel="apple-touch-icon" href="../assets/img/Logo-Whizard-cropped.jpg">
+        <!-- Google Web Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap"
+            rel="stylesheet"
+        />
+        <!-- K2D Google Font import -->
+        <link href="https://fonts.googleapis.com/css2?family=K2D:wght@500;600;700;1000&display=swap" rel="stylesheet" />
 
-    <!-- Google Web Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap"
-        rel="stylesheet">
-    <!-- K2D Google Font import -->
-    <link href="https://fonts.googleapis.com/css2?family=K2D:wght@500;600;700;1000&display=swap" rel="stylesheet">
+        <!-- Icon Font Stylesheet -->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet" />
 
-    <!-- Icon Font Stylesheet -->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+        <!-- Libraries Stylesheet -->
+        <link href="../assets/lib/lightbox/css/lightbox.min.css" rel="stylesheet" />
+        <link href="../assets/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet" />
 
-    <!-- Libraries Stylesheet -->
-    <link href="../assets/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
-    <link href="../assets/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+        <!-- Customized Bootstrap Stylesheet -->
+        <link href="../assets/css/bootstrap.min.css" rel="stylesheet" />
 
+        <!-- Template Stylesheet -->
+        <link href="../assets/css/style.css" rel="stylesheet" />
 
-    <!-- Customized Bootstrap Stylesheet -->
-    <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Add before the closing head tag -->
+        <style>
+            .star-rating {
+                display: flex;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
 
-    <!-- Template Stylesheet -->
-    <link href="../assets/css/style.css" rel="stylesheet">
+            .star-rating i {
+                margin-right: 5px;
+                transition: all 0.2s;
+            }
 
-    <!-- Add before the closing head tag -->
-<style>
-    .star-rating {
-        display: flex;
-        font-size: 1.5rem;
-        cursor: pointer;
-    }
-    
-    .star-rating i {
-        margin-right: 5px;
-        transition: all 0.2s;
-    }
-    
-    .star-rating i:hover {
-        transform: scale(1.2);
-    }
-    
-    .rating-message {
-        font-size: 0.9rem;
-    }
+            .star-rating i:hover {
+                transform: scale(1.2);
+            }
 
-    .favorite-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        color: #212529;
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 0.25rem;
-        padding: 0.375rem 0.75rem;
-        font-size: 1rem;
-        line-height: 1.5;
-        cursor: pointer;
-        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
-    }
-    
-    .favorite-btn:hover {
-        background-color: #e9ecef;
-    }
-    
-    .favorite-btn .fas {
-        color: #ffc107; /* Yellow/gold star when favorited */
-    }
-    
-    .favorite-btn .far {
-        color: #6c757d; /* Gray star when not favorited */
-    }
-</style>
-</head>
+            .rating-message {
+                font-size: 0.9rem;
+            }
 
-<body>
+            .favorite-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                color: #212529;
+                background-color: #f8f9fa;
+                border: 1px solid #dee2e6;
+                border-radius: 0.25rem;
+                padding: 0.375rem 0.75rem;
+                font-size: 1rem;
+                line-height: 1.5;
+                cursor: pointer;
+                transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+            }
 
-    <!-- Spinner Start -->
-    <div id="spinner"
-        class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50  d-flex align-items-center justify-content-center">
-        <div class="spinner-grow text-primary" role="status"></div>
-    </div>
-    <!-- Spinner End -->
+            .favorite-btn:hover {
+                background-color: #e9ecef;
+            }
 
+            .favorite-btn .fas {
+                color: #ffc107; /* Yellow/gold star when favorited */
+            }
 
-    <!-- Navbar start -->
-    <div class="container-fluid fixed-top">
-        <div class="container px-0">
-            <nav class="navbar navbar-light bg-white navbar-expand-xl">
-                <a href="../index.html" class="navbar-brand d-flex align-items-center">
-                    <img src="../assets/img/Logo-Whizard-cropped-tranparent.png" alt="MealWhiz Logo"
-                        style="height: 65px; margin-right: 10px;">
-                    <h1 class="m-0"
-                        style="font-family: 'K2D', sans-serif; color: #000; font-weight: 1000; font-size: 3.5rem;">
-                        MealWhiz</h1>
-                </a>
-                <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarCollapse">
-                    <span class="fa fa-bars text-primary"></span>
-                </button>
-                <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
-                    <div class="navbar-nav mx-auto">
-                        <a href="../index.html" class="nav-item nav-link">Home</a>
-                        <a href="recipes.html" class="nav-item nav-link active">Recipes</a>
-                        <a href="CookOff.html" class="nav-item nav-link">CookOff</a>
-                    </div>
-                    <div class="d-flex m-3 me-0">
-                        <button
-                            class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4"
-                            data-bs-toggle="modal" data-bs-target="#searchModal"><i
-                                class="fas fa-search text-primary"></i></button>
-                        <a href="shopping_cart.html" class="position-relative me-4 my-auto cart-icon">
-                            <i class="fa fa-shopping-bag fa-2x"></i>
-                            <span
-                                class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-white px-1"
-                                style="top: -5px; left: 15px; height: 20px; min-width: 20px;" id="cart-count">0</span>
-                        </a>
-                        <a href="login.html" class="my-auto">
-                            <i class="fas fa-user fa-2x"></i>
-                        </a>
-                    </div>
-                </div>
-            </nav>
+            .favorite-btn .far {
+                color: #6c757d; /* Gray star when not favorited */
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- Spinner Start -->
+        <div
+            id="spinner"
+            class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center"
+        >
+            <div class="spinner-grow text-primary" role="status"></div>
         </div>
-    </div>
-    <!-- Navbar End -->
+        <!-- Spinner End -->
 
+        <!-- Navbar start -->
+        <div class="container-fluid fixed-top">
+            <div class="container px-0">
+                <nav class="navbar navbar-light bg-white navbar-expand-xl">
+                    <a href="../index.html" class="navbar-brand d-flex align-items-center">
+                        <img
+                            src="../assets/img/Logo-Whizard-cropped-tranparent.png"
+                            alt="MealWhiz Logo"
+                            style="height: 65px; margin-right: 10px"
+                        />
+                        <h1
+                            class="m-0"
+                            style="font-family: 'K2D', sans-serif; color: #000; font-weight: 1000; font-size: 3.5rem"
+                        >
+                            MealWhiz
+                        </h1>
+                    </a>
+                    <button
+                        class="navbar-toggler py-2 px-3"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#navbarCollapse"
+                    >
+                        <span class="fa fa-bars text-primary"></span>
+                    </button>
+                    <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
+                        <div class="navbar-nav mx-auto">
+                            <a href="../index.html" class="nav-item nav-link">Home</a>
+                            <a href="recipes.html" class="nav-item nav-link active">Recipes</a>
+                            <a href="CookOff.html" class="nav-item nav-link">CookOff</a>
+                        </div>
+                        <div class="d-flex m-3 me-0">
+                            <button
+                                class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4"
+                                data-bs-toggle="modal"
+                                data-bs-target="#searchModal"
+                            >
+                                <i class="fas fa-search text-primary"></i>
+                            </button>
+                            <a href="shopping_cart.html" class="position-relative me-4 my-auto cart-icon">
+                                <i class="fa fa-shopping-bag fa-2x"></i>
+                                <span
+                                    class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-white px-1"
+                                    style="top: -5px; left: 15px; height: 20px; min-width: 20px"
+                                    id="cart-count"
+                                    >0</span
+                                >
+                            </a>
+                            <a href="login.html" class="my-auto">
+                                <i class="fas fa-user fa-2x"></i>
+                            </a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+        <!-- Navbar End -->
 
-    <!-- Modal Search Start -->
-    <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-fullscreen">
-            <div class="modal-content rounded-0">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Search by keyword</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body d-flex align-items-center">
-                    <div class="input-group w-75 mx-auto d-flex">
-                        <input type="search" class="form-control p-3" placeholder="keywords"
-                            aria-describedby="search-icon-1">
-                        <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
+        <!-- Modal Search Start -->
+        <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-fullscreen">
+                <div class="modal-content rounded-0">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Search by keyword</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body d-flex align-items-center">
+                        <div class="input-group w-75 mx-auto d-flex">
+                            <input
+                                type="search"
+                                class="form-control p-3"
+                                placeholder="keywords"
+                                aria-describedby="search-icon-1"
+                            />
+                            <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <!-- Modal Search End -->
+        <!-- Modal Search End -->
 
-
-    <!-- Single Page Header start -->
-    <div class="container-fluid page-header py-5">
-        <h1 class="text-center text-white display-6">Recipe Details</h1>
-        <ol class="breadcrumb justify-content-center mb-0">
-            <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
-            <li class="breadcrumb-item"><a href="recipes.html">Recipes</a></li>
-            <li class="breadcrumb-item active text-white">Recipe Details</li>
-        </ol>
-    </div>
-    <!-- Single Page Header End -->
-
-
-    <!-- Recipe Details Start -->
-    <div class="container-fluid py-5 mt-5">
-        <div class="container py-5" id="recipe-dynamic-content">
-            <!-- Recipe details will be injected here by recipe-view.js -->
+        <!-- Single Page Header start -->
+        <div class="container-fluid page-header py-5">
+            <h1 class="text-center text-white display-6">Recipe Details</h1>
+            <ol class="breadcrumb justify-content-center mb-0">
+                <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
+                <li class="breadcrumb-item"><a href="recipes.html">Recipes</a></li>
+                <li class="breadcrumb-item active text-white">Recipe Details</li>
+            </ol>
         </div>
-    </div>
-    <!-- Recipe Details End -->
+        <!-- Single Page Header End -->
 
+        <!-- Recipe Details Start -->
+        <div class="container-fluid py-5 mt-5">
+            <div class="container py-5" id="recipe-dynamic-content">
+                <!-- Recipe details will be injected here by recipe-view.js -->
+            </div>
+        </div>
+        <!-- Recipe Details End -->
 
-    <!-- Footer Start -->
-    <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
-        <div class="container py-5">
-            <div class="pb-4 mb-4" style="border-bottom: 1px solid rgba(226, 175, 24, 0.5)">
-                <div class="row g-4">
-                    <div class="col-lg-3">
-                        <a href="#">
-                            <h1 class="text-primary mb-0">MealWhiz</h1>
-                            <!-- <p class="text-secondary mb-0">Fresh products</p> -->
-                        </a>
-                    </div>
-                    <!-- <div class="col-lg-6">
+        <!-- Footer Start -->
+        <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
+            <div class="container py-5">
+                <div class="pb-4 mb-4" style="border-bottom: 1px solid rgba(226, 175, 24, 0.5)">
+                    <div class="row g-4">
+                        <div class="col-lg-3">
+                            <a href="#">
+                                <h1 class="text-primary mb-0">MealWhiz</h1>
+                                <!-- <p class="text-secondary mb-0">Fresh products</p> -->
+                            </a>
+                        </div>
+                        <!-- <div class="col-lg-6">
                         <div class="position-relative mx-auto">
                             <input class="form-control border-0 w-100 py-3 px-4 rounded-pill" type="number"
                                 placeholder="Your Email" />
@@ -216,157 +231,157 @@
                                     class="fab fa-linkedin-in"></i></a>
                         </div>
                     </div> -->
+                    </div>
+                </div>
+                <div class="row g-5">
+                    <div class="col-lg-3 col-md-6" style="width: 40%">
+                        <div class="footer-item">
+                            <h4 class="text-light mb-3">Why People Like Us!</h4>
+                            <p class="mb-4">
+                                Meal Whiz takes the stress out of everyday cooking by turning leftover ingredients into
+                                exciting, personalized meals.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="d-flex flex-column text-start footer-item">
+                            <h4 class="text-light mb-3">Navigation</h4>
+                            <a class="btn-link" href="../index.html">Home</a>
+                            <a class="btn-link" href="./recipes.html">Recipes</a>
+                            <a class="btn-link" href="./cookoff.html">CookOff</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-item">
+                            <h4 class="text-light mb-3">Contact</h4>
+                            <p>Address: Limesstraße 12/14, 4060 Leonding</p>
+                            <p>Email: mealhwiz@mealwhiz.at</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="row g-5">
-                <div class="col-lg-3 col-md-6" style="width: 40%;">
-                    <div class="footer-item">
-                        <h4 class="text-light mb-3">Why People Like Us!</h4>
-                        <p class="mb-4">
-                            Meal Whiz takes the stress out of everyday cooking by turning leftover ingredients into
-                            exciting, personalized meals.
-                        </p>
+        </div>
+        <!-- Footer End -->
+
+        <!-- Copyright Start -->
+        <div class="container-fluid copyright bg-dark py-4">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                        <span class="text-light"
+                            ><a href="#"><i class="fas fa-copyright text-light me-2"></i>Your Site Name</a>, All right
+                            reserved.</span
+                        >
                     </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="d-flex flex-column text-start footer-item">
-                        <h4 class="text-light mb-3">Navigation</h4>
-                        <a class="btn-link" href="../index.html">Home</a>
-                        <a class="btn-link" href="./recipes.html">Recipes</a>
-                        <a class="btn-link" href="./cookoff.html">CookOff</a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="footer-item">
-                        <h4 class="text-light mb-3">Contact</h4>
-                        <p>Address: Limesstraße 12/14, 4060 Leonding</p>
-                        <p>Email: mealhwiz@mealwhiz.at</p>
+                    <div class="col-md-6 my-auto text-center text-md-end text-white">
+                        <!--/*** This template is free as long as you keep the below author’s credit link/attribution link/backlink. ***/-->
+                        <!--/*** If you'd like to use the template without the below author’s credit link/attribution link/backlink, ***/-->
+                        <!--/*** you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". ***/-->
+                        Designed By <a class="border-bottom" href="https://htmlcodex.com">HTML Codex</a> Distributed By
+                        <a class="border-bottom" href="https://themewagon.com">ThemeWagon</a>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <!-- Footer End -->
+        <!-- Copyright End -->
 
-    <!-- Copyright Start -->
-    <div class="container-fluid copyright bg-dark py-4">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <span class="text-light"><a href="#"><i class="fas fa-copyright text-light me-2"></i>Your Site
-                            Name</a>, All right reserved.</span>
-                </div>
-                <div class="col-md-6 my-auto text-center text-md-end text-white">
-                    <!--/*** This template is free as long as you keep the below author’s credit link/attribution link/backlink. ***/-->
-                    <!--/*** If you'd like to use the template without the below author’s credit link/attribution link/backlink, ***/-->
-                    <!--/*** you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". ***/-->
-                    Designed By <a class="border-bottom" href="https://htmlcodex.com">HTML Codex</a> Distributed By <a
-                        class="border-bottom" href="https://themewagon.com">ThemeWagon</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Copyright End -->
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"
+            ><i class="fa fa-arrow-up"></i
+        ></a>
 
+        <!-- JavaScript Libraries -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="../assets/lib/easing/easing.min.js"></script>
+        <script src="../assets/lib/waypoints/waypoints.min.js"></script>
+        <script src="../assets/lib/lightbox/js/lightbox.min.js"></script>
+        <script src="../assets/lib/owlcarousel/owl.carousel.min.js"></script>
 
+        <!-- Template Javascript -->
+        <script src="../assets/js/main.js"></script>
+        <script src="../assets/js/recipe-view.js"></script>
+        <script src="../assets/js/auth-nav.js"></script>
 
-    <!-- Back to Top -->
-    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
-            class="fa fa-arrow-up"></i></a>
+        <!-- Add before the closing body tag -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // Modify the ingredients section to add a button
+                const addButtonToIngredientsSection = () => {
+                    const ingredientsSection = document.querySelector("#ingredients-section");
+                    if (ingredientsSection) {
+                        const heading = ingredientsSection.querySelector("h4");
+                        if (heading) {
+                            // Convert to flex container to put button on the right
+                            heading.style.display = "flex";
+                            heading.style.justifyContent = "space-between";
+                            heading.style.alignItems = "center";
 
+                            // Create the button
+                            const addToCartBtn = document.createElement("button");
+                            addToCartBtn.className = "btn btn-sm btn-outline-primary";
+                            addToCartBtn.innerHTML = '<i class="fa fa-shopping-bag me-1"></i> Add all to shopping list';
 
-    <!-- JavaScript Libraries -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/lib/easing/easing.min.js"></script>
-    <script src="../assets/lib/waypoints/waypoints.min.js"></script>
-    <script src="../assets/lib/lightbox/js/lightbox.min.js"></script>
-    <script src="../assets/lib/owlcarousel/owl.carousel.min.js"></script>
+                            // Add click handler
+                            addToCartBtn.addEventListener("click", function () {
+                                const recipeId = new URLSearchParams(window.location.search).get("id");
+                                if (recipeId) {
+                                    addRecipeToShoppingList(recipeId);
+                                }
+                            });
 
-    <!-- Template Javascript -->
-    <script src="../assets/js/main.js"></script>
-    <script src="../assets/js/recipe-view.js"></script>
-    <script src="../assets/js/auth-nav.js"></script>
-
-    <!-- Add before the closing body tag -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Modify the ingredients section to add a button
-            const addButtonToIngredientsSection = () => {
-                const ingredientsSection = document.querySelector('#ingredients-section');
-                if (ingredientsSection) {
-                    const heading = ingredientsSection.querySelector('h4');
-                    if (heading) {
-                        // Convert to flex container to put button on the right
-                        heading.style.display = 'flex';
-                        heading.style.justifyContent = 'space-between';
-                        heading.style.alignItems = 'center';
-
-                        // Create the button
-                        const addToCartBtn = document.createElement('button');
-                        addToCartBtn.className = 'btn btn-sm btn-outline-primary';
-                        addToCartBtn.innerHTML = '<i class="fa fa-shopping-bag me-1"></i> Add all to shopping list';
-
-                        // Add click handler
-                        addToCartBtn.addEventListener('click', function () {
-                            const recipeId = new URLSearchParams(window.location.search).get('id');
-                            if (recipeId) {
-                                addRecipeToShoppingList(recipeId);
-                            }
-                        });
-
-                        heading.appendChild(addToCartBtn);
-                    }
-                }
-            };
-
-            // Function to add all ingredients to shopping list
-            function addRecipeToShoppingList(recipeId) {
-                const token = localStorage.getItem('accessToken');
-                if (!token) {
-                    showToast('Please log in to add items to your shopping list', true);
-                    return;
-                }
-
-                fetch(`http://localhost:3000/cart/recipe/${recipeId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`Failed to add ingredients (${response.status})`);
+                            heading.appendChild(addToCartBtn);
                         }
-                        return response.text();
-                    })
-                    .then(() => {
-                        showToast('All ingredients added to shopping list!');
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showToast('Error adding ingredients to shopping list', true);
-                    });
-            }
+                    }
+                };
 
-            // Helper function to show toast notifications
-            function showToast(message, isError = false) {
-                // Create toast container if it doesn't exist
-                let toastContainer = document.querySelector('.toast-container');
-                if (!toastContainer) {
-                    toastContainer = document.createElement('div');
-                    toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
-                    document.body.appendChild(toastContainer);
+                // Function to add all ingredients to shopping list
+                function addRecipeToShoppingList(recipeId) {
+                    const token = localStorage.getItem("accessToken");
+                    if (!token) {
+                        showToast("Please log in to add items to your shopping list", true);
+                        return;
+                    }
+
+                    fetch(`http://mealwhiz.at:3000/cart/recipe/${recipeId}`, {
+                        method: "POST",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    })
+                        .then((response) => {
+                            if (!response.ok) {
+                                throw new Error(`Failed to add ingredients (${response.status})`);
+                            }
+                            return response.text();
+                        })
+                        .then(() => {
+                            showToast("All ingredients added to shopping list!");
+                        })
+                        .catch((error) => {
+                            console.error("Error:", error);
+                            showToast("Error adding ingredients to shopping list", true);
+                        });
                 }
 
-                // Create toast element
-                const toastEl = document.createElement('div');
-                toastEl.className = `toast ${isError ? 'bg-danger' : 'bg-success'} text-white`;
-                toastEl.setAttribute('role', 'alert');
+                // Helper function to show toast notifications
+                function showToast(message, isError = false) {
+                    // Create toast container if it doesn't exist
+                    let toastContainer = document.querySelector(".toast-container");
+                    if (!toastContainer) {
+                        toastContainer = document.createElement("div");
+                        toastContainer.className = "toast-container position-fixed bottom-0 end-0 p-3";
+                        document.body.appendChild(toastContainer);
+                    }
 
-                toastEl.innerHTML = `
-                <div class="toast-header ${isError ? 'bg-danger' : 'bg-success'} text-white">
-                    <strong class="me-auto">${isError ? 'Error' : 'Success'}</strong>
+                    // Create toast element
+                    const toastEl = document.createElement("div");
+                    toastEl.className = `toast ${isError ? "bg-danger" : "bg-success"} text-white`;
+                    toastEl.setAttribute("role", "alert");
+
+                    toastEl.innerHTML = `
+                <div class="toast-header ${isError ? "bg-danger" : "bg-success"} text-white">
+                    <strong class="me-auto">${isError ? "Error" : "Success"}</strong>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
                 <div class="toast-body">
@@ -374,31 +389,30 @@
                 </div>
             `;
 
-                // Add to container
-                toastContainer.appendChild(toastEl);
+                    // Add to container
+                    toastContainer.appendChild(toastEl);
 
-                // Initialize and show using Bootstrap's toast
-                const toast = new bootstrap.Toast(toastEl, { autohide: true, delay: 5000 });
-                toast.show();
+                    // Initialize and show using Bootstrap's toast
+                    const toast = new bootstrap.Toast(toastEl, { autohide: true, delay: 5000 });
+                    toast.show();
 
-                // Remove from DOM after hiding
-                toastEl.addEventListener('hidden.bs.toast', function () {
-                    toastContainer.removeChild(toastEl);
-                });
-            }
-
-            // Wait for recipe to load, then add button
-            const checkForIngredientsAndAddButton = () => {
-                if (document.querySelector('#ingredients-section')) {
-                    addButtonToIngredientsSection();
-                } else {
-                    setTimeout(checkForIngredientsAndAddButton, 300);
+                    // Remove from DOM after hiding
+                    toastEl.addEventListener("hidden.bs.toast", function () {
+                        toastContainer.removeChild(toastEl);
+                    });
                 }
-            };
 
-            checkForIngredientsAndAddButton();
-        });
-    </script>
-</body>
+                // Wait for recipe to load, then add button
+                const checkForIngredientsAndAddButton = () => {
+                    if (document.querySelector("#ingredients-section")) {
+                        addButtonToIngredientsSection();
+                    } else {
+                        setTimeout(checkForIngredientsAndAddButton, 300);
+                    }
+                };
 
+                checkForIngredientsAndAddButton();
+            });
+        </script>
+    </body>
 </html>
