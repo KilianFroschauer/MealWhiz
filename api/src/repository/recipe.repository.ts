@@ -206,7 +206,7 @@ export async function getFilteredRecipes(filters: RecipeFilterOptions): Promise<
  * @param rows An array of rows from the database.
  * @returns A promise that resolves to an array of Recipe objects.
  */
-async function mapDbRowsToRecipes(rows: any[]): Promise<Recipe[]> {
+export async function mapDbRowsToRecipes(rows: any[]): Promise<Recipe[]> {
   const recipePromises = rows.map(async row => {
     const basicIngredients = parseIngredients(row.ingredients);
     const difficulty = mapDifficultyToEnum(row.difficulty);
@@ -329,6 +329,84 @@ export async function updateRecipeRating(recipeId: number, rating: number, userI
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('Error updating recipe rating:', error);
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Toggle a recipe as favorite for a user
+ * Adds the recipe to favorites if not already favorited, 
+ * or removes it if already a favorite
+ * 
+ * @param recipeId The ID of the recipe to toggle
+ * @param userId The ID of the user
+ * @returns Object with added property indicating whether recipe was added (true) or removed (false)
+ */
+export async function toggleRecipeFavorite(recipeId: number, userId: number): Promise<{added: boolean}> {
+  const client = await pool.connect();
+  
+  try {
+    // First, check if the recipe exists
+    const recipeCheck = await client.query(
+      'SELECT recipe_id FROM recipe WHERE recipe_id = $1',
+      [recipeId]
+    );
+    
+    if (recipeCheck.rows.length === 0) {
+      throw new Error('Recipe not found');
+    }
+    
+    // Check if the recipe is already favorited by this user
+    const favoriteCheck = await client.query(
+      'SELECT * FROM user_favorites WHERE user_id = $1 AND recipe_id = $2',
+      [userId, recipeId]
+    );
+    
+    // If already favorited, remove it
+    if (favoriteCheck.rows.length > 0) {
+      await client.query(
+        'DELETE FROM user_favorites WHERE user_id = $1 AND recipe_id = $2',
+        [userId, recipeId]
+      );
+      return { added: false };
+    }
+    
+    // If not favorited, add it
+    await client.query(
+      'INSERT INTO user_favorites (user_id, recipe_id, created_at) VALUES ($1, $2, NOW())',
+      [userId, recipeId]
+    );
+    
+    return { added: true };
+  } catch (error) {
+    console.error('Error toggling recipe favorite status:', error);
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Check if a recipe is favorited by a specific user
+ * 
+ * @param recipeId The ID of the recipe to check
+ * @param userId The ID of the user
+ * @returns Boolean indicating whether the recipe is favorited
+ */
+export async function isRecipeFavorited(recipeId: number, userId: number): Promise<boolean> {
+  const client = await pool.connect();
+  
+  try {
+    const result = await client.query(
+      'SELECT * FROM user_favorites WHERE user_id = $2 AND recipe_id = $1',
+      [userId, recipeId]
+    );
+    
+    return result.rows.length > 0;
+  } catch (error) {
+    console.error('Error checking favorite status:', error);
     throw error;
   } finally {
     client.release();

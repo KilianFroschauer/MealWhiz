@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { getAllRecipes, getRecipeById, getFilteredRecipes, updateRecipeRating } from '../repository/recipe.repository';
 import { convertToSimpleRecipe } from '../utils/recipe.utils';
 import { AuthRequest } from '../middlewares/auth.middlware';
+import { toggleRecipeFavorite as toggleFavoriteRecipe, isRecipeFavorited } from '../repository/recipe.repository';
 // Convert query params to arrays (handles single or multiple values)
 const parseArrayParam = (param: string | string[] | undefined) =>
     param ? (Array.isArray(param) ? param : param.split(",")) : [];
@@ -107,8 +108,6 @@ export class RecipeController {
         }
     }
 
-    // ...existing code...
-
     async rateRecipe(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const authReq = req as AuthRequest;
@@ -140,4 +139,50 @@ export class RecipeController {
             res.status(500).json({ error: "Internal server error" });
         }
     }
+
+    async toggleFavorite(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const authReq = req as AuthRequest;
+            const recipeId = parseInt(req.params.id);
+
+            // Validate recipe ID
+            if (isNaN(recipeId)) {
+                res.status(400).json({ error: "Invalid recipe ID" });
+                return;
+            }
+
+            const result = await toggleFavoriteRecipe(recipeId, authReq.payload.user.userId);
+
+            res.status(200).json({
+                success: true,
+                isFavorite: result.added
+            });
+        } catch (error) {
+            console.error(`Error toggling favorite for recipe:`, error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
+
+    async checkFavorite(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const authReq = req as AuthRequest;
+            const recipeId = parseInt(req.params.id);
+
+            // Validate recipe ID
+            if (isNaN(recipeId)) {
+                res.status(400).json({ error: "Invalid recipe ID" });
+                return;
+            }
+
+            const isFavorite = await isRecipeFavorited(authReq.payload.user.userId, recipeId);
+
+            res.status(200).json({
+                isFavorite
+            });
+        } catch (error) {
+            console.error(`Error checking favorite status:`, error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
+
 }

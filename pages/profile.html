@@ -262,6 +262,22 @@
     </div>
     <!-- Profile Content End -->
 
+    <!-- My Favorite Recipes Section Start -->
+    <div class="container-fluid py-3">
+        <div class="container">
+            <h2 class="mb-4">My Favorite Recipes</h2>
+            <div id="favorite-recipes" class="row g-4">
+                <!-- Favorites will be loaded here -->
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- My Favorite Recipes Section End -->
+
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
         <div class="container py-5">
@@ -548,6 +564,80 @@
                 notification.style.opacity = '0';
             }, 3000);
         }
+
+        async function loadFavoriteRecipes() {
+            const token = localStorage.getItem('accessToken');
+            if (!token) return;
+
+            try {
+                const response = await fetch('http://localhost:3000/users/favorites', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load favorites');
+                }
+
+                const favorites = await response.json();
+                const container = document.getElementById('favorite-recipes');
+
+                if (!container) return;
+
+                if (favorites.length === 0) {
+                    container.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <p>You haven't saved any favorite recipes yet.</p>
+                    <a href="/pages/recipes.html" class="btn btn-primary">Browse Recipes</a>
+                </div>
+            `;
+                    return;
+                }
+
+                container.innerHTML = favorites.map(recipe => `
+            <div class="col-md-6 col-lg-4 col-xl-3">
+                <div class="rounded position-relative fruite-item">
+                    <div class="fruite-img">
+                        <img src="../assets/img/recipe_imgs/${recipe.id}.jpg" class="img-fluid w-100 rounded-top" alt="${recipe.name}" 
+                            onerror="this.onerror=null;this.src='../assets/img/recipe_placeholder.jpg';">
+                    </div>
+                    <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">${recipe.difficulty}</div>
+                    <div class="p-4 border border-secondary border-top-0 rounded-bottom">
+                        <h4>${recipe.name}</h4>
+                        <div class="d-flex justify-content-between flex-lg-wrap">
+                            <p class="text-dark fs-5 fw-bold mb-0">
+                                <i class="far fa-clock text-primary me-1"></i> ${recipe.time} min
+                            </p>
+                            <div class="d-flex align-items-center">
+                                <a href="/pages/recipe-view.html?id=${recipe.id}" class="btn border border-secondary rounded-pill px-3 text-primary">
+                                    <i class="fa fa-eye me-2"></i> View Recipe
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+            } catch (error) {
+                console.error('Error loading favorites:', error);
+                const container = document.getElementById('favorite-recipes');
+                if (container) {
+                    container.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <p class="text-danger">Error loading favorite recipes.</p>
+                </div>
+            `;
+                }
+            }
+        }
+
+        // Call this function when the page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add this to your other initial function calls
+            loadFavoriteRecipes();
+        });
     </script>
 </body>
 

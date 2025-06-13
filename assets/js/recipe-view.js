@@ -164,7 +164,152 @@ async function submitRating(recipeId, rating, stars, messageElement) {
         alert('Error submitting rating');
     }
 }
-// Renders the fetched recipe details into the HTML structure.
+// Asynchronously loads the recipe data.
+async function loadRecipe() {
+    setLoading(true); // Show loader.
+    const id = getRecipeIdFromUrl(); // Get recipe ID from URL.
+    if (!id) {
+        showError('No recipe ID provided in URL.');
+        return;
+    }
+    try {
+        // Fetch recipe data from the API.
+        const res = await fetch(`http://localhost:3000/recipes/${id}`);
+        if (!res.ok) {
+            // Handle cases where the recipe is not found (e.g., 404 error).
+            showError('Recipe not found.');
+            return;
+        }
+        const recipe = await res.json(); // Parse JSON response.
+        // Check if the user has favorited this recipe
+        if (await isUserLoggedIn()) {
+            recipe.isFavorite = await checkFavoriteStatus(id);
+        }
+        renderRecipe(recipe); // Render the fetched recipe.
+    }
+    catch (e) {
+        // Handle generic fetch errors (e.g., network issues).
+        showError('Failed to load recipe.');
+        console.error("Error loading recipe:", e);
+    }
+}
+// Add an event listener to call loadRecipe when the DOM is fully loaded.
+document.addEventListener('DOMContentLoaded', loadRecipe);
+// Add these functions for favorite management
+async function checkFavoriteStatus(recipeId) {
+    try {
+        const token = localStorage.getItem('accessToken');
+        if (!token)
+            return false;
+        const response = await fetch(`http://localhost:3000/recipes/${recipeId}/favorite`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (!response.ok)
+            return false;
+        const data = await response.json();
+        return data.isFavorite === true;
+    }
+    catch (error) {
+        console.error('Error checking favorite status:', error);
+        return false;
+    }
+}
+async function toggleFavorite(recipeId, button) {
+    try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            showToast('Please log in to save favorites', true);
+            return;
+        }
+        // Disable button during API call
+        button.setAttribute('disabled', 'true');
+        const response = await fetch(`http://localhost:3000/recipes/${recipeId}/favorite`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to toggle favorite status');
+        }
+        const result = await response.json();
+        // Update button appearance based on the new status
+        updateFavoriteButton(button, result.isFavorite);
+    }
+    catch (error) {
+        console.error('Error toggling favorite:', error);
+        showToast('Error updating favorite status', true);
+    }
+    finally {
+        // Re-enable button
+        button.removeAttribute('disabled');
+    }
+}
+function updateFavoriteButton(button, isFavorite) {
+    const icon = button.querySelector('i');
+    if (!icon)
+        return;
+    if (isFavorite) {
+        icon.className = 'fas fa-heart';
+        button.setAttribute('title', 'Remove from favorites');
+    }
+    else {
+        icon.className = 'far fa-heart';
+        button.setAttribute('title', 'Add to favorites');
+    }
+}
+function renderFavoriteButton(recipe, container) {
+    if (!isUserLoggedIn()) {
+        return;
+    }
+    const favoriteBtn = document.createElement('button');
+    favoriteBtn.className = 'favorite-btn ms-2';
+    favoriteBtn.innerHTML = `
+        <i class="${recipe.isFavorite ? 'fas' : 'far'} fa-heart me-1"></i>
+    `;
+    favoriteBtn.title = recipe.isFavorite ? 'Remove from favorites' : 'Add to favorites';
+    favoriteBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleFavorite(recipe.id, favoriteBtn);
+    });
+    container.appendChild(favoriteBtn);
+}
+// Add toast notification function
+function showToast(message, isError = false) {
+    // Create toast container if it doesn't exist
+    let toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
+        toastContainer.style.position = 'fixed';
+        toastContainer.style.bottom = '20px';
+        toastContainer.style.right = '20px';
+        toastContainer.style.zIndex = '1050';
+        document.body.appendChild(toastContainer);
+    }
+    const toast = document.createElement('div');
+    toast.className = `toast ${isError ? 'bg-danger text-white' : 'bg-success text-white'}`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    toast.innerHTML = `
+        <div class="toast-body">
+            ${message}
+        </div>
+    `;
+    toastContainer.appendChild(toast);
+    // Initialize toast using Bootstrap
+    const bsToast = new bootstrap.Toast(toast, { autohide: true, delay: 3000 });
+    bsToast.show();
+    // Remove toast from DOM after it's hidden
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
+}
+// Update the renderRecipe function to include the favorite button
 function renderRecipe(recipe) {
     setLoading(false); // Hide loader.
     const container = document.getElementById('recipe-dynamic-content');
@@ -205,7 +350,8 @@ function renderRecipe(recipe) {
                         </div>
                     </div>
                     <div class="col-lg-6">
-                        <h4 class="fw-bold mb-3">${recipe.name}</h4>
+                        <div class="recipe-header mb-4">
+                        <h4 class="recipe-title fw-bold mb-3">${recipe.name}</h4>
                         <p class="mb-3">Category: <span class="badge bg-secondary">${recipe.mealTimes.join(', ') || 'N/A'}</span></p>
                         <div class="d-flex mb-3">
                             <span class="badge badge-difficulty-${recipe.difficulty.toLowerCase()} me-2">${recipe.difficulty.charAt(0).toUpperCase() + recipe.difficulty.slice(1)}</span>
@@ -240,6 +386,8 @@ function renderRecipe(recipe) {
                             <h5 class="fw-bold mb-2">Tags:</h5>
                             ${recipe.tags && recipe.tags.length > 0 ? recipe.tags.map(tag => `<span class="badge bg-info me-2">${tag}</span>`).join('') : '<span class="text-muted">None</span>'}
                         </div>
+                        </div>
+
                     </div>
                     <div class="col-lg-12">
                         <div class="row">
@@ -283,36 +431,21 @@ function renderRecipe(recipe) {
             
         </div>
     `;
-    // Add the rating component after the recipe content is loaded
-    const recipeContentTab = container.querySelector('#recipe-content');
-    if (recipeContentTab) {
-        renderRatingComponent(recipe, recipeContentTab);
+    // Add favorite button next to the recipe title
+    const recipeTitle = container.querySelector('.recipe-title');
+    if (recipeTitle) {
+        const titleContainer = document.createElement('div');
+        titleContainer.className = 'd-flex align-items-center';
+        // Move the existing title into the container
+        titleContainer.appendChild(recipeTitle.cloneNode(true));
+        // Add the favorite button
+        renderFavoriteButton(recipe, titleContainer);
+        // Replace the original title with our new container
+        recipeTitle.parentNode.replaceChild(titleContainer, recipeTitle);
+    }
+    // Add rating component
+    const recipeContent = document.getElementById('recipe-content');
+    if (recipeContent) {
+        renderRatingComponent(recipe, recipeContent);
     }
 }
-// Asynchronously loads the recipe data.
-async function loadRecipe() {
-    setLoading(true); // Show loader.
-    const id = getRecipeIdFromUrl(); // Get recipe ID from URL.
-    if (!id) {
-        showError('No recipe ID provided in URL.');
-        return;
-    }
-    try {
-        // Fetch recipe data from the API.
-        const res = await fetch(`http://localhost:3000/recipes/${id}`);
-        if (!res.ok) {
-            // Handle cases where the recipe is not found (e.g., 404 error).
-            showError('Recipe not found.');
-            return;
-        }
-        const recipe = await res.json(); // Parse JSON response.
-        renderRecipe(recipe); // Render the fetched recipe.
-    }
-    catch (e) {
-        // Handle generic fetch errors (e.g., network issues).
-        showError('Failed to load recipe.');
-        console.error("Error loading recipe:", e);
-    }
-}
-// Add an event listener to call loadRecipe when the DOM is fully loaded.
-document.addEventListener('DOMContentLoaded', loadRecipe);

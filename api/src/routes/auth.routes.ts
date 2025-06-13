@@ -13,6 +13,7 @@ const authController = new AuthController();
  *   description: User authentication and management
  */
 
+// TODO secure user routes with authentication middleware
 /**
  * @swagger
  * /users:
@@ -290,3 +291,27 @@ authRouter.put("/users/update", isAuthenticated, authController.updateCurrentUse
  *         description: Token is invalid or expired
  */
 authRouter.get("/validate-token", isAuthenticated, authController.validateToken);
+
+/**
+ * @swagger
+ * /users/favorites:
+ *   get:
+ *     tags:
+ *       - user
+ *     summary: Get user's favorite recipes
+ *     description: Get all recipes that the current user has favorited
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Recipe'
+ *       401:
+ *         description: Unauthorized - user must be logged in
+ */
+authRouter.get("/users/favorites", isAuthenticated, authController.getFavorites);

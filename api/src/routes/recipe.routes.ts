@@ -330,3 +330,73 @@ recipeRouter.get("/:id", recipeController.getRecipeById);
  *         description: Recipe not found
  */
 recipeRouter.post("/:id/rate", isAuthenticated, recipeController.rateRecipe);
+
+/**
+ * @swagger
+ * /recipes/{id}/favorite:
+ *   post:
+ *     tags:
+ *       - recipe
+ *     summary: Toggle a recipe as favorite
+ *     description: Add or remove a recipe from the user's favorites
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the recipe to favorite/unfavorite
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 isFavorite:
+ *                   type: boolean
+ *                   description: Whether the recipe is now favorited
+ *                 count:
+ *                   type: integer
+ *                   description: Total number of users who favorited this recipe
+ *       401:
+ *         description: Unauthorized - user must be logged in
+ */
+recipeRouter.post("/:id/favorite", isAuthenticated, recipeController.toggleFavorite);
+
+/**
+ * @swagger
+ * /recipes/{id}/favorite:
+ *   get:
+ *     tags:
+ *       - recipe
+ *     summary: Check if a recipe is favorited
+ *     description: Check if the current user has favorited a specific recipe
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the recipe to check
+ *     responses:
+ *       200:
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 isFavorite:
+ *                   type: boolean
+ *       401:
+ *         description: Unauthorized - user must be logged in
+ */
+recipeRouter.get("/:id/favorite", isAuthenticated, recipeController.checkFavorite);
