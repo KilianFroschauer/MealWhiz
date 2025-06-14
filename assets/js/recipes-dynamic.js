@@ -156,7 +156,10 @@ var RecipesDynamic;
         // Name (from the main search bar, usually at the top of the filter sidebar).
         const nameInput = document.querySelector('.col-xl-3 .input-group input[type="search"]');
         if (nameInput && nameInput.value.trim() !== "") {
-            filters.name = nameInput.value.trim();
+            const names = nameInput.value.split(',').map(name => name.trim()).filter(name => name !== "");
+            if (names.length > 0) {
+                filters.name = names;
+            }
         }
         // Dietary Preferences (checkboxes with IDs starting "dp-").
         const dpChecked = Array.from(document.querySelectorAll('input[id^="dp-"]:checked'));
@@ -206,7 +209,9 @@ var RecipesDynamic;
         else {
             const ingInput = document.getElementById("ingredientInput");
             if (ingInput && ingInput.value.trim() !== "") {
-                filters.ing = [ingInput.value.trim()]; // Send as an array even if single input.
+                filters.ing = ingInput.value.split(',')
+                    .map(s => s.trim()) // Trim whitespace for each ingredient
+                    .filter(s => s !== ""); // Remove any empty strings
             }
         }
         // Tags (from selectable badges in #tagsCollapse).

@@ -173,11 +173,14 @@ namespace RecipesDynamic {
     function collectRecipeFilters(): Record<string, any> {
         const filters: Record<string, any> = {};
 
-        // Name (from the main search bar, usually at the top of the filter sidebar).
-        const nameInput = document.querySelector('.col-xl-3 .input-group input[type="search"]') as HTMLInputElement | null;
-        if (nameInput && nameInput.value.trim() !== "") {
-            filters.name = nameInput.value.trim();
+    // Name (from the main search bar, usually at the top of the filter sidebar).
+    const nameInput = document.querySelector('.col-xl-3 .input-group input[type="search"]') as HTMLInputElement | null;
+    if (nameInput && nameInput.value.trim() !== "") {
+        const names = nameInput.value.split(',').map(name => name.trim()).filter(name => name !== "");
+        if (names.length > 0) {
+            filters.name = names;
         }
+    }
 
         // Dietary Preferences (checkboxes with IDs starting "dp-").
         const dpChecked = Array.from(document.querySelectorAll('input[id^="dp-"]:checked')) as HTMLInputElement[];
@@ -224,16 +227,18 @@ namespace RecipesDynamic {
         if (minCal && minCal.trim() !== "") filters.minCal = minCal;
         if (maxCal && maxCal.trim() !== "") filters.maxCal = maxCal;
 
-        // Ingredients (from a tag-based input or a single input field).
-        const ingredientTags = Array.from(document.querySelectorAll("#ingredientTags .ingredient-tag")) as HTMLElement[];
-        if (ingredientTags.length) {
-            filters.ing = ingredientTags.map((tag) => tag.textContent?.trim() || "").filter(Boolean);
-        } else {
-            const ingInput = document.getElementById("ingredientInput") as HTMLInputElement | null;
-            if (ingInput && ingInput.value.trim() !== "") {
-                filters.ing = [ingInput.value.trim()]; // Send as an array even if single input.
-            }
+    // Ingredients (from a tag-based input or a single input field).
+    const ingredientTags = Array.from(document.querySelectorAll("#ingredientTags .ingredient-tag")) as HTMLElement[];
+    if (ingredientTags.length) {
+        filters.ing = ingredientTags.map((tag) => tag.textContent?.trim() || "").filter(Boolean);
+    } else {
+        const ingInput = document.getElementById("ingredientInput") as HTMLInputElement | null;
+        if (ingInput && ingInput.value.trim() !== "") {
+             filters.ing = ingInput.value.split(',')
+                .map(s => s.trim()) // Trim whitespace for each ingredient
+                .filter(s => s !== ""); // Remove any empty strings
         }
+    }
 
         // Tags (from selectable badges in #tagsCollapse).
         const tagBadges = Array.from(

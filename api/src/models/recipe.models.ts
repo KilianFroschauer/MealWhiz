@@ -46,5 +46,5 @@ export type RecipeFilterOptions = {
   allergens?: string[];
   mealTimes?: string[];
   tags?: string[];
-  ingredients?: string;
+  ingredients?: string[];
 };
