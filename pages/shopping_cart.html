@@ -1,727 +1,273 @@
 <!DOCTYPE html>
 <html lang="de">
-    <head>
-        <meta charset="UTF-8" />
-        <title>Shopping List - MealWhiz</title>
-        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-        <meta content="" name="keywords" />
-        <meta content="" name="description" />
 
-        <link rel="icon" type="image/png" href="assets/img/Logo-Whizard-cropped.jpg" />
+<head>
+    <meta charset="UTF-8" />
+    <title>Shopping List - MealWhiz</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="" name="keywords" />
+    <meta content="" name="description" />
 
-        <!-- Google Web Fonts -->
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=K2D:wght@500;600;700;1000&display=swap" rel="stylesheet" />
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../assets/img/Logo-Whizard-cropped.jpg">
+    <link rel="shortcut icon" type="image/png" href="../assets/img/Logo-Whizard-cropped.jpg">
+    <link rel="apple-touch-icon" href="../assets/img/Logo-Whizard-cropped.jpg">
 
-        <!-- Icon Font Stylesheet -->
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=K2D:wght@500;600;700;1000&display=swap" rel="stylesheet" />
 
-        <!-- Libraries Stylesheet -->
-        <link href="../assets/lib/lightbox/css/lightbox.min.css" rel="stylesheet" />
-        <link href="../assets/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet" />
+    <!-- Icon Font Stylesheet -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet" />
 
-        <!-- Customized Bootstrap Stylesheet -->
-        <link href="../assets/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Libraries Stylesheet -->
+    <link href="../assets/lib/lightbox/css/lightbox.min.css" rel="stylesheet" />
+    <link href="../assets/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet" />
 
-        <!-- Template Stylesheet -->
-        <link href="../assets/css/style.css" rel="stylesheet" />
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="../assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../assets/css/shopping_cart.css" rel="stylesheet" />
 
-        <!-- Additional shopping cart styles -->
-        <style>
-            .unit-display {
-                margin: 0 8px 0 2px;
-                color: #6c757d;
-                font-size: 0.9rem;
-                min-width: 30px;
-            }
+    <!-- Template Stylesheet -->
+    <link href="../assets/css/style.css" rel="stylesheet" />
+</head>
 
-            .cart-item {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 0.75rem 0;
-                border-bottom: 1px solid #e9ecef;
-            }
+<body>
+    <!-- Spinner Start -->
+    <div id="spinner"
+        class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-grow text-primary" role="status"></div>
+    </div>
+    <!-- Spinner End -->
 
-            .quantity-control {
-                display: flex;
-                align-items: center;
-            }
-
-            .quantity-control input {
-                width: 50px;
-                text-align: center;
-                border: 1px solid #ced4da;
-                border-radius: 4px;
-                padding: 0.25rem;
-            }
-
-            .btn-quantity {
-                background: none;
-                border: none;
-                font-size: 1.2rem;
-                cursor: pointer;
-                color: #6c757d;
-            }
-
-            .btn-quantity:hover {
-                color: #495057;
-            }
-
-            .shopping-list-container {
-                background-color: white;
-                border-radius: 10px;
-                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-                padding: 2rem;
-            }
-        </style>
-    </head>
-
-    <body>
-        <!-- Spinner Start -->
-        <div
-            id="spinner"
-            class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center"
-        >
-            <div class="spinner-grow text-primary" role="status"></div>
-        </div>
-        <!-- Spinner End -->
-
-        <!-- Navbar start -->
-        <div class="container-fluid fixed-top">
-            <!--<div class="container topbar bg-primary d-none d-lg-block">
-                <div class="d-flex justify-content-between">
-                    <div class="top-info ps-2">
-                        <small class="me-3"><i class="fas fa-map-marker-alt me-2 text-secondary"></i> <a href="#" class="text-white">123 Street, New York</a></small>
-                        <small class="me-3"><i class="fas fa-envelope me-2 text-secondary"></i><a href="#" class="text-white">Email@Example.com</a></small>
+    <!-- Navbar start -->
+    <div class="container-fluid fixed-top">
+        <div class="container px-0">
+            <nav class="navbar navbar-light bg-white navbar-expand-xl">
+                <a href="../index.html" class="navbar-brand d-flex align-items-center">
+                    <img src="../assets/img/Logo-Whizard-cropped-tranparent.png" alt="MealWhiz Logo"
+                        style="height: 65px; margin-right: 10px" />
+                    <h1 class="m-0"
+                        style="font-family: 'K2D', sans-serif; color: #000; font-weight: 1000; font-size: 3.5rem">
+                        MealWhiz
+                    </h1>
+                </a>
+                <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarCollapse">
+                    <span class="fa fa-bars text-primary"></span>
+                </button>
+                <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
+                    <div class="navbar-nav mx-auto">
+                        <a href="../index.html" class="nav-item nav-link">Home</a>
+                        <a href="recipes.html" class="nav-item nav-link">Recipes</a>
+                        <a href="CookOff.html" class="nav-item nav-link">CookOff</a>
                     </div>
-                    <div class="top-link pe-2">
-                        <a href="#" class="text-white"><small class="text-white mx-2">Privacy Policy</small>/</a>
-                        <a href="#" class="text-white"><small class="text-white mx-2">Terms of Use</small>/</a>
-                        <a href="#" class="text-white"><small class="text-white ms-2">Sales and Refunds</small></a>
+                    <div class="d-flex m-3 me-0">
+                        <button
+                            class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4"
+                            data-bs-toggle="modal" data-bs-target="#searchModal">
+                            <i class="fas fa-search text-primary"></i>
+                        </button>
+                        <a href="shopping_cart.html" class="position-relative me-4 my-auto cart-icon">
+                            <i class="fa fa-shopping-bag fa-2x"></i>
+                            <span
+                                class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-white px-1"
+                                style="top: -5px; left: 15px; height: 20px; min-width: 20px" id="cart-count">0</span>
+                        </a>
+                        <a href="login.html" class="my-auto">
+                            <i class="fas fa-user fa-2x"></i>
+                        </a>
                     </div>
                 </div>
-            </div>-->
-            <div class="container px-0">
-                <nav class="navbar navbar-light bg-white navbar-expand-xl">
-                    <a href="../index.html" class="navbar-brand d-flex align-items-center">
-                        <img
-                            src="../assets/img/Logo-Whizard-cropped-tranparent.png"
-                            alt="MealWhiz Logo"
-                            style="height: 65px; margin-right: 10px"
-                        />
-                        <h1
-                            class="m-0"
-                            style="font-family: 'K2D', sans-serif; color: #000; font-weight: 1000; font-size: 3.5rem"
-                        >
-                            MealWhiz
-                        </h1>
-                    </a>
-                    <button
-                        class="navbar-toggler py-2 px-3"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#navbarCollapse"
-                    >
-                        <span class="fa fa-bars text-primary"></span>
-                    </button>
-                    <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
-                        <div class="navbar-nav mx-auto">
-                            <a href="../index.html" class="nav-item nav-link">Home</a>
-                            <a href="recipes.html" class="nav-item nav-link">Recipes</a>
-                            <a href="CookOff.html" class="nav-item nav-link">CookOff</a>
-                        </div>
-                        <div class="d-flex m-3 me-0">
-                            <button
-                                class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4"
-                                data-bs-toggle="modal"
-                                data-bs-target="#searchModal"
-                            >
-                                <i class="fas fa-search text-primary"></i>
-                            </button>
-                            <a href="shopping_cart.html" class="position-relative me-4 my-auto cart-icon">
-                                <i class="fa fa-shopping-bag fa-2x"></i>
-                                <span
-                                    class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-white px-1"
-                                    style="top: -5px; left: 15px; height: 20px; min-width: 20px"
-                                    id="cart-count"
-                                    >0</span
-                                >
-                            </a>
-                            <a href="login.html" class="my-auto">
-                                <i class="fas fa-user fa-2x"></i>
-                            </a>
-                        </div>
-                    </div>
-                </nav>
-            </div>
+            </nav>
         </div>
-        <!-- Navbar End -->
+    </div>
+    <!-- Navbar End -->
 
-        <!-- Modal Search Start -->
-        <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-fullscreen">
-                <div class="modal-content rounded-0">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Search by keyword</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body d-flex align-items-center">
-                        <div class="input-group w-75 mx-auto d-flex">
-                            <input
-                                type="search"
-                                class="form-control p-3"
-                                placeholder="Search recipes..."
-                                aria-describedby="search-icon-1"
-                            />
-                            <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
-                        </div>
+    <!-- Modal Search Start -->
+    <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content rounded-0">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Search by keyword</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body d-flex align-items-center">
+                    <div class="input-group w-75 mx-auto d-flex">
+                        <input type="search" class="form-control p-3" placeholder="Search recipes..."
+                            aria-describedby="search-icon-1" />
+                        <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Modal Search End -->
+    </div>
+    <!-- Modal Search End -->
 
-        <!-- Single Page Header start -->
-        <div class="container-fluid page-header py-5">
-            <h1 class="text-center text-white display-6">Shopping List</h1>
-            <ol class="breadcrumb justify-content-center mb-0">
-                <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
-                <li class="breadcrumb-item"><a href="#">Pages</a></li>
-                <li class="breadcrumb-item active text-white">Shopping List</li>
-            </ol>
-        </div>
-        <!-- Single Page Header End -->
+    <!-- Single Page Header start -->
+    <div class="container-fluid page-header py-5">
+        <h1 class="text-center text-white display-6">Shopping List</h1>
+        <ol class="breadcrumb justify-content-center mb-0">
+            <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
+            <li class="breadcrumb-item"><a href="#">Pages</a></li>
+            <li class="breadcrumb-item active text-white">Shopping List</li>
+        </ol>
+    </div>
+    <!-- Single Page Header End -->
 
-        <!-- Shopping List Start -->
-        <div class="container-fluid py-5">
-            <div class="container py-5">
-                <div class="row g-4 mb-5">
-                    <div class="col-lg-8 mx-auto">
-                        <div class="shopping-list-container">
-                            <h2 class="text-center mb-4">
-                                <i class="fas fa-shopping-basket me-2 text-primary"></i>
-                                My Shopping List
-                            </h2>
+    <!-- Shopping List Start -->
+    <div class="container-fluid py-5">
+        <div class="container py-5">
+            <div class="row g-4 mb-5">
+                <div class="col-lg-8 mx-auto">
+                    <div class="shopping-list-container">
+                        <h2 class="text-center mb-4">
+                            <i class="fas fa-shopping-basket me-2 text-primary"></i>
+                            My Shopping List
+                        </h2>
 
-                            <div class="mb-4">
-                                <div class="input-group">
-                                    <input
-                                        type="text"
-                                        id="ingredient"
-                                        class="form-control"
-                                        placeholder="Add ingredient"
-                                    />
-                                    <input
-                                        type="number"
-                                        id="quantity"
-                                        class="form-control"
-                                        placeholder="Qty"
-                                        min="1"
-                                        value="1"
-                                    />
-                                    <select id="unit" class="form-control" style="max-width: 120px">
-                                        <option value="piece" selected>piece</option>
-                                        <option value="g">g</option>
-                                        <option value="kg">kg</option>
-                                        <option value="liter">liter</option>
-                                    </select>
-                                    <button class="btn btn-primary" onclick="addToCart()">
-                                        <i class="fas fa-plus me-1"></i> Add
-                                    </button>
-                                </div>
+                        <div class="mb-4">
+                            <div class="input-group">
+                                <input type="text" id="ingredient" class="form-control" placeholder="Add ingredient" />
+                                <input type="number" id="quantity" class="form-control" placeholder="Qty" min="1"
+                                    value="1" />
+                                <select id="unit" class="form-control" style="max-width: 120px">
+                                    <option value="piece" selected>piece</option>
+                                    <option value="g">g</option>
+                                    <option value="kg">kg</option>
+                                    <option value="liter">liter</option>
+                                </select>
+                                <button class="btn btn-primary" onclick="addToCart()">
+                                    <i class="fas fa-plus me-1"></i> Add
+                                </button>
                             </div>
+                        </div>
 
-                            <div class="mb-3">
-                                <div id="cart" class="mb-4">
-                                    <!-- Cart items will be displayed here -->
-                                    <div class="text-center py-4">
-                                        <div class="spinner-border text-primary" role="status">
-                                            <span class="visually-hidden">Loading...</span>
-                                        </div>
+                        <div class="mb-3">
+                            <div id="cart" class="mb-4">
+                                <!-- Cart items will be displayed here -->
+                                <div class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
                                     </div>
                                 </div>
-
-                                <div id="message" class="alert alert-danger" style="display: none"></div>
                             </div>
 
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <button class="btn btn-outline-secondary me-2" onclick="loadCart()">
-                                        <i class="fas fa-sync-alt me-1"></i> Refresh
-                                    </button>
-                                    <button class="btn btn-outline-danger" onclick="deleteAllFromCart()">
-                                        <i class="fas fa-trash-alt me-1"></i> Clear All
-                                    </button>
-                                </div>
+                            <div id="message" class="alert alert-danger" style="display: none"></div>
+                        </div>
 
-                                <div class="dropdown">
-                                    <button
-                                        class="btn btn-success dropdown-toggle"
-                                        type="button"
-                                        id="exportDropdown"
-                                        data-bs-toggle="dropdown"
-                                        aria-expanded="false"
-                                    >
-                                        <i class="fas fa-file-export me-1"></i> Export
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="exportDropdown">
-                                        <li>
-                                            <a class="dropdown-item" href="#" onclick="exportList('csv')"
-                                                >Export as CSV</a
-                                            >
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="#" onclick="exportList('pdf')"
-                                                >Export as PDF</a
-                                            >
-                                        </li>
-                                    </ul>
-                                </div>
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <button class="btn btn-outline-secondary me-2" onclick="loadCart()">
+                                    <i class="fas fa-sync-alt me-1"></i> Refresh
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="deleteAllFromCart()">
+                                    <i class="fas fa-trash-alt me-1"></i> Clear All
+                                </button>
+                            </div>
+
+                            <div class="dropdown">
+                                <button class="btn btn-success dropdown-toggle" type="button" id="exportDropdown"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-file-export me-1"></i> Export
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="exportList('csv')">Export as CSV</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="exportList('pdf')">Export as PDF</a>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Shopping List End -->
+    </div>
+    <!-- Shopping List End -->
 
-        <!-- Footer Start -->
-        <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
-            <div class="container py-5">
-                <div class="pb-4 mb-4" style="border-bottom: 1px solid rgba(226, 175, 24, 0.5)">
-                    <div class="row g-4">
-                        <div class="col-lg-3">
-                            <a href="#">
-                                <h1 class="text-primary mb-0">MealWhiz</h1>
-                                <!-- <p class="text-secondary mb-0">Fresh products</p> -->
-                            </a>
-                        </div>
-                        <!-- <div class="col-lg-6">
-                        <div class="position-relative mx-auto">
-                            <input class="form-control border-0 w-100 py-3 px-4 rounded-pill" type="number"
-                                placeholder="Your Email" />
-                            <button type="submit"
-                                class="btn btn-primary border-0 border-secondary py-3 px-4 position-absolute rounded-pill text-white"
-                                style="top: 0; right: 0">
-                                Subscribe Now
-                            </button>
-                        </div>
-                    </div>
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
+        <div class="container py-5">
+            <div class="pb-4 mb-4" style="border-bottom: 1px solid rgba(226, 175, 24, 0.5)">
+                <div class="row g-4">
                     <div class="col-lg-3">
-                        <div class="d-flex justify-content-end pt-3">
-                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i
-                                    class="fab fa-twitter"></i></a>
-                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i
-                                    class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i
-                                    class="fab fa-youtube"></i></a>
-                            <a class="btn btn-outline-secondary btn-md-square rounded-circle" href=""><i
-                                    class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div> -->
+                        <a href="#">
+                            <h1 class="text-primary mb-0">MealWhiz</h1>
+                        </a>
                     </div>
                 </div>
-                <div class="row g-5">
-                    <div class="col-lg-3 col-md-6" style="width: 40%">
-                        <div class="footer-item">
-                            <h4 class="text-light mb-3">Why People Like Us!</h4>
-                            <p class="mb-4">
-                                Meal Whiz takes the stress out of everyday cooking by turning leftover ingredients into
-                                exciting, personalized meals.
-                            </p>
-                        </div>
+            </div>
+            <div class="row g-5">
+                <div class="col-lg-3 col-md-6" style="width: 40%">
+                    <div class="footer-item">
+                        <h4 class="text-light mb-3">Why People Like Us!</h4>
+                        <p class="mb-4">
+                            Meal Whiz takes the stress out of everyday cooking by turning leftover ingredients into
+                            exciting, personalized meals.
+                        </p>
                     </div>
-                    <div class="col-lg-4 col-md-6">
-                        <div class="d-flex flex-column text-start footer-item">
-                            <h4 class="text-light mb-3">Navigation</h4>
-                            <a class="btn-link" href="../index.html">Home</a>
-                            <a class="btn-link" href="./recipes.html">Recipes</a>
-                            <a class="btn-link" href="./cookoff.html">CookOff</a>
-                        </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="d-flex flex-column text-start footer-item">
+                        <h4 class="text-light mb-3">Navigation</h4>
+                        <a class="btn-link" href="../index.html">Home</a>
+                        <a class="btn-link" href="./recipes.html">Recipes</a>
+                        <a class="btn-link" href="./cookoff.html">CookOff</a>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="footer-item">
-                            <h4 class="text-light mb-3">Contact</h4>
-                            <p>Address: Limesstraße 12/14, 4060 Leonding</p>
-                            <p>Email: mealhwiz@mealwhiz.at</p>
-                        </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="footer-item">
+                        <h4 class="text-light mb-3">Contact</h4>
+                        <p>Address: Limesstraße 12/14, 4060 Leonding</p>
+                        <p>Email: mealhwiz@mealwhiz.at</p>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Footer End -->
+    </div>
+    <!-- Footer End -->
 
-        <!-- Copyright Start -->
-        <div class="container-fluid copyright bg-dark py-4">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                        <span class="text-light"
-                            ><a href="#"><i class="fas fa-copyright text-light me-2"></i>MealWhiz</a>, All right
-                            reserved.</span
-                        >
-                    </div>
-                    <div class="col-md-6 my-auto text-center text-md-end text-white">
-                        Designed By <a class="border-bottom" href="https://htmlcodex.com">HTML Codex</a> Distributed By
-                        <a class="border-bottom" href="https://themewagon.com">ThemeWagon</a>
-                    </div>
+    <!-- Copyright Start -->
+    <div class="container-fluid copyright bg-dark py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <span class="text-light"><a href="#"><i class="fas fa-copyright text-light me-2"></i>MealWhiz</a>,
+                        All right
+                        reserved.</span>
+                </div>
+                <div class="col-md-6 my-auto text-center text-md-end text-white">
+                    Designed By <a class="border-bottom" href="https://htmlcodex.com">HTML Codex</a> Distributed By
+                    <a class="border-bottom" href="https://themewagon.com">ThemeWagon</a>
                 </div>
             </div>
         </div>
-        <!-- Copyright End -->
+    </div>
+    <!-- Copyright End -->
 
-        <!-- Back to Top -->
-        <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"
-            ><i class="fa fa-arrow-up"></i
-        ></a>
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+            class="fa fa-arrow-up"></i></a>
 
-        <!-- JavaScript Libraries -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="../assets/lib/easing/easing.min.js"></script>
-        <script src="../assets/lib/waypoints/waypoints.min.js"></script>
-        <script src="../assets/lib/lightbox/js/lightbox.min.js"></script>
-        <script src="../assets/lib/owlcarousel/owl.carousel.min.js"></script>
+    <!-- JavaScript Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/lib/easing/easing.min.js"></script>
+    <script src="../assets/lib/waypoints/waypoints.min.js"></script>
+    <script src="../assets/lib/lightbox/js/lightbox.min.js"></script>
+    <script src="../assets/lib/owlcarousel/owl.carousel.min.js"></script>
 
-        <!-- Template Javascript -->
-        <script src="../assets/js/main.js"></script>
-        <script src="../assets/js/auth-nav.js"></script>
+    <!-- Template Javascript -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/auth-nav.js"></script>
+    <script src="../assets/js/shopping-cart.js"></script>
 
-        <!-- Shopping Cart Script -->
-        <script>
-            const apiBase = "http://localhost:3000";
+</body>
 
-            // Helper function to get the token and prepare headers
-            function getAuthHeaders() {
-                const token = localStorage.getItem("accessToken");
-                const headers = {
-                    "Content-Type": "application/json",
-                };
-                if (token) {
-                    headers["Authorization"] = `Bearer ${token}`;
-                }
-                return headers;
-            }
-
-            async function loadCart() {
-                const token = localStorage.getItem("accessToken");
-                if (!token) {
-                    showMessage("Please log in to view your shopping list", true);
-                    document.getElementById("cart").innerHTML = "";
-                    return;
-                }
-
-                try {
-                    const res = await fetch(`${apiBase}/cart`, {
-                        method: "GET",
-                        headers: getAuthHeaders(),
-                    });
-
-                    const cartDiv = document.getElementById("cart");
-
-                    if (res.ok) {
-                        const items = await res.json();
-
-                        if (items.length === 0) {
-                            cartDiv.innerHTML = `
-                    <div class="text-center py-4 text-muted">
-                        <i class="fas fa-shopping-basket fa-3x mb-3"></i>
-                        <p>Your shopping list is empty.</p>
-                    </div>`;
-                        } else {
-                            let html = "";
-
-                            items.forEach((item) => {
-                                // Get unit or default to "piece" if none exists
-                                const unit = item.unit || "piece";
-
-                                html += `
-                    <div class="cart-item">
-                        <span>${item.ingredients}</span>
-                        <div class="quantity-control">
-                            <button class="btn-quantity decrease-qty" data-ingredient="${item.ingredients}">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                            <input type="text" value="${item.quantity}" min="1" 
-                                   class="mx-2 item-quantity" 
-                                   data-ingredient="${item.ingredients}" 
-                                   onchange="updateQuantity('${item.ingredients}', this.value)">
-                            <span class="unit-display">${unit}</span>
-                            <button class="btn-quantity increase-qty" data-ingredient="${item.ingredients}">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger ms-2" onclick="deleteFromCart('${item.ingredients}')">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>`;
-                            });
-
-                            cartDiv.innerHTML = html;
-
-                            // Add event listeners to quantity buttons
-                            document.querySelectorAll(".decrease-qty").forEach((btn) => {
-                                btn.addEventListener("click", function () {
-                                    const ingredient = this.getAttribute("data-ingredient");
-                                    const input = document.querySelector(
-                                        `.item-quantity[data-ingredient="${ingredient}"]`
-                                    );
-                                    let value = parseInt(input.value) - 1;
-                                    if (value < 1) value = 1;
-                                    input.value = value;
-                                    updateQuantity(ingredient, value);
-                                });
-                            });
-
-                            document.querySelectorAll(".increase-qty").forEach((btn) => {
-                                btn.addEventListener("click", function () {
-                                    const ingredient = this.getAttribute("data-ingredient");
-                                    const input = document.querySelector(
-                                        `.item-quantity[data-ingredient="${ingredient}"]`
-                                    );
-                                    let value = parseInt(input.value) + 1;
-                                    input.value = value;
-                                    updateQuantity(ingredient, value);
-                                });
-                            });
-                        }
-                    } else {
-                        handleError(res);
-                    }
-                } catch (error) {
-                    console.error("Error loading cart:", error);
-                    showMessage("Error loading your shopping list", true);
-                }
-            }
-
-            async function addToCart() {
-                const token = localStorage.getItem("accessToken");
-                if (!token) {
-                    showMessage("Please log in to add items", true);
-                    return;
-                }
-
-                const ingredient = document.getElementById("ingredient").value;
-                const quantityInput = document.getElementById("quantity").value;
-                const unit = document.getElementById("unit").value; // Get selected unit
-
-                if (!ingredient || !quantityInput) {
-                    showMessage("Please enter both ingredient and quantity", true);
-                    return;
-                }
-
-                const quantity = parseInt(quantityInput);
-                if (isNaN(quantity) || quantity <= 0) {
-                    showMessage("Please enter a valid quantity", true);
-                    return;
-                }
-
-                try {
-                    const res = await fetch(`${apiBase}/cart`, {
-                        method: "POST",
-                        headers: getAuthHeaders(),
-                        body: JSON.stringify({ ingredient, quantity, unit }), // Include unit in the request
-                    });
-
-                    if (res.ok) {
-                        document.getElementById("ingredient").value = "";
-                        document.getElementById("quantity").value = "1";
-                        // Keep the unit selection as is for convenience
-                        loadCart();
-                        showMessage("Item added to shopping list", false);
-                    } else {
-                        handleError(res);
-                    }
-                } catch (error) {
-                    console.error("Error adding to cart:", error);
-                    showMessage("Error adding item to shopping list", true);
-                }
-            }
-
-            async function deleteFromCart(ingredient) {
-                const token = localStorage.getItem("accessToken");
-                if (!token) {
-                    showMessage("Please log in to remove items", true);
-                    return;
-                }
-
-                try {
-                    const res = await fetch(`${apiBase}/cart`, {
-                        method: "DELETE",
-                        headers: getAuthHeaders(),
-                        body: JSON.stringify({ ingredient }),
-                    });
-
-                    if (res.ok) {
-                        loadCart();
-                        showMessage("Item removed from shopping list", false);
-                    } else {
-                        handleError(res);
-                    }
-                } catch (error) {
-                    console.error("Error deleting from cart:", error);
-                    showMessage("Error removing item from shopping list", true);
-                }
-            }
-
-            async function updateQuantity(ingredient, quantity) {
-                const token = localStorage.getItem("accessToken");
-                if (!token) {
-                    showMessage("Please log in to update items", true);
-                    return;
-                }
-
-                quantity = parseInt(quantity);
-                if (isNaN(quantity) || quantity < 1) {
-                    quantity = 1;
-                }
-
-                try {
-                    const res = await fetch(`${apiBase}/cart`, {
-                        method: "GET",
-                        headers: getAuthHeaders(),
-                    });
-
-                    if (res.ok) {
-                        const items = await res.json();
-                        const item = items.find((i) => i.ingredients === ingredient);
-
-                        if (item) {
-                            // Update with preserved unit
-                            const updateRes = await fetch(`${apiBase}/cart`, {
-                                method: "POST",
-                                headers: getAuthHeaders(),
-                                body: JSON.stringify({
-                                    ingredient,
-                                    quantity,
-                                    unit: item.unit || "piece",
-                                }),
-                            });
-
-                            if (!updateRes.ok) {
-                                handleError(updateRes);
-                            }
-                        }
-                    } else {
-                        handleError(res);
-                    }
-                } catch (error) {
-                    console.error("Error updating quantity:", error);
-                    showMessage("Error updating quantity", true);
-                    loadCart(); // Reload to restore correct state
-                }
-            }
-
-            async function deleteAllFromCart() {
-                const token = localStorage.getItem("accessToken");
-                if (!token) {
-                    showMessage("Please log in to clear your shopping list", true);
-                    return;
-                }
-
-                try {
-                    const res = await fetch(`${apiBase}/cart/all`, {
-                        method: "DELETE",
-                        headers: getAuthHeaders(),
-                    });
-
-                    if (res.ok) {
-                        document.getElementById("cart").innerHTML = `
-                        <div class="text-center py-4 text-muted">
-                            <i class="fas fa-shopping-basket fa-3x mb-3"></i>
-                            <p>Your shopping list is empty.</p>
-                        </div>`;
-                        showMessage("All items removed from shopping list", false);
-                    } else {
-                        handleError(res);
-                    }
-                } catch (error) {
-                    console.error("Error clearing cart:", error);
-                    showMessage("Error clearing shopping list", true);
-                }
-            }
-
-            function exportList(format) {
-                const token = localStorage.getItem("accessToken");
-                if (!token) {
-                    showMessage("Please log in to export your shopping list", true);
-                    return;
-                }
-
-                // Show export in progress message
-                showMessage(`Preparing ${format.toUpperCase()} export...`, false);
-
-                fetch(`${apiBase}/cart/export/${format}`, {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
-                    .then((response) => {
-                        if (!response.ok) {
-                            throw new Error(`Export failed: ${response.status}`);
-                        }
-                        return response.blob();
-                    })
-                    .then((blob) => {
-                        // Create download link
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement("a");
-                        a.style.display = "none";
-                        a.href = url;
-                        a.download = `shopping-list.${format}`;
-
-                        // Trigger download
-                        document.body.appendChild(a);
-                        a.click();
-
-                        // Cleanup
-                        window.URL.revokeObjectURL(url);
-                        document.body.removeChild(a);
-
-                        showMessage(`Shopping list exported as ${format.toUpperCase()}`, false);
-                    })
-                    .catch((error) => {
-                        console.error("Export error:", error);
-                        showMessage(`Failed to export shopping list: ${error.message}`, true);
-                    });
-            }
-
-            function handleError(response) {
-                if (response.status === 401) {
-                    showMessage("Session invalid or expired. Please log in again.", true);
-                    // Optional: Redirect to login page
-                    // localStorage.removeItem('accessToken');
-                    // window.location.href = '/pages/login.html';
-                } else {
-                    response.text().then((text) => {
-                        showMessage(text, true);
-                    });
-                }
-            }
-
-            function showMessage(msg, isError = false) {
-                const messageEl = document.getElementById("message");
-                messageEl.textContent = msg;
-                messageEl.className = isError ? "alert alert-danger" : "alert alert-success";
-                messageEl.style.display = "block";
-
-                // Hide message after 5 seconds
-                setTimeout(() => {
-                    messageEl.style.display = "none";
-                }, 5000);
-            }
-
-            // Hide spinner once page is loaded
-            window.addEventListener("load", function () {
-                document.querySelector("#spinner").classList.remove("show");
-            });
-
-            // Load cart when page loads
-            document.addEventListener("DOMContentLoaded", loadCart);
-        </script>
-    </body>
 </html>

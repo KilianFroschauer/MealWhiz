@@ -165,7 +165,8 @@
                             </div>
                         </div>
                         <div class="card-body text-center py-4">
-                            <h3 class="card-title">Competitive Mode</h3>                            <div class="my-4">
+                            <h3 class="card-title">Competitive Mode</h3>
+                            <div class="my-4">
                                 <div class="d-flex justify-content-center align-items-center mb-2">
                                     <i class="fas fa-clock text-primary me-2"></i>
                                     <span>Customizable time limits</span>
@@ -187,7 +188,8 @@
                                     <span>Live chat during battle</span>
                                 </div>
                             </div>
-                            <p class="card-text">Challenge another chef in a customizable timed cooking battle with live video streaming and spectator chat!</p>
+                            <p class="card-text">Challenge another chef in a customizable timed cooking battle with live
+                                video streaming and spectator chat!</p>
                             <button class="btn btn-primary btn-lg px-4 py-3 mt-2" data-bs-toggle="modal"
                                 data-bs-target="#competitiveModeModal">Enter Competition</button>
                         </div>
@@ -205,7 +207,8 @@
                             </div>
                         </div>
                         <div class="card-body text-center py-4">
-                            <h3 class="card-title">Casual Mode</h3>                            <div class="my-4">
+                            <h3 class="card-title">Casual Mode</h3>
+                            <div class="my-4">
                                 <div class="d-flex justify-content-center align-items-center mb-2">
                                     <i class="fas fa-video text-primary me-2"></i>
                                     <span>Video chat while cooking</span>
@@ -227,10 +230,15 @@
                                     <span>Cook together, learn together</span>
                                 </div>
                             </div>
-                            <p class="card-text">Connect with fellow cooking enthusiasts through video chat and cook together at your own pace - pure fun, no competition!</p><button class="btn btn-info btn-lg px-4 py-3 mt-2 text-white" id="startCasualCookingBtn">Start Casual Cooking</button>
+                            <p class="card-text">Connect with fellow cooking enthusiasts through video chat and cook
+                                together at your own pace - pure fun, no competition!</p><button
+                                class="btn btn-info btn-lg px-4 py-3 mt-2 text-white" id="startCasualCookingBtn">Start
+                                Casual Cooking</button>
                         </div>
-                    </div>                </div>
-            </div>        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <!-- CookOff Mode Selection End -->
 
@@ -243,32 +251,8 @@
                     <div class="col-lg-3">
                         <a href="#">
                             <h1 class="text-primary mb-0">MealWhiz</h1>
-                            <!-- <p class="text-secondary mb-0">Fresh products</p> -->
                         </a>
                     </div>
-                    <!-- <div class="col-lg-6">
-                        <div class="position-relative mx-auto">
-                            <input class="form-control border-0 w-100 py-3 px-4 rounded-pill" type="number"
-                                placeholder="Your Email" />
-                            <button type="submit"
-                                class="btn btn-primary border-0 border-secondary py-3 px-4 position-absolute rounded-pill text-white"
-                                style="top: 0; right: 0">
-                                Subscribe Now
-                            </button>
-                        </div>
-                    </div>
-                    <div class="col-lg-3">
-                        <div class="d-flex justify-content-end pt-3">
-                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i
-                                    class="fab fa-twitter"></i></a>
-                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i
-                                    class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i
-                                    class="fab fa-youtube"></i></a>
-                            <a class="btn btn-outline-secondary btn-md-square rounded-circle" href=""><i
-                                    class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div> -->
                 </div>
             </div>
             <div class="row g-5">
@@ -325,7 +309,7 @@
 
     <!-- Back to Top -->
     <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
-            class="fa fa-arrow-up"></i></a>    <!-- Casual Lobby Selection Modal -->
+            class="fa fa-arrow-up"></i></a> <!-- Casual Lobby Selection Modal -->
     <div class="modal fade" id="casualLobbyModal" tabindex="-1" aria-labelledby="casualLobbyModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -389,7 +373,8 @@
     </div>
 
     <!-- Create Competitive Lobby Modal -->
-    <div class="modal fade" id="createCompetitiveLobbyModal" tabindex="-1" aria-labelledby="createCompetitiveLobbyModalLabel" aria-hidden="true">
+    <div class="modal fade" id="createCompetitiveLobbyModal" tabindex="-1"
+        aria-labelledby="createCompetitiveLobbyModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -400,11 +385,13 @@
                     <form id="competitiveLobbyForm">
                         <div class="mb-3">
                             <label for="cookoffDuration" class="form-label">CookOff Duration (minutes)</label>
-                            <input type="number" class="form-control" id="cookoffDuration" name="duration" min="10" max="180" value="30" required>
+                            <input type="number" class="form-control" id="cookoffDuration" name="duration" min="10"
+                                max="180" value="30" required>
                         </div>
                         <div class="mb-3">
                             <label for="cookoffDescription" class="form-label">Description / Theme</label>
-                            <input type="text" class="form-control" id="cookoffDescription" name="description" maxlength="100" placeholder="e.g. Italian Pasta Night" required>
+                            <input type="text" class="form-control" id="cookoffDescription" name="description"
+                                maxlength="100" placeholder="e.g. Italian Pasta Night" required>
                         </div>
                         <button type="submit" class="btn btn-danger w-100">Create Lobby</button>
                     </form>
@@ -414,7 +401,8 @@
     </div>
 
     <!-- Create Casual Lobby Modal -->
-    <div class="modal fade" id="createCasualLobbyModal" tabindex="-1" aria-labelledby="createCasualLobbyModalLabel" aria-hidden="true">
+    <div class="modal fade" id="createCasualLobbyModal" tabindex="-1" aria-labelledby="createCasualLobbyModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -422,9 +410,11 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="casualLobbyForm">                        <div class="mb-3">
+                    <form id="casualLobbyForm">
+                        <div class="mb-3">
                             <label for="casualLobbyTitle" class="form-label">Lobby Title</label>
-                            <input type="text" class="form-control" id="casualLobbyTitle" name="title" maxlength="50" placeholder="e.g. Sunday Cooking Session" required>
+                            <input type="text" class="form-control" id="casualLobbyTitle" name="title" maxlength="50"
+                                placeholder="e.g. Sunday Cooking Session" required>
                         </div>
                         <button type="submit" class="btn btn-success w-100">Create Lobby</button>
                     </form>
@@ -442,6 +432,7 @@
     <script src="../assets/lib/owlcarousel/owl.carousel.min.js"></script>
 
     <!-- Template Javascript -->
+    <script src="../assets/js/config.js"></script>
     <script src="../assets/js/main.js"></script>
     <script src="../assets/js/cookoff.js"></script>
     <script src="../assets/js/auth-nav.js"></script>

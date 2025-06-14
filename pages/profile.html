@@ -1,656 +1,321 @@
 <!DOCTYPE html>
 <html lang="de">
-    <head>
-        <meta charset="UTF-8" />
-        <title>Profile - MealWhiz</title>
-        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-        <meta content="" name="keywords" />
-        <meta content="" name="description" />
 
-        <link rel="icon" type="image/png" href="assets/img/Logo-Whizard-cropped.jpg" />
+<head>
+    <meta charset="UTF-8" />
+    <title>Profile - MealWhiz</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="" name="keywords" />
+    <meta content="" name="description" />
 
-        <!-- Google Web Fonts -->
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=K2D:wght@500;600;700;1000&display=swap" rel="stylesheet" />
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../assets/img/Logo-Whizard-cropped.jpg">
+    <link rel="shortcut icon" type="image/png" href="../assets/img/Logo-Whizard-cropped.jpg">
+    <link rel="apple-touch-icon" href="../assets/img/Logo-Whizard-cropped.jpg">
+    
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=K2D:wght@500;600;700;1000&display=swap" rel="stylesheet" />
 
-        <!-- Icon Font Stylesheet -->
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Icon Font Stylesheet -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet" />
 
-        <!-- Libraries Stylesheet -->
-        <link href="../assets/lib/lightbox/css/lightbox.min.css" rel="stylesheet" />
-        <link href="../assets/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet" />
+    <!-- Libraries Stylesheet -->
+    <link href="../assets/lib/lightbox/css/lightbox.min.css" rel="stylesheet" />
+    <link href="../assets/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet" />
 
-        <!-- Customized Bootstrap Stylesheet -->
-        <link href="../assets/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="../assets/css/bootstrap.min.css" rel="stylesheet" />
 
-        <!-- Template Stylesheet -->
-        <link href="../assets/css/style.css" rel="stylesheet" />
+    <!-- Template Stylesheet -->
+    <link href="../assets/css/style.css" rel="stylesheet" />
+    <link href="../assets/css/profile.css" rel="stylesheet" />
+</head>
 
-        <style>
-            .profile-container {
-                background-color: white;
-                border-radius: 10px;
-                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-                padding: 2rem;
-            }
+<body>
+    <!-- Spinner Start -->
+    <div id="spinner"
+        class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-grow text-primary" role="status"></div>
+    </div>
+    <!-- Spinner End -->
 
-            .profile-header {
-                display: flex;
-                align-items: center;
-                margin-bottom: 2rem;
-            }
-
-            .profile-avatar {
-                width: 100px;
-                height: 100px;
-                border-radius: 50%;
-                background-color: #f8f9fa;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                margin-right: 1.5rem;
-                font-size: 2.5rem;
-                color: #adb5bd;
-            }
-
-            .profile-card {
-                transition: transform 0.3s, box-shadow 0.3s;
-                cursor: pointer;
-            }
-
-            .profile-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.15);
-            }
-        </style>
-    </head>
-
-    <body>
-        <!-- Spinner Start -->
-        <div
-            id="spinner"
-            class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center"
-        >
-            <div class="spinner-grow text-primary" role="status"></div>
-        </div>
-        <!-- Spinner End -->
-
-        <!-- Navbar Start -->
-        <div class="container-fluid fixed-top">
-            <div class="container px-0">
-                <nav class="navbar navbar-light bg-white navbar-expand-xl">
-                    <a href="../index.html" class="navbar-brand d-flex align-items-center">
-                        <img
-                            src="../assets/img/Logo-Whizard-cropped-tranparent.png"
-                            alt="MealWhiz Logo"
-                            style="height: 65px; margin-right: 10px"
-                        />
-                        <h1
-                            class="m-0"
-                            style="font-family: 'K2D', sans-serif; color: #000; font-weight: 1000; font-size: 3.5rem"
-                        >
-                            MealWhiz
-                        </h1>
-                    </a>
-                    <button
-                        class="navbar-toggler py-2 px-3"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#navbarCollapse"
-                    >
-                        <span class="fa fa-bars text-primary"></span>
-                    </button>
-                    <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
-                        <div class="navbar-nav mx-auto">
-                            <a href="../index.html" class="nav-item nav-link">Home</a>
-                            <a href="recipes.html" class="nav-item nav-link">Recipes</a>
-                            <a href="CookOff.html" class="nav-item nav-link">CookOff</a>
-                        </div>
-                        <div class="d-flex m-3 me-0">
-                            <button
-                                class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4"
-                                data-bs-toggle="modal"
-                                data-bs-target="#searchModal"
-                            >
-                                <i class="fas fa-search text-primary"></i>
-                            </button>
-                            <a href="shopping_cart.html" class="position-relative me-4 my-auto cart-icon">
-                                <i class="fa fa-shopping-bag fa-2x"></i>
-                                <span
-                                    class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-white px-1"
-                                    style="top: -5px; left: 15px; height: 20px; min-width: 20px"
-                                    id="cart-count"
-                                    >0</span
-                                >
-                            </a>
-                            <a href="profile.html" class="my-auto active">
-                                <i class="fas fa-user fa-2x"></i>
-                            </a>
-                        </div>
+    <!-- Navbar Start -->
+    <div class="container-fluid fixed-top">
+        <div class="container px-0">
+            <nav class="navbar navbar-light bg-white navbar-expand-xl">
+                <a href="../index.html" class="navbar-brand d-flex align-items-center">
+                    <img src="../assets/img/Logo-Whizard-cropped-tranparent.png" alt="MealWhiz Logo"
+                        style="height: 65px; margin-right: 10px" />
+                    <h1 class="m-0"
+                        style="font-family: 'K2D', sans-serif; color: #000; font-weight: 1000; font-size: 3.5rem">
+                        MealWhiz
+                    </h1>
+                </a>
+                <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarCollapse">
+                    <span class="fa fa-bars text-primary"></span>
+                </button>
+                <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
+                    <div class="navbar-nav mx-auto">
+                        <a href="../index.html" class="nav-item nav-link">Home</a>
+                        <a href="recipes.html" class="nav-item nav-link">Recipes</a>
+                        <a href="CookOff.html" class="nav-item nav-link">CookOff</a>
                     </div>
-                </nav>
-            </div>
-        </div>
-        <!-- Navbar End -->
-
-        <!-- Modal Search Start -->
-        <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-fullscreen">
-                <div class="modal-content rounded-0">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Search by keyword</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="d-flex m-3 me-0">
+                        <button
+                            class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4"
+                            data-bs-toggle="modal" data-bs-target="#searchModal">
+                            <i class="fas fa-search text-primary"></i>
+                        </button>
+                        <a href="shopping_cart.html" class="position-relative me-4 my-auto cart-icon">
+                            <i class="fa fa-shopping-bag fa-2x"></i>
+                            <span
+                                class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-white px-1"
+                                style="top: -5px; left: 15px; height: 20px; min-width: 20px" id="cart-count">0</span>
+                        </a>
+                        <a href="profile.html" class="my-auto active">
+                            <i class="fas fa-user fa-2x"></i>
+                        </a>
                     </div>
-                    <div class="modal-body d-flex align-items-center">
-                        <div class="input-group w-75 mx-auto d-flex">
-                            <input
-                                type="search"
-                                class="form-control p-3"
-                                placeholder="Search recipes..."
-                                aria-describedby="search-icon-1"
-                            />
-                            <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
-                        </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <!-- Navbar End -->
+
+    <!-- Modal Search Start -->
+    <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content rounded-0">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Search by keyword</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body d-flex align-items-center">
+                    <div class="input-group w-75 mx-auto d-flex">
+                        <input type="search" class="form-control p-3" placeholder="Search recipes..."
+                            aria-describedby="search-icon-1" />
+                        <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Modal Search End -->
+    </div>
+    <!-- Modal Search End -->
 
-        <!-- Single Page Header start -->
-        <div class="container-fluid page-header py-5">
-            <h1 class="text-center text-white display-6">My Profile</h1>
-            <ol class="breadcrumb justify-content-center mb-0">
-                <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
-                <li class="breadcrumb-item active text-white">Profile</li>
-            </ol>
-        </div>
-        <!-- Single Page Header End -->
+    <!-- Single Page Header start -->
+    <div class="container-fluid page-header py-5">
+        <h1 class="text-center text-white display-6">My Profile</h1>
+        <ol class="breadcrumb justify-content-center mb-0">
+            <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
+            <li class="breadcrumb-item active text-white">Profile</li>
+        </ol>
+    </div>
+    <!-- Single Page Header End -->
 
-        <!-- Profile Content Start -->
-        <div class="container-fluid py-5">
-            <div class="container py-5">
-                <div class="row g-4 mb-5">
-                    <div class="col-lg-10 mx-auto">
-                        <div class="profile-container">
-                            <!-- Profile Header -->
-                            <div class="profile-header">
-                                <div class="profile-avatar">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <div>
-                                    <h2 id="username-display">Loading...</h2>
-                                    <p class="text-muted">Member since <span id="member-since">2023</span></p>
-                                </div>
+    <!-- Profile Content Start -->
+    <div class="container-fluid py-5">
+        <div class="container py-5">
+            <div class="row g-4 mb-5">
+                <div class="col-lg-10 mx-auto">
+                    <div class="profile-container">
+                        <!-- Profile Header -->
+                        <div class="profile-header">
+                            <div class="profile-avatar">
+                                <i class="fas fa-user"></i>
                             </div>
-
-                            <!-- Profile Options -->
-                            <div class="row g-4">
-                                <!-- Shopping List Card -->
-                                <div class="col-md-4">
-                                    <div
-                                        class="card h-100 profile-card"
-                                        onclick="window.location.href='shopping_cart.html'"
-                                    >
-                                        <div class="card-body text-center p-4">
-                                            <div class="mb-4">
-                                                <i class="fas fa-shopping-basket fa-4x text-primary"></i>
-                                            </div>
-                                            <h4>Shopping List</h4>
-                                            <p class="text-muted">Manage your ingredients and recipe items</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Favorites Card -->
-                                <div class="col-md-4">
-                                    <div class="card h-100 profile-card" onclick="scrollToFavorites()">
-                                        <div class="card-body text-center p-4">
-                                            <div class="mb-4">
-                                                <i class="fas fa-heart fa-4x text-danger"></i>
-                                            </div>
-                                            <h4>My Favorites</h4>
-                                            <p class="text-muted">View and manage your favorite recipes</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Settings Card -->
-                                <div class="col-md-4">
-                                    <div class="card h-100 profile-card" onclick="openSettings()">
-                                        <div class="card-body text-center p-4">
-                                            <div class="mb-4">
-                                                <i class="fas fa-cog fa-4x text-secondary"></i>
-                                            </div>
-                                            <h4>Settings</h4>
-                                            <p class="text-muted">Update your profile and preferences</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Settings Section (Hidden by Default) -->
-                            <div id="settings-section" class="mt-4 pt-4 border-top" style="display: none">
-                                <h3 class="mb-4">Account Settings</h3>
-
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label for="display-name" class="form-label">Display Name</label>
-                                        <input type="text" class="form-control" id="display-name" />
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="email" class="form-label">Email</label>
-                                        <input type="email" class="form-control" id="email" />
-                                    </div>
-                                    <div class="col-12">
-                                        <label for="bio" class="form-label">Bio</label>
-                                        <textarea class="form-control" id="bio" rows="3"></textarea>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="new-password" class="form-label">New Password</label>
-                                        <input type="password" class="form-control" id="new-password" />
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="confirm-password" class="form-label">Confirm Password</label>
-                                        <input type="password" class="form-control" id="confirm-password" />
-                                    </div>
-                                    <div class="col-12 mt-4">
-                                        <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
-                                        <button class="btn btn-outline-secondary ms-2" onclick="closeSettings()">
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Logout Button -->
-                            <div class="mt-5 text-center">
-                                <button class="btn btn-danger" onclick="logout()">
-                                    <i class="fas fa-sign-out-alt me-2"></i> Logout
-                                </button>
+                            <div>
+                                <h2 id="username-display">Loading...</h2>
+                                <p class="text-muted">Member since <span id="member-since">2023</span></p>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Profile Content End -->
 
-        <!-- My Favorite Recipes Section Start -->
-        <div class="container-fluid py-3">
-            <div class="container">
-                <h2 id="my-favorites-section" class="mb-4">My Favorite Recipes</h2>
-                <div id="favorite-recipes" class="row g-4">
-                    <!-- Favorites will be loaded here -->
-                    <div class="text-center py-5">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- My Favorite Recipes Section End -->
+                        <!-- Profile Options -->
+                        <div class="row g-4">
+                            <!-- Shopping List Card -->
+                            <div class="col-md-4">
+                                <div class="card h-100 profile-card"
+                                    onclick="window.location.href='shopping_cart.html'">
+                                    <div class="card-body text-center p-4">
+                                        <div class="mb-4">
+                                            <i class="fas fa-shopping-basket fa-4x text-primary"></i>
+                                        </div>
+                                        <h4>Shopping List</h4>
+                                        <p class="text-muted">Manage your ingredients and recipe items</p>
+                                    </div>
+                                </div>
+                            </div>
 
-        <!-- Footer Start -->
-        <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
-            <div class="container py-5">
-                <div class="pb-4 mb-4" style="border-bottom: 1px solid rgba(226, 175, 24, 0.5)">
-                    <div class="row g-4">
-                        <div class="col-lg-3">
-                            <a href="#">
-                                <h1 class="text-primary mb-0">MealWhiz</h1>
-                                <!-- <p class="text-secondary mb-0">Fresh products</p> -->
-                            </a>
+                            <!-- Favorites Card -->
+                            <div class="col-md-4">
+                                <div class="card h-100 profile-card" onclick="scrollToFavorites()">
+                                    <div class="card-body text-center p-4">
+                                        <div class="mb-4">
+                                            <i class="fas fa-heart fa-4x text-danger"></i>
+                                        </div>
+                                        <h4>My Favorites</h4>
+                                        <p class="text-muted">View and manage your favorite recipes</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Settings Card -->
+                            <div class="col-md-4">
+                                <div class="card h-100 profile-card" onclick="openSettings()">
+                                    <div class="card-body text-center p-4">
+                                        <div class="mb-4">
+                                            <i class="fas fa-cog fa-4x text-secondary"></i>
+                                        </div>
+                                        <h4>Settings</h4>
+                                        <p class="text-muted">Update your profile and preferences</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <!-- <div class="col-lg-6">
-                        <div class="position-relative mx-auto">
-                            <input class="form-control border-0 w-100 py-3 px-4 rounded-pill" type="number"
-                                placeholder="Your Email" />
-                            <button type="submit"
-                                class="btn btn-primary border-0 border-secondary py-3 px-4 position-absolute rounded-pill text-white"
-                                style="top: 0; right: 0">
-                                Subscribe Now
+
+                        <!-- Settings Section (Hidden by Default) -->
+                        <div id="settings-section" class="mt-4 pt-4 border-top" style="display: none">
+                            <h3 class="mb-4">Account Settings</h3>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="display-name" class="form-label">Display Name</label>
+                                    <input type="text" class="form-control" id="display-name" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" />
+                                </div>
+                                <div class="col-12">
+                                    <label for="bio" class="form-label">Bio</label>
+                                    <textarea class="form-control" id="bio" rows="3"></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="new-password" class="form-label">New Password</label>
+                                    <input type="password" class="form-control" id="new-password" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="confirm-password" class="form-label">Confirm Password</label>
+                                    <input type="password" class="form-control" id="confirm-password" />
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+                                    <button class="btn btn-outline-secondary ms-2" onclick="closeSettings()">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Logout Button -->
+                        <div class="mt-5 text-center">
+                            <button class="btn btn-danger" onclick="logout()">
+                                <i class="fas fa-sign-out-alt me-2"></i> Logout
                             </button>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Profile Content End -->
+
+    <!-- My Favorite Recipes Section Start -->
+    <div class="container-fluid py-3">
+        <div class="container">
+            <h2 id="my-favorites-section" class="mb-4">My Favorite Recipes</h2>
+            <div id="favorite-recipes" class="row g-4">
+                <!-- Favorites will be loaded here -->
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- My Favorite Recipes Section End -->
+
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
+        <div class="container py-5">
+            <div class="pb-4 mb-4" style="border-bottom: 1px solid rgba(226, 175, 24, 0.5)">
+                <div class="row g-4">
                     <div class="col-lg-3">
-                        <div class="d-flex justify-content-end pt-3">
-                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i
-                                    class="fab fa-twitter"></i></a>
-                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i
-                                    class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-outline-secondary me-2 btn-md-square rounded-circle" href=""><i
-                                    class="fab fa-youtube"></i></a>
-                            <a class="btn btn-outline-secondary btn-md-square rounded-circle" href=""><i
-                                    class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div> -->
+                        <a href="#">
+                            <h1 class="text-primary mb-0">MealWhiz</h1>
+                        </a>
                     </div>
                 </div>
-                <div class="row g-5">
-                    <div class="col-lg-3 col-md-6" style="width: 40%">
-                        <div class="footer-item">
-                            <h4 class="text-light mb-3">Why People Like Us!</h4>
-                            <p class="mb-4">
-                                Meal Whiz takes the stress out of everyday cooking by turning leftover ingredients into
-                                exciting, personalized meals.
-                            </p>
-                        </div>
+            </div>
+            <div class="row g-5">
+                <div class="col-lg-3 col-md-6" style="width: 40%">
+                    <div class="footer-item">
+                        <h4 class="text-light mb-3">Why People Like Us!</h4>
+                        <p class="mb-4">
+                            Meal Whiz takes the stress out of everyday cooking by turning leftover ingredients into
+                            exciting, personalized meals.
+                        </p>
                     </div>
-                    <div class="col-lg-4 col-md-6">
-                        <div class="d-flex flex-column text-start footer-item">
-                            <h4 class="text-light mb-3">Navigation</h4>
-                            <a class="btn-link" href="../index.html">Home</a>
-                            <a class="btn-link" href="./recipes.html">Recipes</a>
-                            <a class="btn-link" href="./cookoff.html">CookOff</a>
-                        </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="d-flex flex-column text-start footer-item">
+                        <h4 class="text-light mb-3">Navigation</h4>
+                        <a class="btn-link" href="../index.html">Home</a>
+                        <a class="btn-link" href="./recipes.html">Recipes</a>
+                        <a class="btn-link" href="./cookoff.html">CookOff</a>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="footer-item">
-                            <h4 class="text-light mb-3">Contact</h4>
-                            <p>Address: Limesstraße 12/14, 4060 Leonding</p>
-                            <p>Email: mealhwiz@mealwhiz.at</p>
-                        </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="footer-item">
+                        <h4 class="text-light mb-3">Contact</h4>
+                        <p>Address: Limesstraße 12/14, 4060 Leonding</p>
+                        <p>Email: mealhwiz@mealwhiz.at</p>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Footer End -->
+    </div>
+    <!-- Footer End -->
 
-        <!-- Copyright Start -->
-        <div class="container-fluid copyright bg-dark py-4">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                        <span class="text-light"
-                            ><a href="#"><i class="fas fa-copyright text-light me-2"></i>MealWhiz</a>, All right
-                            reserved.</span
-                        >
-                    </div>
-                    <div class="col-md-6 my-auto text-center text-md-end text-white">
-                        Designed By <a class="border-bottom" href="https://htmlcodex.com">HTML Codex</a> Distributed By
-                        <a class="border-bottom" href="https://themewagon.com">ThemeWagon</a>
-                    </div>
+    <!-- Copyright Start -->
+    <div class="container-fluid copyright bg-dark py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <span class="text-light"><a href="#"><i class="fas fa-copyright text-light me-2"></i>MealWhiz</a>,
+                        All right
+                        reserved.</span>
+                </div>
+                <div class="col-md-6 my-auto text-center text-md-end text-white">
+                    Designed By <a class="border-bottom" href="https://htmlcodex.com">HTML Codex</a> Distributed By
+                    <a class="border-bottom" href="https://themewagon.com">ThemeWagon</a>
                 </div>
             </div>
         </div>
-        <!-- Copyright End -->
+    </div>
+    <!-- Copyright End -->
 
-        <!-- Back to Top -->
-        <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"
-            ><i class="fa fa-arrow-up"></i
-        ></a>
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+            class="fa fa-arrow-up"></i></a>
 
-        <!-- JavaScript Libraries -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="../assets/lib/easing/easing.min.js"></script>
-        <script src="../assets/lib/waypoints/waypoints.min.js"></script>
-        <script src="../assets/lib/lightbox/js/lightbox.min.js"></script>
-        <script src="../assets/lib/owlcarousel/owl.carousel.min.js"></script>
+    <!-- JavaScript Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/lib/easing/easing.min.js"></script>
+    <script src="../assets/lib/waypoints/waypoints.min.js"></script>
+    <script src="../assets/lib/lightbox/js/lightbox.min.js"></script>
+    <script src="../assets/lib/owlcarousel/owl.carousel.min.js"></script>
 
-        <!-- Template Javascript -->
-        <script src="../assets/js/main.js"></script>
-        <script src="../assets/js/auth-nav.js"></script>
+    <!-- Template Javascript -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/auth-nav.js"></script>
+    <script src="../assets/js/profile.js"></script>
+</body>
 
-        <!-- Profile Page Javascript -->
-        <script>
-            const apiBase = "http://localhost:3000";
-
-            // On page load, check if user is logged in and redirect if not
-            document.addEventListener("DOMContentLoaded", function () {
-                // Hide spinner once page is loaded
-                document.querySelector("#spinner").classList.remove("show");
-
-                // Check for login token
-                const token = localStorage.getItem("accessToken");
-                if (!token) {
-                    window.location.href = "login.html";
-                    return;
-                }
-
-                // Load user data
-                loadUserData();
-
-                // Update cart count
-                updateCartCount();
-            });
-
-            async function loadUserData() {
-                const token = localStorage.getItem("accessToken");
-                if (!token) return;
-
-                try {
-                    const res = await fetch(`${apiBase}/users/me`, {
-                        method: "GET",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
-
-                    if (res.ok) {
-                        const user = await res.json();
-                        document.getElementById("username-display").textContent = user.username || "User";
-
-                        // Set other user data if available
-                        if (user.joinDate) {
-                            const joinDate = new Date(user.joinDate);
-                            document.getElementById("member-since").textContent = joinDate.getFullYear();
-                        }
-
-                        // Pre-fill settings form
-                        document.getElementById("display-name").value = user.username || "";
-                        document.getElementById("email").value = user.email || "";
-                        document.getElementById("bio").value = user.bio || "";
-                    } else {
-                        showNotification("Could not load user data", true);
-                    }
-                } catch (error) {
-                    console.error("Error loading user data:", error);
-                    showNotification("Error connecting to server", true);
-                }
-            }
-
-            async function updateCartCount() {
-                const token = localStorage.getItem("accessToken");
-                if (!token) return;
-
-                try {
-                    const res = await fetch(`${apiBase}/cart`, {
-                        method: "GET",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
-
-                    if (res.ok) {
-                        const items = await res.json();
-                        document.getElementById("cart-count").textContent = items.length;
-                    }
-                } catch (error) {
-                    console.error("Error updating cart count:", error);
-                }
-            }
-
-            function openSettings() {
-                document.getElementById("settings-section").style.display = "block";
-                // Smooth scroll to settings section
-                document.getElementById("settings-section").scrollIntoView({ behavior: "smooth" });
-            }
-
-            function scrollToFavorites() {
-                // Smooth scroll to favorites section
-                document.getElementById("my-favorites-section").scrollIntoView({ behavior: "smooth" });
-            }
-
-            function closeSettings() {
-                document.getElementById("settings-section").style.display = "none";
-            }
-
-            async function saveSettings() {
-                const token = localStorage.getItem("accessToken");
-                if (!token) return;
-
-                const username = document.getElementById("display-name").value;
-                const email = document.getElementById("email").value;
-                const bio = document.getElementById("bio").value;
-                const newPassword = document.getElementById("new-password").value;
-                const confirmPassword = document.getElementById("confirm-password").value;
-
-                // Basic validation
-                if (newPassword && newPassword !== confirmPassword) {
-                    showNotification("Passwords do not match", true);
-                    return;
-                }
-
-                const userData = {
-                    username,
-                    email,
-                    bio,
-                };
-
-                if (newPassword) {
-                    userData.password = newPassword;
-                }
-
-                try {
-                    const res = await fetch(`${apiBase}/users/update`, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`,
-                        },
-                        body: JSON.stringify(userData),
-                    });
-
-                    if (res.ok) {
-                        showNotification("Settings updated successfully");
-                        closeSettings();
-                        loadUserData(); // Refresh displayed user data
-                    } else {
-                        const error = await res.text();
-                        showNotification(`Failed to update settings: ${error}`, true);
-                    }
-                } catch (error) {
-                    console.error("Error updating user settings:", error);
-                    showNotification("Error connecting to server", true);
-                }
-            }
-
-            function logout() {
-                localStorage.removeItem("accessToken");
-                window.location.href = "../index.html";
-            }
-
-            function showNotification(message, isError = false) {
-                // Create notification element if it doesn't exist
-                let notification = document.getElementById("notification");
-                if (!notification) {
-                    notification = document.createElement("div");
-                    notification.id = "notification";
-                    notification.style.position = "fixed";
-                    notification.style.bottom = "20px";
-                    notification.style.right = "20px";
-                    notification.style.padding = "15px 25px";
-                    notification.style.borderRadius = "5px";
-                    notification.style.zIndex = "9999";
-                    notification.style.transition = "opacity 0.5s";
-                    document.body.appendChild(notification);
-                }
-
-                // Set colors based on type
-                notification.style.backgroundColor = isError ? "#dc3545" : "#28a745";
-                notification.style.color = "white";
-
-                // Set message and show
-                notification.textContent = message;
-                notification.style.opacity = "1";
-
-                // Hide after 3 seconds
-                setTimeout(() => {
-                    notification.style.opacity = "0";
-                }, 3000);
-            }
-
-            async function loadFavoriteRecipes() {
-                const token = localStorage.getItem("accessToken");
-                if (!token) return;
-
-                try {
-                    const response = await fetch("http://localhost:3000/users/favorites", {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
-
-                    if (!response.ok) {
-                        throw new Error("Failed to load favorites");
-                    }
-
-                    const favorites = await response.json();
-                    const container = document.getElementById("favorite-recipes");
-
-                    if (!container) return;
-
-                    if (favorites.length === 0) {
-                        container.innerHTML = `
-                <div class="col-12 text-center py-5">
-                    <p>You haven't saved any favorite recipes yet.</p>
-                    <a href="/pages/recipes.html" class="btn btn-primary">Browse Recipes</a>
-                </div>
-            `;
-                        return;
-                    }
-
-                    container.innerHTML = favorites
-                        .map(
-                            (recipe) => `
-            <div class="col-md-6 col-lg-4 col-xl-3">
-                <div class="rounded position-relative fruite-item">
-                    <div class="fruite-img">
-                        <img src="../assets/img/recipe_imgs/${recipe.id}.jpg" class="img-fluid w-100 rounded-top" alt="${recipe.name}" 
-                            onerror="this.onerror=null;this.src='../assets/img/recipe_placeholder.jpg';">
-                    </div>
-                    <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">${recipe.difficulty}</div>
-                    <div class="p-4 border border-secondary border-top-0 rounded-bottom">
-                        <h4>${recipe.name}</h4>
-                        <div class="d-flex justify-content-between flex-lg-wrap">
-                            <p class="text-dark fs-5 fw-bold mb-0">
-                                <i class="far fa-clock text-primary me-1"></i> ${recipe.time} min
-                            </p>
-                            <div class="d-flex align-items-center">
-                                <a href="/pages/recipe-view.html?id=${recipe.id}" class="btn border border-secondary rounded-pill px-3 text-primary">
-                                    <i class="fa fa-eye me-2"></i> View Recipe
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `
-                        )
-                        .join("");
-                } catch (error) {
-                    console.error("Error loading favorites:", error);
-                    const container = document.getElementById("favorite-recipes");
-                    if (container) {
-                        container.innerHTML = `
-                <div class="col-12 text-center py-5">
-                    <p class="text-danger">Error loading favorite recipes.</p>
-                </div>
-            `;
-                    }
-                }
-            }
-
-            // Call this function when the page loads
-            document.addEventListener("DOMContentLoaded", function () {
-                // Add this to your other initial function calls
-                loadFavoriteRecipes();
-            });
-        </script>
-    </body>
 </html>
