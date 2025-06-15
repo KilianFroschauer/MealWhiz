@@ -106,37 +106,52 @@ namespace RecipeView {
     async function renderRatingComponent(recipe: Recipe, container: HTMLElement) {
         const ratingContainer = document.createElement("div");
         ratingContainer.className = "my-4 border-top pt-4";
+        
+        // Check if user is logged in
+        const isLoggedIn = await isUserLoggedIn();
+        
+        // Get user's existing rating if logged in
+        let userRating = 0;
+        if (isLoggedIn) {
+            userRating = await getUserExistingRating(recipe.id);
+        }
+
         ratingContainer.innerHTML = `
             <h5 class="fw-bold mb-3">Rate this recipe</h5>
             ${
-                (await isUserLoggedIn())
+                isLoggedIn
                     ? `
-                <div class="d-flex align-items-center recipe-rating-component">
-                    <div class="star-rating">
-                        <i class="far fa-star" data-rating="1"></i>
-                        <i class="far fa-star" data-rating="2"></i>
-                        <i class="far fa-star" data-rating="3"></i>
-                        <i class="far fa-star" data-rating="4"></i>
-                        <i class="far fa-star" data-rating="5"></i>
-                    </div>
-                    <span class="ms-3 rating-message">Click to rate</span>
+            <div class="d-flex align-items-center recipe-rating-component">
+                <div class="star-rating">
+                    <i class="far fa-star" data-rating="1"></i>
+                    <i class="far fa-star" data-rating="2"></i>
+                    <i class="far fa-star" data-rating="3"></i>
+                    <i class="far fa-star" data-rating="4"></i>
+                    <i class="far fa-star" data-rating="5"></i>
                 </div>
-            `
+                <span class="ms-3 rating-message">${userRating > 0 ? `Your rating: ${userRating} star${userRating !== 1 ? 's' : ''}` : 'Click to rate'}</span>
+            </div>
+        `
                     : `
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle me-2"></i>
-                    <a href="login.html" class="alert-link">Log in</a> to rate this recipe
-                </div>
-            `
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <a href="login.html" class="alert-link">Log in</a> to rate this recipe
+            </div>
+        `
             }
         `;
 
         container.appendChild(ratingContainer);
 
         // Only add event listeners if user is logged in
-        if (await isUserLoggedIn()) {
+        if (isLoggedIn) {
             const stars = ratingContainer.querySelectorAll(".star-rating i");
             const ratingMessage = ratingContainer.querySelector(".rating-message");
+            
+            // Initialize stars to show user's current rating if they have one
+            if (userRating > 0) {
+                updateStarsDisplay(stars, userRating, "set");
+            }
 
             // Highlight stars on hover
             stars.forEach((star) => {
@@ -147,19 +162,46 @@ namespace RecipeView {
                 });
             });
 
-            // Reset stars when not hovering
+            // Reset stars when not hovering to user's actual rating (not 0)
             ratingContainer.querySelector(".star-rating")?.addEventListener("mouseleave", () => {
-                updateStarsDisplay(stars, 0, "reset");
-                if (ratingMessage) ratingMessage.textContent = "Click to rate";
+                updateStarsDisplay(stars, userRating, userRating > 0 ? "set" : "reset");
+                if (ratingMessage) {
+                    ratingMessage.textContent = userRating > 0 ? 
+                        `Your rating: ${userRating} star${userRating !== 1 ? 's' : ''}` : 
+                        "Click to rate";
+                }
             });
 
             // Handle click to submit rating
             stars.forEach((star) => {
                 star.addEventListener("click", async () => {
                     const rating = parseInt(star.getAttribute("data-rating") || "0");
+                    userRating = rating; // Update the user's rating immediately for UX
                     await submitRating(recipe.id, rating, stars, ratingMessage as HTMLElement);
                 });
             });
+        }
+    }
+
+    // Add this new function to get user's existing rating
+    async function getUserExistingRating(recipeId: number): Promise<number> {
+        try {
+            const token = localStorage.getItem("accessToken");
+            if (!token) return 0;
+
+            const response = await fetch(`${apiBase}/recipes/${recipeId}/user-rating`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) return 0;
+            
+            const data = await response.json();
+            return data.rating || 0;
+        } catch (error) {
+            console.error("Error fetching user rating:", error);
+            return 0;
         }
     }
 
@@ -207,11 +249,14 @@ namespace RecipeView {
 
             // Show toast notification
             showToast(`You rated this recipe ${rating} star${rating !== 1 ? "s" : ""}`, false);
+            
+            return rating;
         } catch (error) {
             console.error("Error submitting rating:", error);
             messageElement.textContent = "Failed to submit rating. Please try again.";
             messageElement.className = "ms-3 rating-message text-danger";
             showToast("Error submitting rating", true);
+            return 0;
         }
     }
 

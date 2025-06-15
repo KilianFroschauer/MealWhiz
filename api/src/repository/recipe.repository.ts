@@ -461,3 +461,28 @@ export async function isRecipeFavorited(recipeId: number, userId: number): Promi
     client.release();
   }
 }
+
+/**
+ * Get the rating a user has given to a specific recipe
+ * 
+ * @param userId The ID of the user
+ * @param recipeId The ID of the recipe
+ * @returns The rating (1-5) or 0 if the user hasn't rated the recipe
+ */
+export async function getUserRecipeRating(userId: number, recipeId: number): Promise<number> {
+  const client = await pool.connect();
+
+  try {
+    const result = await client.query(
+      'SELECT rating FROM user_recipe_ratings WHERE user_id = $1 AND recipe_id = $2',
+      [userId, recipeId]
+    );
+
+    return result.rows.length > 0 ? parseInt(result.rows[0].rating) : 0;
+  } catch (error) {
+    console.error('Error getting user recipe rating:', error);
+    throw error;
+  } finally {
+    client.release();
+  }
+}

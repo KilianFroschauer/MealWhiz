@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { getAllRecipes, getRecipeById, getFilteredRecipes, updateRecipeRating } from '../repository/recipe.repository';
+import { getAllRecipes, getRecipeById, getFilteredRecipes, updateRecipeRating, getUserRecipeRating } from '../repository/recipe.repository';
 import { convertToSimpleRecipe } from '../utils/recipe.utils';
 import { AuthRequest } from '../middlewares/auth.middlware';
 import { toggleRecipeFavorite as toggleFavoriteRecipe, isRecipeFavorited } from '../repository/recipe.repository';
@@ -181,6 +181,25 @@ export class RecipeController {
             });
         } catch (error) {
             console.error(`Error checking favorite status:`, error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
+
+    async getUserRatingForRecipe(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const authReq = req as AuthRequest;
+            const recipeId = parseInt(req.params.id);
+
+            // Validate recipe ID
+            if (isNaN(recipeId)) {
+                res.status(400).json({ error: "Invalid recipe ID" });
+                return;
+            }
+
+            const rating = await getUserRecipeRating(authReq.payload.user.userId, recipeId);
+            res.status(200).json({ rating });
+        } catch (error) {
+            console.error(`Error getting user rating for recipe:`, error);
             res.status(500).json({ error: "Internal server error" });
         }
     }

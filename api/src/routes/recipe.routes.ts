@@ -400,3 +400,40 @@ recipeRouter.post("/:id/favorite", isAuthenticated, recipeController.toggleFavor
  *         description: Unauthorized - user must be logged in
  */
 recipeRouter.get("/:id/favorite", isAuthenticated, recipeController.checkFavorite);
+
+/**
+ * @swagger
+ * /recipes/{id}/user-rating:
+ *   get:
+ *     tags:
+ *       - recipe
+ *     summary: Get the current user's rating for a recipe
+ *     description: Retrieve the authenticated user's rating for a specific recipe
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the recipe
+ *     responses:
+ *       200:
+ *         description: User's rating for the recipe
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 rating:
+ *                   type: integer
+ *                   minimum: 0
+ *                   maximum: 5
+ *                   description: User's rating (0 if not rated)
+ *       400:
+ *         description: Invalid recipe ID
+ *       401:
+ *         description: Unauthorized - user must be logged in
+ */
+recipeRouter.get("/:id/user-rating", isAuthenticated, recipeController.getUserRatingForRecipe);
