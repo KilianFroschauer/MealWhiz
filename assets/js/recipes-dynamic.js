@@ -645,6 +645,45 @@ var RecipesDynamic;
                 timeValueSpan.textContent = `${timeRangeInput.value} min`;
             });
         }
+        const initFilterAccordion = () => {
+            // Get all collapse elements in the filter sidebar
+            const filterCollapses = document.querySelectorAll('[id$="Collapse"].collapse');
+            // For each collapse element, add a listener for when it's about to be shown
+            filterCollapses.forEach((collapse) => {
+                collapse.addEventListener('show.bs.collapse', (event) => {
+                    // Close all other open filter sections
+                    filterCollapses.forEach((otherCollapse) => {
+                        if (otherCollapse !== collapse &&
+                            otherCollapse.classList.contains('show')) {
+                            const bsCollapse = new bootstrap.Collapse(otherCollapse);
+                            bsCollapse.hide();
+                        }
+                    });
+                    // Update the icon for the collapsing section
+                    const trigger = document.querySelector(`[data-bs-toggle="collapse"][href="#${collapse.id}"]`);
+                    if (trigger) {
+                        const icon = trigger.querySelector('.fas');
+                        if (icon) {
+                            icon.classList.remove('fa-chevron-down');
+                            icon.classList.add('fa-chevron-up');
+                        }
+                    }
+                });
+                // Add listener for when collapse is hidden
+                collapse.addEventListener('hide.bs.collapse', (event) => {
+                    const trigger = document.querySelector(`[data-bs-toggle="collapse"][href="#${collapse.id}"]`);
+                    if (trigger) {
+                        const icon = trigger.querySelector('.fas');
+                        if (icon) {
+                            icon.classList.remove('fa-chevron-up');
+                            icon.classList.add('fa-chevron-down');
+                        }
+                    }
+                });
+            });
+        };
+        // Call the function to initialize the accordion behavior
+        initFilterAccordion();
     });
     // Make functionality accessible from outside the namespace if needed
     window.RecipesDynamic = {

@@ -5,9 +5,11 @@
 
 namespace RecipesDynamic {
     // Global API base URL with fallback if MealWhizConfig is not defined
-    const apiBase: string = (typeof MealWhizConfig !== 'undefined' ? 
-                            MealWhizConfig.apiBaseURL : 
-                            'https://mealhwiz.at:3000');
+    const apiBase: string = (typeof MealWhizConfig !== 'undefined' ?
+        MealWhizConfig.apiBaseURL :
+        'https://mealhwiz.at:3000');
+
+    declare var bootstrap: any;
 
     // Minimal interface for data needed to render a recipe card in search results or listings.
     interface RecipeCardData {
@@ -40,9 +42,8 @@ namespace RecipesDynamic {
           <a href="recipe-view.html?id=${recipe.id}" class="text-decoration-none">
             <div class="rounded position-relative food-item card-has-skeleton">
               <div class="food-img position-relative">
-                <img src="${imageUrl}" class="img-fluid w-100 rounded-top recipe-img-loading" alt="${
-            recipe.name
-        }" loading="lazy" 
+                <img src="${imageUrl}" class="img-fluid w-100 rounded-top recipe-img-loading" alt="${recipe.name
+            }" loading="lazy" 
                      onload="this.parentElement.querySelector('.skeleton-img-overlay')?.classList.add('d-none'); this.classList.remove('recipe-img-loading'); this.closest('.card-has-skeleton')?.classList.remove('card-has-skeleton');"
                      onerror="this.onerror=null; this.src='../assets/img/Food_Example_01-unsplash.jpg'; this.parentElement.querySelector('.skeleton-img-overlay')?.classList.add('d-none'); this.classList.remove('recipe-img-loading'); this.closest('.card-has-skeleton')?.classList.remove('card-has-skeleton');"> {/* Fallback image and skeleton removal on error */}
                 <div class="skeleton-img-overlay skeleton-img position-absolute top-0 start-0 w-100 h-100"></div>
@@ -56,9 +57,8 @@ namespace RecipesDynamic {
                 <div class="d-flex justify-content-end">
                   <div class="d-flex align-items-center">
                     <i class="fas fa-star text-warning me-2"></i>
-                    <span class="fw-bold text-dark">${
-                        ratingValue !== undefined && !isNaN(ratingValue) ? ratingValue.toFixed(1) : "-"
-                    }</span>
+                    <span class="fw-bold text-dark">${ratingValue !== undefined && !isNaN(ratingValue) ? ratingValue.toFixed(1) : "-"
+            }</span>
                   </div>
                 </div>
               </div>
@@ -173,14 +173,14 @@ namespace RecipesDynamic {
     function collectRecipeFilters(): Record<string, any> {
         const filters: Record<string, any> = {};
 
-    // Name (from the main search bar, usually at the top of the filter sidebar).
-    const nameInput = document.querySelector('.col-xl-3 .input-group input[type="search"]') as HTMLInputElement | null;
-    if (nameInput && nameInput.value.trim() !== "") {
-        const names = nameInput.value.split(',').map(name => name.trim()).filter(name => name !== "");
-        if (names.length > 0) {
-            filters.name = names;
+        // Name (from the main search bar, usually at the top of the filter sidebar).
+        const nameInput = document.querySelector('.col-xl-3 .input-group input[type="search"]') as HTMLInputElement | null;
+        if (nameInput && nameInput.value.trim() !== "") {
+            const names = nameInput.value.split(',').map(name => name.trim()).filter(name => name !== "");
+            if (names.length > 0) {
+                filters.name = names;
+            }
         }
-    }
 
         // Dietary Preferences (checkboxes with IDs starting "dp-").
         const dpChecked = Array.from(document.querySelectorAll('input[id^="dp-"]:checked')) as HTMLInputElement[];
@@ -227,18 +227,18 @@ namespace RecipesDynamic {
         if (minCal && minCal.trim() !== "") filters.minCal = minCal;
         if (maxCal && maxCal.trim() !== "") filters.maxCal = maxCal;
 
-    // Ingredients (from a tag-based input or a single input field).
-    const ingredientTags = Array.from(document.querySelectorAll("#ingredientTags .ingredient-tag")) as HTMLElement[];
-    if (ingredientTags.length) {
-        filters.ing = ingredientTags.map((tag) => tag.textContent?.trim() || "").filter(Boolean);
-    } else {
-        const ingInput = document.getElementById("ingredientInput") as HTMLInputElement | null;
-        if (ingInput && ingInput.value.trim() !== "") {
-             filters.ing = ingInput.value.split(',')
-                .map(s => s.trim()) // Trim whitespace for each ingredient
-                .filter(s => s !== ""); // Remove any empty strings
+        // Ingredients (from a tag-based input or a single input field).
+        const ingredientTags = Array.from(document.querySelectorAll("#ingredientTags .ingredient-tag")) as HTMLElement[];
+        if (ingredientTags.length) {
+            filters.ing = ingredientTags.map((tag) => tag.textContent?.trim() || "").filter(Boolean);
+        } else {
+            const ingInput = document.getElementById("ingredientInput") as HTMLInputElement | null;
+            if (ingInput && ingInput.value.trim() !== "") {
+                filters.ing = ingInput.value.split(',')
+                    .map(s => s.trim()) // Trim whitespace for each ingredient
+                    .filter(s => s !== ""); // Remove any empty strings
+            }
         }
-    }
 
         // Tags (from selectable badges in #tagsCollapse).
         const tagBadges = Array.from(
@@ -360,9 +360,8 @@ namespace RecipesDynamic {
         let html = "";
         if (totalPages > 1) {
             // Only show pagination if more than one page.
-            html += `<li class="page-item${
-                currentPage === 1 ? " disabled" : ""
-            }"><a class="page-link" href="#" data-page="${currentPage - 1}">Previous</a></li>`;
+            html += `<li class="page-item${currentPage === 1 ? " disabled" : ""
+                }"><a class="page-link" href="#" data-page="${currentPage - 1}">Previous</a></li>`;
 
             // Logic for displaying page numbers (e.g., with ellipses for many pages)
             let startPage = Math.max(1, currentPage - 2);
@@ -377,9 +376,8 @@ namespace RecipesDynamic {
             }
 
             for (let i = startPage; i <= endPage; i++) {
-                html += `<li class="page-item${
-                    i === currentPage ? " active" : ""
-                }"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+                html += `<li class="page-item${i === currentPage ? " active" : ""
+                    }"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
             }
 
             if (endPage < totalPages) {
@@ -387,9 +385,8 @@ namespace RecipesDynamic {
                     html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
                 html += `<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">${totalPages}</a></li>`;
             }
-            html += `<li class="page-item${
-                currentPage === totalPages ? " disabled" : ""
-            }"><a class="page-link" href="#" data-page="${currentPage + 1}">Next</a></li>`;
+            html += `<li class="page-item${currentPage === totalPages ? " disabled" : ""
+                }"><a class="page-link" href="#" data-page="${currentPage + 1}">Next</a></li>`;
         }
         paginationContainer.innerHTML = html;
     }
@@ -445,19 +442,17 @@ namespace RecipesDynamic {
             <a href="recipe-view.html?id=${r.id}" class="text-decoration-none text-dark">
                 <div class="d-flex align-items-center justify-content-start mb-3 featured-recipe-card" style="cursor:pointer;">
                     <div class="rounded me-3" style="width: 80px; height: 80px; overflow: hidden;">
-                        <img src="${getRecipeImage(r.id)}" class="img-fluid rounded h-100 w-100" alt="${
-                    r.name
-                }" style="object-fit: cover;" onerror="this.onerror=null; this.src='../assets/img/Food_Example_02-unsplash.jpg';">
+                        <img src="${getRecipeImage(r.id)}" class="img-fluid rounded h-100 w-100" alt="${r.name
+                    }" style="object-fit: cover;" onerror="this.onerror=null; this.src='../assets/img/Food_Example_02-unsplash.jpg';">
                     </div>
                     <div>
                         <h6 class="mb-1 fw-semibold" style="font-size: 0.9rem;">${r.name}</h6>
                         <div class="d-flex align-items-center mb-1">
                             <span class="badge badge-difficulty-${r.difficulty} me-2 small">${capitalize(
-                    r.difficulty
-                )}</span>
-                            <span class="small text-muted" style="font-size: 0.8rem;"><i class="far fa-clock me-1"></i>${
-                                r.time
-                            } min</span>
+                        r.difficulty
+                    )}</span>
+                            <span class="small text-muted" style="font-size: 0.8rem;"><i class="far fa-clock me-1"></i>${r.time
+                    } min</span>
                         </div>
                         <div class="d-flex align-items-center">
                             <i class="fas fa-star text-warning me-1 small"></i>
@@ -695,6 +690,52 @@ namespace RecipesDynamic {
                 timeValueSpan.textContent = `${timeRangeInput.value} min`;
             });
         }
+
+        const initFilterAccordion = () => {
+            // Get all collapse elements in the filter sidebar
+            const filterCollapses = document.querySelectorAll(
+                '[id$="Collapse"].collapse'
+            );
+
+            // For each collapse element, add a listener for when it's about to be shown
+            filterCollapses.forEach((collapse) => {
+                collapse.addEventListener('show.bs.collapse', (event) => {
+                    // Close all other open filter sections
+                    filterCollapses.forEach((otherCollapse) => {
+                        if (otherCollapse !== collapse &&
+                            otherCollapse.classList.contains('show')) {
+                            const bsCollapse = new bootstrap.Collapse(otherCollapse);
+                            bsCollapse.hide();
+                        }
+                    });
+
+                    // Update the icon for the collapsing section
+                    const trigger = document.querySelector(`[data-bs-toggle="collapse"][href="#${collapse.id}"]`);
+                    if (trigger) {
+                        const icon = trigger.querySelector('.fas');
+                        if (icon) {
+                            icon.classList.remove('fa-chevron-down');
+                            icon.classList.add('fa-chevron-up');
+                        }
+                    }
+                });
+
+                // Add listener for when collapse is hidden
+                collapse.addEventListener('hide.bs.collapse', (event) => {
+                    const trigger = document.querySelector(`[data-bs-toggle="collapse"][href="#${collapse.id}"]`);
+                    if (trigger) {
+                        const icon = trigger.querySelector('.fas');
+                        if (icon) {
+                            icon.classList.remove('fa-chevron-up');
+                            icon.classList.add('fa-chevron-down');
+                        }
+                    }
+                });
+            });
+        };
+
+        // Call the function to initialize the accordion behavior
+        initFilterAccordion();
     });
 
     // Make functionality accessible from outside the namespace if needed
