@@ -373,9 +373,9 @@ var RecipesDynamic;
                     currentPage = page;
                     updatePagination(); // Re-render for the new page.
                     // Scroll to the top of the recipe list after pagination
-                    const recipeListElement = document.getElementById("recipe-list-section"); // Assuming you have a section/div wrapping the list
+                    const recipeListElement = document.getElementById("recipe-list"); // Assuming you have a section/div wrapping the list
                     if (recipeListElement) {
-                        recipeListElement.scrollIntoView({ behavior: "smooth" });
+                        window.scrollTo({ top: recipeListElement.offsetTop - 100, behavior: "smooth", });
                     }
                 }
             }
@@ -468,7 +468,8 @@ var RecipesDynamic;
         }
         else {
             // If no query in URL, fetch all recipes (or default set).
-            fetchAndRenderRecipes();
+            const filters = collectRecipeFilters();
+            fetchAndRenderRecipesWithFilters(filters);
         }
         // Event listener for the main search input in the filter sidebar.
         if (filterSidebarSearchInput) {

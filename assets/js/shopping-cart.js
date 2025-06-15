@@ -96,6 +96,7 @@ var ShoppingCart;
                         });
                     });
                 }
+                AuthNav.updateCartCount(); // Update cart count in header
             }
             else {
                 handleError(res);
@@ -252,6 +253,7 @@ var ShoppingCart;
                     <i class="fas fa-shopping-basket fa-3x mb-3"></i>
                     <p>Your shopping list is empty.</p>
                 </div>`;
+                AuthNav.updateCartCount(); // Update cart count in header
                 showMessage("All items removed from shopping list", false);
             }
             else {
