@@ -5,9 +5,9 @@
 
 namespace RecipeView {
     // Global API base URL with fallback if MealWhizConfig is not defined
-    const apiBase: string = (typeof MealWhizConfig !== 'undefined' ? 
-                            MealWhizConfig.apiBaseURL : 
-                            'https://mealhwiz.at:3000');
+    const apiBase: string = (typeof MealWhizConfig !== 'undefined' ?
+        MealWhizConfig.apiBaseURL :
+        'https://mealhwiz.at:3000');
 
     // Interface defining the structure of a full Recipe object.
     interface Recipe {
@@ -106,10 +106,10 @@ namespace RecipeView {
     async function renderRatingComponent(recipe: Recipe, container: HTMLElement) {
         const ratingContainer = document.createElement("div");
         ratingContainer.className = "my-4 border-top pt-4";
-        
+
         // Check if user is logged in
         const isLoggedIn = await isUserLoggedIn();
-        
+
         // Get user's existing rating if logged in
         let userRating = 0;
         if (isLoggedIn) {
@@ -118,9 +118,8 @@ namespace RecipeView {
 
         ratingContainer.innerHTML = `
             <h5 class="fw-bold mb-3">Rate this recipe</h5>
-            ${
-                isLoggedIn
-                    ? `
+            ${isLoggedIn
+                ? `
             <div class="d-flex align-items-center recipe-rating-component">
                 <div class="star-rating">
                     <i class="far fa-star" data-rating="1"></i>
@@ -132,7 +131,7 @@ namespace RecipeView {
                 <span class="ms-3 rating-message">${userRating > 0 ? `Your rating: ${userRating} star${userRating !== 1 ? 's' : ''}` : 'Click to rate'}</span>
             </div>
         `
-                    : `
+                : `
             <div class="alert alert-info">
                 <i class="fas fa-info-circle me-2"></i>
                 <a href="login.html" class="alert-link">Log in</a> to rate this recipe
@@ -147,7 +146,7 @@ namespace RecipeView {
         if (isLoggedIn) {
             const stars = ratingContainer.querySelectorAll(".star-rating i");
             const ratingMessage = ratingContainer.querySelector(".rating-message");
-            
+
             // Initialize stars to show user's current rating if they have one
             if (userRating > 0) {
                 updateStarsDisplay(stars, userRating, "set");
@@ -166,8 +165,8 @@ namespace RecipeView {
             ratingContainer.querySelector(".star-rating")?.addEventListener("mouseleave", () => {
                 updateStarsDisplay(stars, userRating, userRating > 0 ? "set" : "reset");
                 if (ratingMessage) {
-                    ratingMessage.textContent = userRating > 0 ? 
-                        `Your rating: ${userRating} star${userRating !== 1 ? 's' : ''}` : 
+                    ratingMessage.textContent = userRating > 0 ?
+                        `Your rating: ${userRating} star${userRating !== 1 ? 's' : ''}` :
                         "Click to rate";
                 }
             });
@@ -196,7 +195,7 @@ namespace RecipeView {
             });
 
             if (!response.ok) return 0;
-            
+
             const data = await response.json();
             return data.rating || 0;
         } catch (error) {
@@ -249,7 +248,7 @@ namespace RecipeView {
 
             // Show toast notification
             showToast(`You rated this recipe ${rating} star${rating !== 1 ? "s" : ""}`, false);
-            
+
             return rating;
         } catch (error) {
             console.error("Error submitting rating:", error);
@@ -283,16 +282,16 @@ namespace RecipeView {
                 recipe.isFavorite = await checkFavoriteStatus(id);
             }
 
-        renderRecipe(recipe); // Render the fetched recipe.
-    } catch (e) {
-        // Handle generic fetch errors (e.g., network issues).
-        showError("Failed to load recipe.");
-        console.error("Error loading recipe:", e);
+            renderRecipe(recipe); // Render the fetched recipe.
+        } catch (e) {
+            // Handle generic fetch errors (e.g., network issues).
+            showError("Failed to load recipe.");
+            console.error("Error loading recipe:", e);
+        }
     }
-}
 
-// Add an event listener to call loadRecipe when the DOM is fully loaded.
-document.addEventListener("DOMContentLoaded", loadRecipe);
+    // Add an event listener to call loadRecipe when the DOM is fully loaded.
+    document.addEventListener("DOMContentLoaded", loadRecipe);
 
     // Add these functions for favorite management
     async function checkFavoriteStatus(recipeId: number): Promise<boolean> {
@@ -434,26 +433,31 @@ document.addEventListener("DOMContentLoaded", loadRecipe);
 
         // Prepare the list of ingredients with their amounts.
         let ingredientsList = "";
-        if (
-            recipe.ingredients &&
-            recipe.ingredientsAmount &&
-            recipe.ingredients.length === recipe.ingredientsAmount.length
-        ) {
-            // If amounts are available and match the number of ingredients.
-            ingredientsList = recipe.ingredients
-                .map(
-                    (ing, i) =>
-                        `<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">${ing}<span class="badge bg-light text-dark">${recipe.ingredientsAmount[i]}</span></li>`
-                )
-                .join("");
+        if (recipe.ingredients.length !== 0) {
+            console.log(recipe.ingredients)
+            if (
+                recipe.ingredients &&
+                recipe.ingredientsAmount &&
+                recipe.ingredients.length === recipe.ingredientsAmount.length
+            ) {
+                // If amounts are available and match the number of ingredients.
+                ingredientsList = recipe.ingredients
+                    .map(
+                        (ing, i) =>
+                            `<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">${ing}<span class="badge bg-light text-dark">${recipe.ingredientsAmount[i]}</span></li>`
+                    )
+                    .join("");
+            } else {
+                // Fallback if amounts are missing or mismatched.
+                ingredientsList = recipe.ingredients
+                    .map(
+                        (ing) =>
+                            `<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">${ing}</li>`
+                    )
+                    .join("");
+            }
         } else {
-            // Fallback if amounts are missing or mismatched.
-            ingredientsList = recipe.ingredients
-                .map(
-                    (ing) =>
-                        `<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">${ing}</li>`
-                )
-                .join("");
+            ingredientsList = '<div class="alert alert-info">Ingredients not available.</div>';
         }
 
         // Process recipe instructions: convert basic markdown to HTML.
@@ -478,21 +482,18 @@ document.addEventListener("DOMContentLoaded", loadRecipe);
                     <div class="row g-4">
                         <div class="col-lg-6">
                             <div class="border rounded">
-                                <img src="${recipeImgPath}" class="img-fluid rounded" alt="${
-            recipe.name
-        }" onerror="this.onerror=null; this.src='../assets/img/Food_Example_01-unsplash.jpg';"> <!-- Fallback image -->
+                                <img src="${recipeImgPath}" class="img-fluid rounded" alt="${recipe.name
+            }" onerror="this.onerror=null; this.src='../assets/img/Food_Example_01-unsplash.jpg';"> <!-- Fallback image -->
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="recipe-header mb-4">
                             <h4 class="recipe-title fw-bold mb-3">${recipe.name}</h4>
-                            <p class="mb-3">Category: <span class="badge bg-secondary">${
-                                recipe.mealTimes.join(", ") || "N/A"
-                            }</span></p>
+                            <p class="mb-3">Category: <span class="badge bg-secondary">${recipe.mealTimes.join(", ") || "N/A"
+            }</span></p>
                             <div class="d-flex mb-3">
-                                <span class="badge badge-difficulty-${recipe.difficulty.toLowerCase()} me-2">${
-            recipe.difficulty.charAt(0).toUpperCase() + recipe.difficulty.slice(1)
-        }</span>
+                                <span class="badge badge-difficulty-${recipe.difficulty.toLowerCase()} me-2">${recipe.difficulty.charAt(0).toUpperCase() + recipe.difficulty.slice(1)
+            }</span>
                                 <span class="text-dark ms-2"><i class="far fa-clock me-1"></i>${recipe.time} min</span>
                             </div>
                             <div class="d-flex mb-4">
@@ -502,23 +503,21 @@ document.addEventListener("DOMContentLoaded", loadRecipe);
                             <p class="mb-4">${recipe.description || ""}</p> 
                             <div class="mb-4">
                                 <h5 class="fw-bold mb-2">Dietary Information:</h5>
-                                ${
-                                    recipe.dietaryPreferences.length > 0
-                                        ? recipe.dietaryPreferences
-                                              .map((dp) => `<span class="badge bg-success me-2">${dp}</span>`)
-                                              .join("")
-                                        : '<span class="text-muted">None</span>'
-                                }
+                                ${recipe.dietaryPreferences.length > 0
+                ? recipe.dietaryPreferences
+                    .map((dp) => `<span class="badge bg-success me-2">${dp}</span>`)
+                    .join("")
+                : '<span class="text-muted">None</span>'
+            }
                             </div>
                             <div class="mb-4">
                                 <h5 class="fw-bold mb-2">Contains:</h5>
-                                ${
-                                    recipe.allergens.length > 0
-                                        ? recipe.allergens
-                                              .map((a) => `<span class="badge bg-danger me-2">${a}</span>`)
-                                              .join("")
-                                        : '<span class="text-muted">None</span>'
-                                }
+                                ${recipe.allergens.length > 0
+                ? recipe.allergens
+                    .map((a) => `<span class="badge bg-danger me-2">${a}</span>`)
+                    .join("")
+                : '<span class="text-muted">None</span>'
+            }
                             </div>
                             <div class="mb-4">
                                 <h5 class="fw-bold mb-2">Nutrition (per serving):</h5>
@@ -527,22 +526,20 @@ document.addEventListener("DOMContentLoaded", loadRecipe);
                                 </div>
                                 <div class="d-flex flex-wrap">
                                     <span class="me-4"><i class="fas fa-fire me-1"></i> ${recipe.calories} calories</span>
-                                    <span class="me-4"><i class="fas fa-drumstick-bite me-1"></i> ${
-                                        recipe.proteins
-                                    }g protein</span>
+                                    <span class="me-4"><i class="fas fa-drumstick-bite me-1"></i> ${recipe.proteins
+            }g protein</span>
                                     <span class="me-4"><i class="fas fa-bread-slice me-1"></i> ${recipe.carbs}g carbs</span>
                                     <span><i class="fas fa-cheese me-1"></i> ${recipe.fat}g fat</span>
                                 </div>
                             </div>
                             <div class="mb-4">
                                 <h5 class="fw-bold mb-2">Tags:</h5>
-                                ${
-                                    recipe.tags && recipe.tags.length > 0
-                                        ? recipe.tags
-                                              .map((tag) => `<span class="badge bg-info me-2">${tag}</span>`)
-                                              .join("")
-                                        : '<span class="text-muted">None</span>'
-                                }
+                                ${recipe.tags && recipe.tags.length > 0
+                ? recipe.tags
+                    .map((tag) => `<span class="badge bg-info me-2">${tag}</span>`)
+                    .join("")
+                : '<span class="text-muted">None</span>'
+            }
                             </div>
                             </div>
 
@@ -614,115 +611,115 @@ document.addEventListener("DOMContentLoaded", loadRecipe);
     }
 
     document.addEventListener("DOMContentLoaded", function () {
-            // Modify the ingredients section to add a button
-            const addButtonToIngredientsSection = () => {
-                const ingredientsSection = document.querySelector("#ingredients-section");
-                if (ingredientsSection) {
-                    const heading = ingredientsSection.querySelector("h4");
-                    if (heading) {
-                        // Convert to flex container to put button on the right
-                        heading.style.display = "flex";
-                        heading.style.justifyContent = "space-between";
-                        heading.style.alignItems = "center";
+        // Modify the ingredients section to add a button
+        const addButtonToIngredientsSection = () => {
+            const ingredientsSection = document.querySelector("#ingredients-section");
+            if (ingredientsSection) {
+                const heading = ingredientsSection.querySelector("h4");
+                if (heading) {
+                    // Convert to flex container to put button on the right
+                    heading.style.display = "flex";
+                    heading.style.justifyContent = "space-between";
+                    heading.style.alignItems = "center";
 
-                        // Create the button
-                        const addToCartBtn = document.createElement("button");
-                        addToCartBtn.className = "btn btn-sm btn-outline-primary";
-                        addToCartBtn.innerHTML = '<i class="fa fa-shopping-bag me-1"></i> Add all to shopping list';
+                    // Create the button
+                    const addToCartBtn = document.createElement("button");
+                    addToCartBtn.className = "btn btn-sm btn-outline-primary";
+                    addToCartBtn.innerHTML = '<i class="fa fa-shopping-bag me-1"></i> Add all to shopping list';
 
-                        // Add click handler
-                        addToCartBtn.addEventListener("click", function () {
-                            const recipeId = new URLSearchParams(window.location.search).get("id");
-                            if (recipeId) {
-                                addRecipeToShoppingList(recipeId);
-                            }
-                        });
-
-                        heading.appendChild(addToCartBtn);
-                    }
-                }
-            };
-
-            // Function to add all ingredients to shopping list
-            function addRecipeToShoppingList(recipeId: string) {
-                const token = localStorage.getItem("accessToken");
-                if (!token) {
-                    showToast("Please log in to add items to your shopping list", true);
-                    return;
-                }
-
-                fetch(`${apiBase}/cart/recipe/${recipeId}`, {
-                    method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
-                    .then((response) => {
-                        if (!response.ok) {
-                            throw new Error(`Failed to add ingredients (${response.status})`);
+                    // Add click handler
+                    addToCartBtn.addEventListener("click", function () {
+                        const recipeId = new URLSearchParams(window.location.search).get("id");
+                        if (recipeId) {
+                            addRecipeToShoppingList(recipeId);
                         }
-                        return response.text();
-                    })
-                    .then(() => {
-                        showToast("All ingredients added to shopping list!");
-                        // Optionally, update the cart count
-                        AuthNav.updateCartCount();
-                    })
-                    .catch((error) => {
-                        console.error("Error:", error);
-                        showToast("Error adding ingredients to shopping list", true);
                     });
+
+                    heading.appendChild(addToCartBtn);
+                }
+            }
+        };
+
+        // Function to add all ingredients to shopping list
+        function addRecipeToShoppingList(recipeId: string) {
+            const token = localStorage.getItem("accessToken");
+            if (!token) {
+                showToast("Please log in to add items to your shopping list", true);
+                return;
             }
 
-            // Add toast notification function
-            function showToast(message: string, isError = false) {
-                // Create toast container if it doesn't exist
-                let toastContainer = document.getElementById("toast-container");
-                if (!toastContainer) {
-                    toastContainer = document.createElement("div");
-                    toastContainer.id = "toast-container";
-                    toastContainer.style.position = "fixed";
-                    toastContainer.style.bottom = "20px";
-                    toastContainer.style.right = "20px";
-                    toastContainer.style.zIndex = "1050";
-                    document.body.appendChild(toastContainer);
-                }
+            fetch(`${apiBase}/cart/recipe/${recipeId}`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to add ingredients (${response.status})`);
+                    }
+                    return response.text();
+                })
+                .then(() => {
+                    showToast("All ingredients added to shopping list!");
+                    // Optionally, update the cart count
+                    AuthNav.updateCartCount();
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    showToast("Error adding ingredients to shopping list", true);
+                });
+        }
 
-                const toast = document.createElement("div");
-                toast.className = `toast ${isError ? "bg-danger text-white" : "bg-success text-white"}`;
-                toast.setAttribute("role", "alert");
-                toast.setAttribute("aria-live", "assertive");
-                toast.setAttribute("aria-atomic", "true");
+        // Add toast notification function
+        function showToast(message: string, isError = false) {
+            // Create toast container if it doesn't exist
+            let toastContainer = document.getElementById("toast-container");
+            if (!toastContainer) {
+                toastContainer = document.createElement("div");
+                toastContainer.id = "toast-container";
+                toastContainer.style.position = "fixed";
+                toastContainer.style.bottom = "20px";
+                toastContainer.style.right = "20px";
+                toastContainer.style.zIndex = "1050";
+                document.body.appendChild(toastContainer);
+            }
 
-                toast.innerHTML = `
+            const toast = document.createElement("div");
+            toast.className = `toast ${isError ? "bg-danger text-white" : "bg-success text-white"}`;
+            toast.setAttribute("role", "alert");
+            toast.setAttribute("aria-live", "assertive");
+            toast.setAttribute("aria-atomic", "true");
+
+            toast.innerHTML = `
         <div class="toast-body">
             ${message}
         </div>
     `;
 
-                toastContainer.appendChild(toast);
+            toastContainer.appendChild(toast);
 
-                // Initialize toast using Bootstrap
-                const bsToast = new bootstrap.Toast(toast, { autohide: true, delay: 3000 });
-                bsToast.show();
+            // Initialize toast using Bootstrap
+            const bsToast = new bootstrap.Toast(toast, { autohide: true, delay: 3000 });
+            bsToast.show();
 
-                // Remove toast from DOM after it's hidden
-                toast.addEventListener("hidden.bs.toast", () => {
-                    toast.remove();
-                });
+            // Remove toast from DOM after it's hidden
+            toast.addEventListener("hidden.bs.toast", () => {
+                toast.remove();
+            });
+        }
+
+        // Wait for recipe to load, then add button
+        const checkForIngredientsAndAddButton = () => {
+            if (document.querySelector("#ingredients-section")) {
+                addButtonToIngredientsSection();
+            } else {
+                setTimeout(checkForIngredientsAndAddButton, 300);
             }
+        };
 
-            // Wait for recipe to load, then add button
-            const checkForIngredientsAndAddButton = () => {
-                if (document.querySelector("#ingredients-section")) {
-                    addButtonToIngredientsSection();
-                } else {
-                    setTimeout(checkForIngredientsAndAddButton, 300);
-                }
-            };
-
-            checkForIngredientsAndAddButton();
-        });
+        checkForIngredientsAndAddButton();
+    });
 
     // Add an event listener to call loadRecipe when the DOM is fully loaded.
     document.addEventListener("DOMContentLoaded", loadRecipe);

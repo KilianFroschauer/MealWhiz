@@ -363,19 +363,25 @@ var RecipeView;
             return; // Exit if the main container isn't found.
         // Prepare the list of ingredients with their amounts.
         let ingredientsList = "";
-        if (recipe.ingredients &&
-            recipe.ingredientsAmount &&
-            recipe.ingredients.length === recipe.ingredientsAmount.length) {
-            // If amounts are available and match the number of ingredients.
-            ingredientsList = recipe.ingredients
-                .map((ing, i) => `<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">${ing}<span class="badge bg-light text-dark">${recipe.ingredientsAmount[i]}</span></li>`)
-                .join("");
+        if (recipe.ingredients.length !== 0) {
+            console.log(recipe.ingredients);
+            if (recipe.ingredients &&
+                recipe.ingredientsAmount &&
+                recipe.ingredients.length === recipe.ingredientsAmount.length) {
+                // If amounts are available and match the number of ingredients.
+                ingredientsList = recipe.ingredients
+                    .map((ing, i) => `<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">${ing}<span class="badge bg-light text-dark">${recipe.ingredientsAmount[i]}</span></li>`)
+                    .join("");
+            }
+            else {
+                // Fallback if amounts are missing or mismatched.
+                ingredientsList = recipe.ingredients
+                    .map((ing) => `<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">${ing}</li>`)
+                    .join("");
+            }
         }
         else {
-            // Fallback if amounts are missing or mismatched.
-            ingredientsList = recipe.ingredients
-                .map((ing) => `<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">${ing}</li>`)
-                .join("");
+            ingredientsList = '<div class="alert alert-info">Ingredients not available.</div>';
         }
         // Process recipe instructions: convert basic markdown to HTML.
         let instructionsHtml = "";
