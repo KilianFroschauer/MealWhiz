@@ -5,28 +5,38 @@ import mainRouter from "./routes/index.routes";
 
 const app = express();
 
-const allowedOrigins = [
-    "http://127.0.0.1:5500", // Common for VS Code Live Server
-    "http://localhost:5500", // Another common Live Server port
-    // Add any other origins your frontend might be served from
-];
+// Parse allowed origins from environment variable or use '*' to allow all
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+    : ['*'];
 
-app.use(
-    cors({
-        origin: function (origin, callback) {
-            // Allow requests with no origin (like mobile apps or curl requests)
-            // or if the origin is in the allowedOrigins list.
-            if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-                callback(null, true);
-            } else {
-                callback(new Error("Not allowed by CORS"));
-            }
-        },
-        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Authorization"],
-        credentials: true, // This is crucial for allowing cookies/session data
-    })
-);
+if (allowedOrigins.includes('*')) {
+    app.use(
+        cors({
+            origin: '*',
+            methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            allowedHeaders: ["Content-Type", "Authorization"],
+        })
+    );
+} else {
+    // Selective origin allowance
+    app.use(
+        cors({
+            origin: function (origin, callback) {
+                // Allow requests with no origin (like mobile apps or curl requests)
+                if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+                    callback(null, true);
+                } else {
+                    callback(new Error("Not allowed by CORS"));
+                }
+            },
+            methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            allowedHeaders: ["Content-Type", "Authorization"],
+            credentials: true
+        })
+    );
+}
+
 app.use(express.json());
 
 app.use("/", mainRouter);
