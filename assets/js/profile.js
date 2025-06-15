@@ -81,7 +81,10 @@ var ProfilePage;
         if (settingsSection) {
             settingsSection.style.display = "block";
             // Smooth scroll to settings section
-            settingsSection.scrollIntoView({ behavior: "smooth" });
+            window.scrollTo({
+                top: settingsSection.offsetTop - 100,
+                behavior: "smooth"
+            });
         }
     }
     /**
@@ -91,7 +94,11 @@ var ProfilePage;
         // Smooth scroll to favorites section
         const favoritesSection = document.getElementById("my-favorites-section");
         if (favoritesSection) {
-            favoritesSection.scrollIntoView({ behavior: "smooth" });
+            // favoritesSection.scrollIntoView({ behavior: "smooth" });
+            window.scrollTo({
+                top: favoritesSection.offsetTop - 100,
+                behavior: "smooth"
+            });
         }
     }
     /**
