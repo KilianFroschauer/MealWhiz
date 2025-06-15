@@ -1,0 +1,26 @@
+ #tagsCollapse .badge.bg-secondary {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #tagsCollapse .badge.bg-secondary.selected {
+            background-color: var(--bs-primary) !important;
+            color: white;
+            position: relative;
+        }
+
+        #tagsCollapse .badge.bg-secondary.selected::after {
+            content: "✓";
+            margin-left: 4px;
+            font-weight: bold;
+        }
+
+        #tagsCollapse .badge.bg-secondary.selected:hover {
+            background-color: var(--bs-primary-dark, #0056b3) !important;
+        }
+
+        #recipes-per-page {
+            position: relative;
+            z-index: 10;
+            background: #f8f9fa;
+        }
