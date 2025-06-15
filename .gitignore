@@ -71,3 +71,7 @@ packages/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# Ignore specific config files
+assets/ts/config.ts
+assets/js/config.js
