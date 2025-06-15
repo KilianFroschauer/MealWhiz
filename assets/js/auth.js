@@ -42,12 +42,18 @@ var Auth;
                         console.log("Access token received:", data.accessToken);
                         localStorage.setItem('accessToken', data.accessToken); // Store the token
                         console.log("Access token stored in localStorage.");
-                        // Optionally store userClaims or expiresAt if needed client-side
-                        // localStorage.setItem('userClaims', JSON.stringify(data.userClaims));
-                        // localStorage.setItem('tokenExpiresAt', data.expiresAt);
-                        // Redirect to a protected page or the main page after successful login
-                        // Replace "index.html" or "/dashboard.html" with the actual page you want to redirect to.
-                        window.location.href = "/index.html"; // Or e.g., "/pages/dashboard.html" or just "/" if your server handles that
+                        // Check if there's a stored return URL
+                        const returnUrl = localStorage.getItem('returnUrl');
+                        if (returnUrl) {
+                            // Clear the stored URL to prevent future unwanted redirects
+                            localStorage.removeItem('returnUrl');
+                            // Redirect to the previous page
+                            window.location.href = returnUrl;
+                        }
+                        else {
+                            // Default redirect if no return URL is stored
+                            window.location.href = "/index.html";
+                        }
                     }
                     else {
                         console.error("Login response did not include an accessToken.");
@@ -91,4 +97,44 @@ var Auth;
             });
         }
     });
+    function backBtn() {
+        // Get page history from localStorage
+        const pageHistory = JSON.parse(localStorage.getItem('pageHistory') || '[]');
+        const currentUrl = window.location.href;
+        // Find the last non-auth page in history (searching backward)
+        let targetUrl = '/index.html'; // Default fallback
+        if (pageHistory.length > 0) {
+            // Look through history in reverse order (most recent first)
+            for (let i = pageHistory.length - 1; i >= 0; i--) {
+                const historyUrl = pageHistory[i];
+                // Skip current page, auth pages and protected pages
+                if (historyUrl !== currentUrl &&
+                    !isAuthPage(historyUrl) &&
+                    !isProtectedPage(historyUrl)) {
+                    targetUrl = historyUrl;
+                    break;
+                }
+            }
+        }
+        else {
+            // Fallback to returnUrl if no history
+            const returnUrl = localStorage.getItem('returnUrl');
+            if (returnUrl && !isAuthPage(returnUrl) && !isProtectedPage(returnUrl)) {
+                targetUrl = returnUrl;
+            }
+        }
+        window.location.href = targetUrl;
+    }
+    // Helper function to check if a URL is an authentication page
+    function isAuthPage(url) {
+        return url.includes('login.html') || url.includes('register.html');
+    }
+    // Helper function to check if a URL is a protected page
+    function isProtectedPage(url) {
+        // Add your protected pages here
+        const protectedPages = ['profile.html', 'shopping_cart.html', 'CookOff-Battle.html'];
+        return protectedPages.some(page => url.includes(page));
+    }
+    // Expose backBtn from AuthNav namespace
+    window.backBtn = backBtn;
 })(Auth || (Auth = {}));

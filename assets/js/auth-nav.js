@@ -10,6 +10,7 @@ var AuthNav;
         MealWhizConfig.apiBaseURL :
         'https://mealhwiz.at:3000');
     document.addEventListener("DOMContentLoaded", async () => {
+        trackPageVisit();
         // Check if user is logged in with a valid token
         const isLoggedIn = await validateToken();
         // Determine if we're in the root directory or pages directory
@@ -18,15 +19,16 @@ var AuthNav;
         const userIconLinks = document.querySelectorAll('a[href="login.html"], a[href="profile.html"], ' + 'a[href="pages/login.html"], a[href="pages/profile.html"]');
         // Update each user icon link
         userIconLinks.forEach((link) => {
-            // If logged in, point to profile; otherwise, point to login
-            if (isRootDirectory) {
-                // In root directory (index.html)
-                link.href = isLoggedIn ? "pages/profile.html" : "pages/login.html";
-            }
-            else {
-                // In pages directory
-                link.href = isLoggedIn ? "profile.html" : "login.html";
-            }
+            link.addEventListener("click", (e) => {
+                const href = link.getAttribute('href');
+                if (!isLoggedIn && href && href.includes('profile')) {
+                    e.preventDefault();
+                    // Store profile page as return URL
+                    localStorage.setItem('returnUrl', 'profile.html');
+                    // Determine the correct login URL path
+                    window.location.href = isRootDirectory ? 'pages/login.html' : 'login.html';
+                }
+            });
         });
         // Handle shopping cart link - should go to login if not logged in
         const cartLinks = document.querySelectorAll(".cart-icon");
@@ -34,13 +36,29 @@ var AuthNav;
             link.addEventListener("click", (e) => {
                 if (!isLoggedIn) {
                     e.preventDefault();
-                    window.location.href = isRootDirectory ? "pages/login.html" : "login.html";
+                    localStorage.setItem('returnUrl', 'shopping_cart.html');
+                    // Determine the correct login URL path
+                    window.location.href = isRootDirectory ? 'pages/login.html' : 'login.html';
                 }
             });
         });
         // Update header UI based on login status
         updateHeaderUI(isLoggedIn);
     });
+    function trackPageVisit() {
+        const currentUrl = window.location.href;
+        // Get existing history or initialize new array
+        const pageHistory = JSON.parse(localStorage.getItem('pageHistory') || '[]');
+        // Only add to history if this is a new page
+        if ((pageHistory.length === 0 || pageHistory[pageHistory.length - 1] !== currentUrl) && !currentUrl.includes('login.html') && !currentUrl.includes('register.html')) {
+            // Limit history length to prevent localStorage bloat
+            if (pageHistory.length >= 10) {
+                pageHistory.shift(); // Remove oldest entry
+            }
+            pageHistory.push(currentUrl);
+            localStorage.setItem('pageHistory', JSON.stringify(pageHistory));
+        }
+    }
     /**
      * Validates the JWT token by checking:
      * 1. If it exists
@@ -90,7 +108,7 @@ var AuthNav;
         const currentPath = window.location.pathname;
         if (protectedPages.some((page) => currentPath.endsWith(page))) {
             const isRootDirectory = !currentPath.includes("/pages/");
-            window.location.href = isRootDirectory ? "pages/login.html" : "login.html";
+            window.location.href = isRootDirectory ? "index.html" : "../index.html";
         }
     }
     AuthNav.logout = logout;

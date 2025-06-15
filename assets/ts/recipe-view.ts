@@ -134,13 +134,23 @@ namespace RecipeView {
                 : `
             <div class="alert alert-info">
                 <i class="fas fa-info-circle me-2"></i>
-                <a href="login.html" class="alert-link">Log in</a> to rate this recipe
+                <a href="#" class="alert-link login-redirect">Log in</a> to rate this recipe
             </div>
         `
             }
         `;
 
         container.appendChild(ratingContainer);
+
+        if (!isLoggedIn) {
+            const loginLink = ratingContainer.querySelector('.login-redirect');
+            if (loginLink) {
+                loginLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    redirectToLoginFromRecipe();
+                });
+            }
+        }
 
         // Only add event listeners if user is logged in
         if (isLoggedIn) {
@@ -180,6 +190,14 @@ namespace RecipeView {
                 });
             });
         }
+    }
+
+    function redirectToLoginFromRecipe(): void {
+        const currentUrl = window.location.href;
+        localStorage.setItem('returnUrl', currentUrl);
+
+        const isRootDirectory = !window.location.pathname.includes('/pages/');
+        window.location.href = isRootDirectory ? 'pages/login.html' : 'login.html';
     }
 
     // Add this new function to get user's existing rating
