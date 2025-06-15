@@ -67,7 +67,7 @@ cartRouter.get("/", isAuthenticated, async (req: Request, res: Response) => {
     try {
         // Update query to include the unit column
         const result = await pool.query(
-            "SELECT ingredients, quantity, unit FROM shopping_cart WHERE user_id = $1", 
+            "SELECT ingredients, quantity, unit FROM shopping_cart WHERE user_id = $1",
             [userId]
         );
         res.json(result.rows);
@@ -273,65 +273,70 @@ cartRouter.post("/recipe/:recipeId", isAuthenticated, async (req: Request, res: 
     }
 
     try {
-    // Get recipe ingredients using the junction table
-    // This approach doesn't rely on array_length with a text column
-    const recipeResult = await pool.query(
-    `SELECT 
-        ARRAY(
-            SELECT fp.product_name
-            FROM recipe_ingredient ri
-            JOIN food_products fp ON ri.ingredient_code = fp.code
-            WHERE ri.recipe_id = r.recipe_id
-            ORDER BY ri.ingredient_code
-        ) as ingredients,
-        ARRAY(
-            SELECT ri.quantity::text 
-            FROM recipe_ingredient ri 
-            WHERE ri.recipe_id = r.recipe_id
-            ORDER BY ri.ingredient_code
-        ) as quantities
-     FROM recipe r
-     WHERE r.recipe_id = $1`,
-    [recipeId]
-);
-
-    if (recipeResult.rows.length === 0) {
-        res.status(404).send("Rezept nicht gefunden");
-        return;
-    }
-
-    const recipe = recipeResult.rows[0];
-    const ingredients = recipe.ingredients;
-    
-    // Handle ingredients based on whether it's stored as text or array
-    // If it's stored as a comma-separated string, split it
-    const ingredientsArray = Array.isArray(ingredients) 
-        ? ingredients 
-        : typeof ingredients === 'string'
-            ? ingredients.split(',').map(item => item.trim())
-            : [];
-    
-    const quantities = recipe.quantities || [];
-
-    // Add each ingredient to shopping cart
-    for (let i = 0; i < ingredientsArray.length; i++) {
-        // Default to 1 if no quantity is available for this index
-        const quantity = i < quantities.length ? parseFloat(quantities[i] || '1') : 1;
-        
-        await pool.query(
-            `INSERT INTO shopping_cart (user_id, ingredients, quantity, unit)
-            VALUES ($1, $2, $3, $4)
-            ON CONFLICT (user_id, ingredients)
-            DO UPDATE SET quantity = shopping_cart.quantity + $3`,
-            [userId, ingredientsArray[i], quantity, 'piece'] // Default to piece for recipe ingredients
+        // Updated query to fetch ingredient units alongside names and quantities
+        const recipeResult = await pool.query(
+            `SELECT 
+                ARRAY(
+                    SELECT fp.product_name
+                    FROM recipe_ingredient ri
+                    JOIN food_products fp ON ri.ingredient_code = fp.code
+                    WHERE ri.recipe_id = r.recipe_id
+                    ORDER BY ri.ingredient_code
+                ) as ingredients,
+                ARRAY(
+                    SELECT ri.quantity::text 
+                    FROM recipe_ingredient ri 
+                    WHERE ri.recipe_id = r.recipe_id
+                    ORDER BY ri.ingredient_code
+                ) as quantities,
+                ARRAY(
+                    SELECT COALESCE(ri.unit, 'piece')::text
+                    FROM recipe_ingredient ri
+                    WHERE ri.recipe_id = r.recipe_id
+                    ORDER BY ri.ingredient_code
+                ) as units
+             FROM recipe r
+             WHERE r.recipe_id = $1`,
+            [recipeId]
         );
-    }
 
-    res.send("Rezeptzutaten zum Warenkorb hinzugefügt");
-} catch (err) {
-    console.error("Fehler beim Hinzufügen der Rezeptzutaten:", err);
-    res.status(500).send("Serverfehler beim Hinzufügen der Rezeptzutaten");
-}
+        if (recipeResult.rows.length === 0) {
+            res.status(404).send("Rezept nicht gefunden");
+            return;
+        }
+
+        const recipe = recipeResult.rows[0];
+        const ingredients = recipe.ingredients;
+
+        // Handle ingredients based on whether it's stored as text or array
+        const ingredientsArray = Array.isArray(ingredients)
+            ? ingredients
+            : typeof ingredients === 'string'
+                ? ingredients.split(',').map(item => item.trim())
+                : [];
+
+        const quantities = recipe.quantities || [];
+        const units = recipe.units || []; // Get the units array
+
+        // Add each ingredient to shopping cart with its proper unit
+        for (let i = 0; i < ingredientsArray.length; i++) {
+            const quantity = i < quantities.length ? parseFloat(quantities[i] || '1') : 1;
+            const unit = i < units.length ? units[i] : 'piece'; // Use the unit from the database or default
+
+            await pool.query(
+                `INSERT INTO shopping_cart (user_id, ingredients, quantity, unit)
+                VALUES ($1, $2, $3, $4)
+                ON CONFLICT (user_id, ingredients)
+                DO UPDATE SET quantity = shopping_cart.quantity + $3, unit = $4`,
+                [userId, ingredientsArray[i], quantity, unit]
+            );
+        }
+
+        res.send("Rezeptzutaten zum Warenkorb hinzugefügt");
+    } catch (err) {
+        console.error("Fehler beim Hinzufügen der Rezeptzutaten:", err);
+        res.status(500).send("Serverfehler beim Hinzufügen der Rezeptzutaten");
+    }
 });
 
 /**
@@ -394,28 +399,28 @@ cartRouter.get("/export/:format", isAuthenticated, async (req: Request, res: Res
             // Generate CSV
             res.setHeader('Content-Type', 'text/csv');
             res.setHeader('Content-Disposition', 'attachment; filename=shopping-list.csv');
-            
+
             // CSV header
             res.write('Ingredient;Quantity;Unit\n');
-            
+
             // Add rows
             result.rows.forEach(item => {
                 res.write(`"${item.ingredients}";${item.quantity};"${item.unit || 'piece'}"\n`);
             });
-            
+
             res.end();
-        } 
+        }
         else if (format === "pdf") {
             // Create a PDF document
             const doc = new PDFDocument();
-            
+
             // Set response headers
             res.setHeader('Content-Type', 'application/pdf');
             res.setHeader('Content-Disposition', 'attachment; filename=shopping-list.pdf');
-            
+
             // Pipe the PDF directly to the response
             doc.pipe(res);
-            
+
             // Add content to the PDF
             doc.fontSize(20).text('MealWhiz Shopping List', {
                 align: 'center'
@@ -423,44 +428,44 @@ cartRouter.get("/export/:format", isAuthenticated, async (req: Request, res: Res
 
             // Add date
             doc.fontSize(12)
-               .text(`Generated on ${new Date().toLocaleDateString()}`, {
-                   align: 'center'
-               });
-            
+                .text(`Generated on ${new Date().toLocaleDateString()}`, {
+                    align: 'center'
+                });
+
             doc.moveDown(2);
-            
+
             // Create a table-like structure for items
             let y = doc.y;
             const startX = 50;
             const colWidth = 200;  // Make columns narrower to fit unit
             const unitWidth = 100;
-            
+
             // Headers
             doc.font('Helvetica-Bold')
-               .text('Ingredient', startX, y)
-               .text('Quantity', startX + colWidth, y)
-               .text('Unit', startX + colWidth + unitWidth, y);
-            
+                .text('Ingredient', startX, y)
+                .text('Quantity', startX + colWidth, y)
+                .text('Unit', startX + colWidth + unitWidth, y);
+
             doc.moveDown();
             y = doc.y;
             doc.font('Helvetica');
-            
+
             // Add each shopping list item
             result.rows.forEach(item => {
                 const unit = item.unit || 'piece';
                 doc.text(item.ingredients, startX, y)
-                   .text(item.quantity.toString(), startX + colWidth, y)
-                   .text(unit, startX + colWidth + unitWidth, y);
+                    .text(item.quantity.toString(), startX + colWidth, y)
+                    .text(unit, startX + colWidth + unitWidth, y);
                 y = doc.y + 10;
                 doc.y = y;
             });
-            
+
             // Add footer
             doc.moveDown(2);
             doc.fontSize(10).text('Thank you for using MealWhiz!', {
                 align: 'center'
             });
-            
+
             // Finalize the PDF
             doc.end();
         }

@@ -613,6 +613,117 @@ document.addEventListener("DOMContentLoaded", loadRecipe);
         }
     }
 
+    document.addEventListener("DOMContentLoaded", function () {
+            // Modify the ingredients section to add a button
+            const addButtonToIngredientsSection = () => {
+                const ingredientsSection = document.querySelector("#ingredients-section");
+                if (ingredientsSection) {
+                    const heading = ingredientsSection.querySelector("h4");
+                    if (heading) {
+                        // Convert to flex container to put button on the right
+                        heading.style.display = "flex";
+                        heading.style.justifyContent = "space-between";
+                        heading.style.alignItems = "center";
+
+                        // Create the button
+                        const addToCartBtn = document.createElement("button");
+                        addToCartBtn.className = "btn btn-sm btn-outline-primary";
+                        addToCartBtn.innerHTML = '<i class="fa fa-shopping-bag me-1"></i> Add all to shopping list';
+
+                        // Add click handler
+                        addToCartBtn.addEventListener("click", function () {
+                            const recipeId = new URLSearchParams(window.location.search).get("id");
+                            if (recipeId) {
+                                addRecipeToShoppingList(recipeId);
+                            }
+                        });
+
+                        heading.appendChild(addToCartBtn);
+                    }
+                }
+            };
+
+            // Function to add all ingredients to shopping list
+            function addRecipeToShoppingList(recipeId: string) {
+                const token = localStorage.getItem("accessToken");
+                if (!token) {
+                    showToast("Please log in to add items to your shopping list", true);
+                    return;
+                }
+
+                fetch(`${apiBase}/cart/recipe/${recipeId}`, {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error(`Failed to add ingredients (${response.status})`);
+                        }
+                        return response.text();
+                    })
+                    .then(() => {
+                        showToast("All ingredients added to shopping list!");
+                        // Optionally, update the cart count
+                        AuthNav.updateCartCount();
+                    })
+                    .catch((error) => {
+                        console.error("Error:", error);
+                        showToast("Error adding ingredients to shopping list", true);
+                    });
+            }
+
+            // Add toast notification function
+            function showToast(message: string, isError = false) {
+                // Create toast container if it doesn't exist
+                let toastContainer = document.getElementById("toast-container");
+                if (!toastContainer) {
+                    toastContainer = document.createElement("div");
+                    toastContainer.id = "toast-container";
+                    toastContainer.style.position = "fixed";
+                    toastContainer.style.bottom = "20px";
+                    toastContainer.style.right = "20px";
+                    toastContainer.style.zIndex = "1050";
+                    document.body.appendChild(toastContainer);
+                }
+
+                const toast = document.createElement("div");
+                toast.className = `toast ${isError ? "bg-danger text-white" : "bg-success text-white"}`;
+                toast.setAttribute("role", "alert");
+                toast.setAttribute("aria-live", "assertive");
+                toast.setAttribute("aria-atomic", "true");
+
+                toast.innerHTML = `
+        <div class="toast-body">
+            ${message}
+        </div>
+    `;
+
+                toastContainer.appendChild(toast);
+
+                // Initialize toast using Bootstrap
+                const bsToast = new bootstrap.Toast(toast, { autohide: true, delay: 3000 });
+                bsToast.show();
+
+                // Remove toast from DOM after it's hidden
+                toast.addEventListener("hidden.bs.toast", () => {
+                    toast.remove();
+                });
+            }
+
+            // Wait for recipe to load, then add button
+            const checkForIngredientsAndAddButton = () => {
+                if (document.querySelector("#ingredients-section")) {
+                    addButtonToIngredientsSection();
+                } else {
+                    setTimeout(checkForIngredientsAndAddButton, 300);
+                }
+            };
+
+            checkForIngredientsAndAddButton();
+        });
+
     // Add an event listener to call loadRecipe when the DOM is fully loaded.
     document.addEventListener("DOMContentLoaded", loadRecipe);
 }
