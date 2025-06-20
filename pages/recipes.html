@@ -1,0 +1,611 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>MealWhiz - Find your Meal</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../assets/img/Logo-Whizard-cropped.jpg">
+    <link rel="shortcut icon" type="image/png" href="../assets/img/Logo-Whizard-cropped.jpg">
+    <link rel="apple-touch-icon" href="../assets/img/Logo-Whizard-cropped.jpg">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap"
+        rel="stylesheet">
+    <!-- K2D Google Font import -->
+    <link href="https://fonts.googleapis.com/css2?family=K2D:wght@500;600;700;1000&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="../assets/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+    <link href="../assets/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="../assets/css/recipes.css" rel="stylesheet">
+    <link href="../assets/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Spinner Start -->
+    <div id="spinner"
+        class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50  d-flex align-items-center justify-content-center">
+        <div class="spinner-grow text-primary" role="status"></div>
+    </div>
+    <!-- Spinner End -->
+
+
+    <!-- Navbar start -->
+    <div class="container-fluid fixed-top">
+        <div class="container px-0">
+            <nav class="navbar navbar-light bg-white navbar-expand-xl">
+                <a href="../index.html" class="navbar-brand d-flex align-items-center">
+                    <img src="../assets/img/Logo-Whizard-cropped-tranparent.png" alt="MealWhiz Logo"
+                        style="height: 65px; margin-right: 10px;">
+                    <h1 class="m-0"
+                        style="font-family: 'K2D', sans-serif; color: #000; font-weight: 1000; font-size: 3.5rem;">
+                        MealWhiz</h1>
+                </a>
+                <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarCollapse">
+                    <span class="fa fa-bars text-primary"></span>
+                </button>
+                <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
+                    <div class="navbar-nav mx-auto">
+                        <a href="../index.html" class="nav-item nav-link">Home</a>
+                        <a href="recipes.html" class="nav-item nav-link active">Recipes</a>
+                        <a href="CookOff.html" class="nav-item nav-link">CookOff</a>
+                    </div>
+                    <div class="d-flex m-3 me-0">
+                        <button
+                            class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4"
+                            data-bs-toggle="modal" data-bs-target="#searchModal"><i
+                                class="fas fa-search text-primary"></i></button>
+                        <a href="shopping_cart.html" class="position-relative me-4 my-auto cart-icon">
+                            <i class="fa fa-shopping-bag fa-2x"></i>
+                            <span
+                                class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-white px-1"
+                                style="top: -5px; left: 15px; height: 20px; min-width: 20px;" id="cart-count">0</span>
+                        </a>
+                        <a href="profile.html" class="my-auto">
+                            <i class="fas fa-user fa-2x"></i>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <!-- Navbar End -->
+
+
+    <!-- Modal Search Start -->
+    <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content rounded-0">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Search by keyword</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body d-flex align-items-center">
+                    <div class="input-group w-75 mx-auto d-flex">
+                        <input type="search" class="form-control p-3" placeholder="keywords"
+                            aria-describedby="search-icon-1">
+                        <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Search End -->
+
+
+    <!-- Single Page Header start -->
+    <div class="container-fluid page-header py-5">
+        <h1 class="text-center text-white display-6">Recipes</h1>
+        <ol class="breadcrumb justify-content-center mb-0">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item"><a href="#">Pages</a></li>
+            <li class="breadcrumb-item active text-white">Recipes</li>
+        </ol>
+    </div>
+    <!-- Single Page Header End -->
+
+
+    <!-- Fruits Shop Start-->
+    <div class="container-fluid food py-5">
+        <div class="container py-5">
+            <h1 class="mb-4">Recipe Collection</h1>
+            <div class="row g-4">
+                <div class="col-lg-12">
+                    <div class="row g-4">
+                        <div class="col-xl-3">
+                            <div class="input-group w-100 mx-auto d-flex">
+                                <input type="search" class="form-control p-3" placeholder="Search recipes"
+                                    id="recipe-search-input" aria-describedby="recipe-search-icon">
+                                <span id="recipe-search-icon" class="input-group-text p-3"><i
+                                        class="fa fa-search"></i></span>
+                            </div>
+                        </div>
+                        <div class="col-6"></div>
+                        <div class="col-xl-3">
+                            <div class="bg-light ps-3 py-2 pe-3 rounded d-flex align-items-center justify-content-start gap-3 flex-wrap"
+                                style="box-shadow:0 2px 8px rgba(0,0,0,0.04); width: fit-content; min-width: 0; margin-top: -12px; overflow: visible; position: relative; z-index: 2;">
+                                <label for="recipe-sorting" class="me-2 mb-0">Sort By:</label>
+                                <select id="recipe-sorting" name="recipe-sorting"
+                                    class="border-0 form-select-sm bg-light me-3">
+                                    <option value="none">No Sorting</option>
+                                    <option value="alpha">Alphabetically</option>
+                                    <!--<option value="popularity">Popularity</option>-->
+                                    <option value="rating">Ratings</option>
+                                </select>
+                                <label for="recipes-per-page" class="me-2 mb-0">Recipes per page:</label>
+                                <select id="recipes-per-page" name="recipes-per-page"
+                                    class="border-0 form-select-sm bg-light">
+                                    <option value="6">6</option>
+                                    <option value="9" selected>9</option>
+                                    <option value="12">12</option>
+                                    <option value="24">24</option>
+                                    <option value="48">48</option>
+                                    <option value="96">96</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-lg-3">
+                            <div class="row g-4">
+                                <div class="col-lg-12">
+                                    <div class="mb-3">
+                                        <h4>Filters</h4>
+
+                                        <!-- Dietary Preferences -->
+                                        <div class="mb-4">
+                                            <h5 class="fw-bold d-flex justify-content-between align-items-center"
+                                                data-bs-toggle="collapse" href="#dietaryCollapse" role="button"
+                                                aria-expanded="true">
+                                                Dietary Preferences
+                                                <i class="fas fa-chevron-down"></i>
+                                            </h5>
+                                            <div class="collapse show" id="dietaryCollapse">
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="dp-vegetarian"
+                                                        name="dp-vegetarian">
+                                                    <label for="dp-vegetarian">Vegetarian</label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="dp-vegan" name="dp-vegan">
+                                                    <label for="dp-vegan">Vegan</label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="dp-pescetarian"
+                                                        name="dp-pescetarian">
+                                                    <label for="dp-pescetarian">Pescetarian</label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="dp-keto" name="dp-keto">
+                                                    <label for="dp-keto">Keto</label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="dp-paleo" name="dp-paleo">
+                                                    <label for="dp-paleo">Paleo</label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="dp-flexitarian"
+                                                        name="dp-flexitarian">
+                                                    <label for="dp-flexitarian">Flexitarian</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Allergens (exclude) -->
+                                        <div class="mb-4">
+                                            <h5 class="fw-bold d-flex justify-content-between align-items-center"
+                                                data-bs-toggle="collapse" href="#allergensCollapse" role="button"
+                                                aria-expanded="false">
+                                                Allergens (exclude)
+                                                <i class="fas fa-chevron-down"></i>
+                                            </h5>
+                                            <div class="collapse" id="allergensCollapse">
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="allergy-gluten"
+                                                        name="allergy-gluten">
+                                                    <label for="allergy-gluten">Gluten-containing grains <span
+                                                            class="badge bg-secondary">A</span></label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="allergy-crustaceans"
+                                                        name="allergy-crustaceans">
+                                                    <label for="allergy-crustaceans">Crustaceans <span
+                                                            class="badge bg-secondary">B</span></label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="allergy-eggs"
+                                                        name="allergy-eggs">
+                                                    <label for="allergy-eggs">Egg <span
+                                                            class="badge bg-secondary">C</span></label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="allergy-fish"
+                                                        name="allergy-fish">
+                                                    <label for="allergy-fish">Fish <span
+                                                            class="badge bg-secondary">D</span></label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="allergy-peanut"
+                                                        name="allergy-peanut">
+                                                    <label for="allergy-peanut">Peanut <span
+                                                            class="badge bg-secondary">E</span></label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="allergy-soy"
+                                                        name="allergy-soy">
+                                                    <label for="allergy-soy">Soy <span
+                                                            class="badge bg-secondary">F</span></label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="allergy-milk"
+                                                        name="allergy-milk">
+                                                    <label for="allergy-milk">Milk or lactose <span
+                                                            class="badge bg-secondary">G</span></label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="allergy-nuts"
+                                                        name="allergy-nuts">
+                                                    <label for="allergy-nuts">Edible nuts <span
+                                                            class="badge bg-secondary">H</span></label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="allergy-celery"
+                                                        name="allergy-celery">
+                                                    <label for="allergy-celery">Celery <span
+                                                            class="badge bg-secondary">L</span></label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="allergy-mustard"
+                                                        name="allergy-mustard">
+                                                    <label for="allergy-mustard">Mustard <span
+                                                            class="badge bg-secondary">M</span></label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="allergy-sesame"
+                                                        name="allergy-sesame">
+                                                    <label for="allergy-sesame">Sesame <span
+                                                            class="badge bg-secondary">N</span></label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="allergy-sulphites"
+                                                        name="allergy-sulphites">
+                                                    <label for="allergy-sulphites">Sulphites <span
+                                                            class="badge bg-secondary">O</span></label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="allergy-lupines"
+                                                        name="allergy-lupines">
+                                                    <label for="allergy-lupines">Lupines <span
+                                                            class="badge bg-secondary">P</span></label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="allergy-molluscs"
+                                                        name="allergy-molluscs">
+                                                    <label for="allergy-molluscs">Molluscs <span
+                                                            class="badge bg-secondary">R</span></label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Meal Times -->
+                                        <div class="mb-4">
+                                            <h5 class="fw-bold d-flex justify-content-between align-items-center"
+                                                data-bs-toggle="collapse" href="#mealsCollapse" role="button"
+                                                aria-expanded="false">
+                                                Meal Time
+                                                <i class="fas fa-chevron-down"></i>
+                                            </h5>
+                                            <div class="collapse" id="mealsCollapse">
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="meal-breakfast"
+                                                        name="meal-breakfast">
+                                                    <label for="meal-breakfast">Breakfast</label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="meal-lunch"
+                                                        name="meal-lunch">
+                                                    <label for="meal-lunch">Lunch</label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="meal-dinner"
+                                                        name="meal-dinner">
+                                                    <label for="meal-dinner">Dinner</label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="meal-snack"
+                                                        name="meal-snack">
+                                                    <label for="meal-snack">Snack</label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="checkbox" class="me-2" id="meal-dessert"
+                                                        name="meal-dessert">
+                                                    <label for="meal-dessert">Dessert</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Difficulty -->
+                                        <div class="mb-4">
+                                            <h5 class="fw-bold d-flex justify-content-between align-items-center"
+                                                data-bs-toggle="collapse" href="#difficultyCollapse" role="button"
+                                                aria-expanded="false">
+                                                Difficulty
+                                                <i class="fas fa-chevron-down"></i>
+                                            </h5>
+                                            <div class="collapse" id="difficultyCollapse">
+                                                <div class="mb-2">
+                                                    <input type="radio" class="me-2" id="diff-easy" name="difficulty"
+                                                        value="easy">
+                                                    <label for="diff-easy">Easy</label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="radio" class="me-2" id="diff-medium" name="difficulty"
+                                                        value="medium">
+                                                    <label for="diff-medium">Medium</label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="radio" class="me-2" id="diff-hard" name="difficulty"
+                                                        value="hard">
+                                                    <label for="diff-hard">Hard</label>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="radio" class="me-2" id="diff-any" name="difficulty"
+                                                        value="any" checked>
+                                                    <label for="diff-any">Any</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Rating -->
+                                        <div class="mb-4">
+                                            <h5 class="fw-bold d-flex justify-content-between align-items-center"
+                                                data-bs-toggle="collapse" href="#ratingCollapse" role="button"
+                                                aria-expanded="false">
+                                                Minimum Rating
+                                                <i class="fas fa-chevron-down"></i>
+                                            </h5>
+                                            <div class="collapse" id="ratingCollapse">
+                                                <div class="d-flex align-items-center">
+                                                    <input type="range" class="form-range w-75" id="ratingRange"
+                                                        name="ratingRange" min="1" max="5" step="1" value="1"
+                                                        oninput="ratingValue.textContent = ratingRange.value + ' ★'">
+                                                    <span id="ratingValue" class="ms-2">1 ★</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Preparation Time -->
+                                        <div class="mb-4">
+                                            <h5 class="fw-bold d-flex justify-content-between align-items-center"
+                                                data-bs-toggle="collapse" href="#timeCollapse" role="button"
+                                                aria-expanded="false">
+                                                Max Preparation Time
+                                                <i class="fas fa-chevron-down"></i>
+                                            </h5>
+                                            <div class="collapse" id="timeCollapse">
+                                                <div class="d-flex align-items-center">
+                                                    <input type="range" class="form-range w-75" id="timeRange"
+                                                        name="timeRange" min="10" max="120" step="5" value="120">
+                                                    <span id="timeValue" class="ms-2">No limit</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <script>
+                                            // Preparation time slider label logic
+                                            const timeRange = document.getElementById('timeRange');
+                                            const timeValue = document.getElementById('timeValue');
+                                            function updateTimeLabel() {
+                                                if (parseInt(timeRange.value) === 120) {
+                                                    timeValue.textContent = 'No limit';
+                                                } else {
+                                                    timeValue.textContent = timeRange.value + ' min';
+                                                }
+                                            }
+                                            timeRange.addEventListener('input', updateTimeLabel);
+                                            // Ensure correct label on page load
+                                            updateTimeLabel();
+                                        </script>
+
+                                        <!-- Calories -->
+                                        <div class="mb-4">
+                                            <h5 class="fw-bold d-flex justify-content-between align-items-center"
+                                                data-bs-toggle="collapse" href="#caloriesCollapse" role="button"
+                                                aria-expanded="false">
+                                                Calories
+                                                <i class="fas fa-chevron-down"></i>
+                                            </h5>
+                                            <div class="collapse" id="caloriesCollapse">
+                                                <div class="row g-2">
+                                                    <div class="col-6">
+                                                        <input type="number" class="form-control form-control-sm"
+                                                            id="minCalories" placeholder="Min">
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <input type="number" class="form-control form-control-sm"
+                                                            id="maxCalories" placeholder="Max">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Ingredients -->
+                                        <div class="mb-4">
+                                            <h5 class="fw-bold d-flex justify-content-between align-items-center"
+                                                data-bs-toggle="collapse" href="#ingredientsCollapse" role="button"
+                                                aria-expanded="false">
+                                                Ingredients
+                                                <i class="fas fa-chevron-down"></i>
+                                            </h5>
+                                            <div class="collapse" id="ingredientsCollapse">
+                                                <div class="mb-2">
+                                                    <input type="text" class="form-control mb-2" id="ingredientInput"
+                                                        placeholder="Add ingredient">
+                                                    <div id="ingredientTags" class="d-flex flex-wrap">
+                                                        <!-- Tags will be added here via JavaScript -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Tags -->
+                                        <div class="mb-4">
+                                            <h5 class="fw-bold d-flex justify-content-between align-items-center"
+                                                data-bs-toggle="collapse" href="#tagsCollapse" role="button"
+                                                aria-expanded="false">
+                                                Tags
+                                                <i class="fas fa-chevron-down"></i>
+                                            </h5>
+                                            <div class="collapse" id="tagsCollapse">
+                                                <div class="d-flex flex-wrap">
+                                                    <span class="badge bg-secondary me-2 mb-2 p-2">Quick</span>
+                                                    <span class="badge bg-secondary me-2 mb-2 p-2">Healthy</span>
+                                                    <span class="badge bg-secondary me-2 mb-2 p-2">Italian</span>
+                                                    <span class="badge bg-secondary me-2 mb-2 p-2">Asian</span>
+                                                    <span class="badge bg-secondary me-2 mb-2 p-2">Mexican</span>
+                                                    <span
+                                                        class="badge bg-secondary me-2 mb-2 p-2">Budget-friendly</span>
+                                                    <span class="badge bg-secondary me-2 mb-2 p-2">Kids</span>
+                                                    <span class="badge bg-secondary me-2 mb-2 p-2">One Pot</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Apply/Clear Buttons -->
+                                        <div class="d-flex justify-content-between mt-4">
+                                            <button id="clearFiltersBtn" class="btn btn-outline-secondary px-4">Clear
+                                                All</button>
+                                            <button id="applyFiltersBtn" class="btn btn-primary px-4">Apply
+                                                Filters</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <h4 class="mb-3">Featured Recipes</h4>
+                                    <div id="featured-recipes" class="d-flex flex-column gap-3"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-9">
+                            <!-- Dynamic Recipe List -->
+                            <div id="recipe-list" class="row g-4 justify-content-center"></div>
+                            <!-- Pagination Controls -->
+                            <nav id="recipe-pagination-nav" aria-label="Recipe pagination"
+                                class="mt-4 d-flex justify-content-center">
+                                <ul id="recipe-pagination" class="pagination flex-wrap"></ul>
+                            </nav>
+                            <!-- End Dynamic Recipe List -->
+                            <!-- The static cards below are removed and replaced by the dynamic container above -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Fruits Shop End-->
+
+
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
+        <div class="container py-5">
+            <div class="pb-4 mb-4" style="border-bottom: 1px solid rgba(226, 175, 24, 0.5)">
+                <div class="row g-4">
+                    <div class="col-lg-3">
+                        <a href="#">
+                            <h1 class="text-primary mb-0">MealWhiz</h1>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-5">
+                <div class="col-lg-3 col-md-6" style="width: 40%;">
+                    <div class="footer-item">
+                        <h4 class="text-light mb-3">Why People Like Us!</h4>
+                        <p class="mb-4">
+                            Meal Whiz takes the stress out of everyday cooking by turning leftover ingredients into
+                            exciting, personalized meals.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="d-flex flex-column text-start footer-item">
+                        <h4 class="text-light mb-3">Navigation</h4>
+                        <a class="btn-link" href="../index.html">Home</a>
+                        <a class="btn-link" href="./recipes.html">Recipes</a>
+                        <a class="btn-link" href="./cookoff.html">CookOff</a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="footer-item">
+                        <h4 class="text-light mb-3">Contact</h4>
+                        <p>Address: Limesstraße 12/14, 4060 Leonding</p>
+                        <p>Email: mealhwiz@mealwhiz.at</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer End -->
+
+    <!-- Copyright Start -->
+    <div class="container-fluid copyright bg-dark py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <span class="text-light"><a href="#"><i class="fas fa-copyright text-light me-2"></i>MealWhiz</a>,
+                        All right reserved.</span>
+                </div>
+                <div class="col-md-6 my-auto text-center text-md-end text-white">
+                    <!--/*** This template is free as long as you keep the below author’s credit link/attribution link/backlink. ***/-->
+                    <!--/*** If you'd like to use the template without the below author’s credit link/attribution link/backlink, ***/-->
+                    <!--/*** you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". ***/-->
+                    Designed By <a class="border-bottom" href="https://htmlcodex.com">HTML Codex</a> Distributed By <a
+                        class="border-bottom" href="https://themewagon.com">ThemeWagon</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Copyright End -->
+
+
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+            class="fa fa-arrow-up"></i></a>
+
+
+    <!-- JavaScript Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/lib/easing/easing.min.js"></script>
+    <script src="../assets/lib/waypoints/waypoints.min.js"></script>
+    <script src="../assets/lib/lightbox/js/lightbox.min.js"></script>
+    <script src="../assets/lib/owlcarousel/owl.carousel.min.js"></script>
+
+    <!-- Template Javascript -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/recipes-dynamic.js"></script>
+    <script src="../assets/js/auth-nav.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>MealWhiz - Find your Meal</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="" name="keywords" />
+    <meta content="" name="description" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/img/Logo-Whizard-cropped.jpg" />
+    <link rel="shortcut icon" type="image/png" href="assets/img/Logo-Whizard-cropped.jpg" />
+    <link rel="apple-touch-icon" href="assets/img/Logo-Whizard-cropped.jpg" />
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap"
+        rel="stylesheet" />
+    <!-- K2D Google Font import -->
+    <link href="https://fonts.googleapis.com/css2?family=K2D:wght@500;600;700;1000&display=swap" rel="stylesheet" />
+
+    <!-- Icon Font Stylesheet -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <!-- Libraries Stylesheet -->
+    <link href="assets/lib/lightbox/css/lightbox.min.css" rel="stylesheet" />
+    <link href="assets/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet" />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Template Stylesheet -->
+    <link href="assets/css/style.css" rel="stylesheet" />
+</head>
+
+<body>
+    <!-- Spinner Start -->
+    <div id="spinner"
+        class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-grow text-primary" role="status"></div>
+    </div>
+    <!-- Spinner End -->
+
+    <!-- Navbar start -->
+    <div class="container-fluid fixed-top">
+        <div class="container px-0">
+            <nav class="navbar navbar-light bg-white navbar-expand-xl">
+                <a href="index.html" class="navbar-brand d-flex align-items-center">
+                    <img src="assets/img/Logo-Whizard-cropped-tranparent.png" alt="MealWhiz Logo"
+                        style="height: 65px; margin-right: 10px" />
+                    <h1 class="m-0"
+                        style="font-family: 'K2D', sans-serif; color: #000; font-weight: 1000; font-size: 3.5rem">
+                        MealWhiz
+                    </h1>
+                </a>
+                <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarCollapse">
+                    <span class="fa fa-bars text-primary"></span>
+                </button>
+                <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
+                    <div class="navbar-nav mx-auto">
+                        <a href="index.html" class="nav-item nav-link active">Home</a>
+                        <a href="pages/recipes.html" class="nav-item nav-link">Recipes</a>
+                        <a href="pages/CookOff.html" class="nav-item nav-link">CookOff</a>
+                    </div>
+                    <div class="d-flex m-3 me-0">
+                        <button
+                            class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4"
+                            data-bs-toggle="modal" data-bs-target="#searchModal">
+                            <i class="fas fa-search text-primary"></i>
+                        </button>
+                        <a href="pages/shopping_cart.html" class="position-relative me-4 my-auto cart-icon">
+                            <i class="fa fa-shopping-bag fa-2x"></i>
+                            <span
+                                class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-white px-1"
+                                style="top: -5px; left: 15px; height: 20px; min-width: 20px;" id="cart-count">0</span>
+                        </a>
+                        <a href="pages/profile.html" class="my-auto">
+                            <i class="fas fa-user fa-2x"></i>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <!-- Navbar End -->
+
+    <!-- Modal Search Start -->
+    <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content rounded-0">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Search by keyword</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body d-flex align-items-center">
+                    <div class="input-group w-75 mx-auto d-flex">
+                        <input type="search" class="form-control p-3" placeholder="keywords"
+                            aria-describedby="search-icon-1" />
+                        <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Search End -->
+
+    <!-- Hero Start -->
+    <div class="container-fluid py-4 mb-5 hero-header">
+        <div class="d-flex justify-content-center my-1">
+            <div class="position-relative w-60">
+                <input type="search" class="form-control rounded-pill py-3 px-4" placeholder="Search products..." />
+                <button type="submit"
+                    class="btn btn-primary border-2 border-secondary position-absolute rounded-pill text-white" style="
+                            top: 0;
+                            right: -1px;
+                            height: 100%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            padding-left: 1.5rem;
+                            padding-right: 1.5rem;
+                        ">
+                    Submit Now
+                </button>
+            </div>
+        </div>
+        <div class="container py-5">
+            <div class="row g-5 align-items-center">
+                <div class="col-12 text-center">
+                    <h1 class="mb-3 display-6 text-primary">
+                        Welcome to MealWhiz – Your Personalized Recipe Finder! 🍽️
+                    </h1>
+                    <p class="mb-4 text-light" style="font-size: 1.1rem">
+                        Enter the ingredients you have, select your dietary preferences, and filter out allergens –
+                        we'll suggest recipes that match your needs. Save time, reduce food waste, and explore new
+                        dishes effortlessly. Start cooking today!
+                    </p>
+
+                    <!-- feature cards -->
+                    <div class="row g-4 justify-content-center" style="margin-top: 4rem">
+                        <div class="col-md-6 col-lg-5">
+                            <a href="pages/recipes.html">
+                                <div class="service-item bg-secondary rounded border border-secondary">
+                                    <img src="assets/img/ingredients-unsplash.jpg" class="img-fluid rounded-top w-100"
+                                        alt="Recipe Collection" style="height: 200px; object-fit: cover" />
+                                    <div class="px-4 rounded-bottom" style="margin-top: -55px; position: relative">
+                                        <div class="service-content bg-primary text-center p-4 rounded">
+                                            <h5 class="text-white">Browse Our Collection</h5>
+                                            <h3 class="mb-0 text-white">Recipes</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6 col-lg-5">
+                            <a href="pages/CookOff.html">
+                                <div class="service-item bg-primary rounded border border-primary">
+                                    <img src="assets/img/wok-fire-unsplash.jpg" class="img-fluid rounded-top w-100"
+                                        alt="CookOff Challenge" style="height: 200px; object-fit: cover" />
+                                    <div class="px-4 rounded-bottom" style="margin-top: -55px; position: relative">
+                                        <div class="service-content bg-secondary text-center p-4 rounded">
+                                            <h5 class="text-white">Join the Challenge</h5>
+                                            <h3 class="mb-0 text-white">CookOff</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Hero End -->
+
+    <!-- Carousel Start -->
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="container py-4">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center mb-4">
+                        <h2 class="display-5 text-primary">Recipes of the Day</h2>
+                    </div>
+                    <div class="col-lg-8">
+                        <div id="carouselId" class="carousel slide position-relative" data-bs-ride="carousel">
+                            <div class="carousel-inner" role="listbox">
+                                <div class="carousel-item active rounded">
+                                    <img src="assets/img/hero-img-1.png"
+                                        class="img-fluid w-100 h-100 bg-secondary rounded" alt="First slide" />
+                                    <a href="#" class="btn px-4 py-2 text-white rounded">Fruites - Example 1</a>
+                                </div>
+                                <div class="carousel-item rounded">
+                                    <img src="assets/img/hero-img-2.jpg" class="img-fluid w-100 h-100 rounded"
+                                        alt="Second slide" />
+                                    <a href="#" class="btn px-4 py-2 text-white rounded">Vesitables - Example 1</a>
+                                </div>
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselId"
+                                data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselId"
+                                data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Carousel End -->
+
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
+        <div class="container py-5">
+            <div class="pb-4 mb-4" style="border-bottom: 1px solid rgba(226, 175, 24, 0.5)">
+                <div class="row g-4">
+                    <div class="col-lg-3">
+                        <a href="#">
+                            <h1 class="text-primary mb-0">MealWhiz</h1>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-5">
+                <div class="col-lg-3 col-md-6" style="width: 40%;">
+                    <div class="footer-item">
+                        <h4 class="text-light mb-3">Why People Like Us!</h4>
+                        <p class="mb-4">
+                            Meal Whiz takes the stress out of everyday cooking by turning leftover ingredients into
+                            exciting, personalized meals.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="d-flex flex-column text-start footer-item">
+                        <h4 class="text-light mb-3">Navigation</h4>
+                        <a class="btn-link" href="index.html">Home</a>
+                        <a class="btn-link" href="./pages/recipes.html">Recipes</a>
+                        <a class="btn-link" href="./pages/cookoff.html">CookOff</a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="footer-item">
+                        <h4 class="text-light mb-3">Contact</h4>
+                        <p>Address: Limesstraße 12/14, 4060 Leonding</p>
+                        <p>Email: mealhwiz@mealwhiz.at</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer End -->
+
+    <!-- Copyright Start -->
+    <div class="container-fluid copyright bg-dark py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <span class="text-light"><a href="#"><i class="fas fa-copyright text-light me-2"></i>MealWhiz</a>,
+                        All right
+                        reserved.</span>
+                </div>
+                <div class="col-md-6 my-auto text-center text-md-end text-white">
+                    <!--/*** This template is free as long as you keep the below author’s credit link/attribution link/backlink. ***/-->
+                    <!--/*** If you'd like to use the template without the below author’s credit link/attribution link/backlink, ***/-->
+                    <!--/*** you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". ***/-->
+                    Designed By <a class="border-bottom" href="https://htmlcodex.com">HTML Codex</a> Distributed By
+                    <a class="border-bottom" href="https://themewagon.com">ThemeWagon</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Copyright End -->
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+            class="fa fa-arrow-up"></i></a>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/lib/easing/easing.min.js"></script>
+    <script src="assets/lib/waypoints/waypoints.min.js"></script>
+    <script src="assets/lib/lightbox/js/lightbox.min.js"></script>
+    <script src="assets/lib/owlcarousel/owl.carousel.min.js"></script>
+
+    <!-- Template Javascript -->
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/recipes-of-the-day.js"></script>
+    <script src="assets/js/auth-nav.js"></script>
+</body>
+
+</html>

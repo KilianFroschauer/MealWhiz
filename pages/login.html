@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>MealWhiz - Login</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../assets/img/Logo-Whizard-cropped.jpg">
+    <link rel="shortcut icon" type="image/png" href="../assets/img/Logo-Whizard-cropped.jpg">
+    <link rel="apple-touch-icon" href="../assets/img/Logo-Whizard-cropped.jpg">
+
+    <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../assets/css/style.css" rel="stylesheet">
+    <link href="../assets/css/login.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="login-register-container">
+        <button onclick="backBtn()" class="btn btn-outline-secondary position-absolute top-0 start-0 m-3"
+            style="width: 40px; height: 40px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <path stroke="#6c757d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+        <h1>Login</h1>
+        <form id="login-form">
+            <input type="text" name="username" placeholder="Username" required />
+            <input type="password" name="password" placeholder="Password" required />
+            <button type="submit">Login</button>
+        </form>
+        <p>Don't have an account? <a href="./register.html">Register</a></p>
+    </div>
+
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/auth.js"></script>
+</body>
+
+</html>
