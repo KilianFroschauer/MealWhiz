@@ -74,4 +74,4 @@ packages/
 
 # Ignore specific config files
 assets/ts/config.ts
-assets/js/config.js
+assets/js/
