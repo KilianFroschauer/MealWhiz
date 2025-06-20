@@ -658,6 +658,29 @@ namespace RecipeView {
             }
         };
 
+        // Add event listeners for smooth scrolling with offset
+        const addSmoothScrollWithOffset = () => {
+            const chapterLinks = document.querySelectorAll('.nav.flex-column .nav-link');
+            chapterLinks.forEach(link => {
+                link.addEventListener('click', function(e: Event) {
+                    e.preventDefault();
+                    const target = e.currentTarget as HTMLAnchorElement;
+                    const targetId = target.getAttribute('href');
+                    if (targetId) {
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                            const offset = 100; // 100px offset
+                            const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - offset;
+                            window.scrollTo({
+                                top: targetPosition,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+        };
+
         // Function to add all ingredients to shopping list
         function addRecipeToShoppingList(recipeId: string) {
             const token = localStorage.getItem("accessToken");
@@ -727,10 +750,11 @@ namespace RecipeView {
             });
         }
 
-        // Wait for recipe to load, then add button
+        // Wait for recipe to load, then add button and scroll behavior
         const checkForIngredientsAndAddButton = () => {
             if (document.querySelector("#ingredients-section")) {
                 addButtonToIngredientsSection();
+                addSmoothScrollWithOffset();
             } else {
                 setTimeout(checkForIngredientsAndAddButton, 300);
             }
