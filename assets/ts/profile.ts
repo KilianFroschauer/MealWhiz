@@ -278,9 +278,8 @@ namespace ProfilePage {
                     (recipe) => `
             <div class="col-md-6 col-lg-4 col-xl-3">
                 <div class="rounded position-relative fruite-item">
-                    <div class="fruite-img">
-                        <img src="../assets/img/recipe_imgs/${recipe.id}.jpg" class="img-fluid w-100 rounded-top" alt="${recipe.name}" 
-                            onerror="this.onerror=null;this.src='../assets/img/recipe_placeholder.jpg';">
+                    <div class="fruite-img">                        <img src="../assets/img/recipe_imgs/${recipe.id}.jpg" class="img-fluid w-100 rounded-top" alt="${recipe.name}" 
+                            onerror="this.onerror=null;this.src='../assets/img/ingredients-unsplash.jpg';">
                     </div>
                     <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">${recipe.difficulty}</div>
                     <div class="p-4 border border-secondary border-top-0 rounded-bottom">

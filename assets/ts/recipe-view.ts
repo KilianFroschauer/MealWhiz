@@ -498,10 +498,9 @@ namespace RecipeView {
             <div class="row g-4 mb-5">
                 <div class="col-lg-8 col-xl-9">
                     <div class="row g-4">
-                        <div class="col-lg-6">
-                            <div class="border rounded">
+                        <div class="col-lg-6">                            <div class="border rounded">
                                 <img src="${recipeImgPath}" class="img-fluid rounded" alt="${recipe.name
-            }" onerror="this.onerror=null; this.src='../assets/img/Food_Example_01-unsplash.jpg';"> <!-- Fallback image -->
+            }" onerror="this.onerror=null; this.src='../assets/img/ingredients-unsplash.jpg';"> <!-- Fallback image -->
                             </div>
                         </div>
                         <div class="col-lg-6">

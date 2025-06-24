@@ -50,12 +50,11 @@ namespace RecipesOfTheDay {
                     (r: any, i: any) => `
                 <div class="carousel-item${
                     i === 0 ? " active" : ""
-                } rounded" style="position:relative;height:350px;width:100%;background:#f0f0f0;overflow:hidden;">
-                    <img src="assets/img/recipe_imgs/${r.id}.jpg" 
+                } rounded" style="position:relative;height:350px;width:100%;background:#f0f0f0;overflow:hidden;">                    <img src="assets/img/recipe_imgs/${r.id}.jpg" 
                          class="img-fluid"
                          alt="${r.name}"
                          style="object-fit:cover;width:100%;height:100%;display:block;margin:auto;"
-                         onerror="this.onerror=null; this.src='assets/img/Food-banner-unsplash.jpg'; this.alt='Fallback Recipe Image';"> {/* Fallback image on error */}
+                         onerror="this.onerror=null; this.src='assets/img/ingredients-unsplash.jpg'; this.alt='Fallback Recipe Image';"> {/* Fallback image on error */}
                     <a href="pages/recipe-view.html?id=${
                         r.id
                     }" class="btn px-4 py-2 text-white rounded d-flex justify-content-center align-items-center text-center" 

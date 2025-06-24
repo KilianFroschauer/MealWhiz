@@ -61,6 +61,8 @@ packages/
 /tmp
 /out-tsc
 
+/scraper
+
 # Coverage directories
 /coverage
 /.nyc_output

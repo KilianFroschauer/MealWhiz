@@ -41,11 +41,10 @@ namespace RecipesDynamic {
         <div class="col-md-6 col-lg-6 col-xl-4">
           <a href="recipe-view.html?id=${recipe.id}" class="text-decoration-none">
             <div class="rounded position-relative food-item card-has-skeleton">
-              <div class="food-img position-relative">
-                <img src="${imageUrl}" class="img-fluid w-100 rounded-top recipe-img-loading" alt="${recipe.name
+              <div class="food-img position-relative">                <img src="${imageUrl}" class="img-fluid w-100 rounded-top recipe-img-loading" alt="${recipe.name
             }" loading="lazy" 
                      onload="this.parentElement.querySelector('.skeleton-img-overlay')?.classList.add('d-none'); this.classList.remove('recipe-img-loading'); this.closest('.card-has-skeleton')?.classList.remove('card-has-skeleton');"
-                     onerror="this.onerror=null; this.src='../assets/img/Food_Example_01-unsplash.jpg'; this.parentElement.querySelector('.skeleton-img-overlay')?.classList.add('d-none'); this.classList.remove('recipe-img-loading'); this.closest('.card-has-skeleton')?.classList.remove('card-has-skeleton');"> {/* Fallback image and skeleton removal on error */}
+                     onerror="this.onerror=null; this.src='../assets/img/ingredients-unsplash.jpg'; this.parentElement.querySelector('.skeleton-img-overlay')?.classList.add('d-none'); this.classList.remove('recipe-img-loading'); this.closest('.card-has-skeleton')?.classList.remove('card-has-skeleton');"> {/* Fallback image and skeleton removal on error */}
                 <div class="skeleton-img-overlay skeleton-img position-absolute top-0 start-0 w-100 h-100"></div>
               </div>
               <div class="p-4 border border-secondary border-top-0 rounded-bottom">
@@ -440,10 +439,9 @@ namespace RecipesDynamic {
             .map(
                 (r) => `
             <a href="recipe-view.html?id=${r.id}" class="text-decoration-none text-dark">
-                <div class="d-flex align-items-center justify-content-start mb-3 featured-recipe-card" style="cursor:pointer;">
-                    <div class="rounded me-3" style="width: 80px; height: 80px; overflow: hidden;">
+                <div class="d-flex align-items-center justify-content-start mb-3 featured-recipe-card" style="cursor:pointer;">                    <div class="rounded me-3" style="width: 80px; height: 80px; overflow: hidden;">
                         <img src="${getRecipeImage(r.id)}" class="img-fluid rounded h-100 w-100" alt="${r.name
-                    }" style="object-fit: cover;" onerror="this.onerror=null; this.src='../assets/img/Food_Example_02-unsplash.jpg';">
+                    }" style="object-fit: cover;" onerror="this.onerror=null; this.src='../assets/img/ingredients-unsplash.jpg';">
                     </div>
                     <div>
                         <h6 class="mb-1 fw-semibold" style="font-size: 0.9rem;">${r.name}</h6>
