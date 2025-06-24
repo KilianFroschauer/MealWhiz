@@ -15,6 +15,7 @@ const BASE_RECIPE_SELECT_QUERY = `
     r.total_time,
     r.rating,
     r.description,
+    r.servings,
     d.difficulty,
     dp.diary_pref,
     c.cuisine,

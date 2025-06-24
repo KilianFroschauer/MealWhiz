@@ -72,19 +72,30 @@ export async function calculateRecipeNutrition(recipeId: number): Promise<Nutrit
         SUM(ri.quantity * fp.energy_kcal_100g / 100) AS total_calories,
         SUM(ri.quantity * fp.proteins_100g / 100) AS total_proteins,
         SUM(ri.quantity * fp.carbohydrates_100g / 100) AS total_carbs,
-        SUM(ri.quantity * fp.fat_100g / 100) AS total_fat
+        SUM(ri.quantity * fp.fat_100g / 100) AS total_fat,
+        r.servings
       FROM recipe_ingredient ri
       JOIN food_products fp ON ri.ingredient_code = fp.code
+      JOIN recipe r ON ri.recipe_id = r.recipe_id
       WHERE ri.recipe_id = $1
+      GROUP BY r.servings
     `;
     const result = await client.query(nutritionQuery, [recipeId]);
     client.release();
+    
+    if (result.rows.length === 0) {
+      // No ingredients found for this recipe
+      return { calories: 0, proteins: 0, carbs: 0, fat: 0 };
+    }
+    
     const nutrition = result.rows[0];
+    const servings = nutrition.servings || 4; // Default to 4 servings if not specified
+    
     return {
-      calories: Math.round(nutrition.total_calories || 0),
-      proteins: Math.round(nutrition.total_proteins || 0),
-      carbs: Math.round(nutrition.total_carbs || 0),
-      fat: Math.round(nutrition.total_fat || 0)
+      calories: Math.round((nutrition.total_calories || 0) / servings),
+      proteins: Math.round((nutrition.total_proteins || 0) / servings),
+      carbs: Math.round((nutrition.total_carbs || 0) / servings),
+      fat: Math.round((nutrition.total_fat || 0) / servings)
     };
   } catch (error) {
     console.error(`Error calculating nutrition for recipe ${recipeId}:`, error);
